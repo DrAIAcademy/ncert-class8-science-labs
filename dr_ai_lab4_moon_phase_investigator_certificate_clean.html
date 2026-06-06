@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Lab 4: Moon Phase Investigator | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#050b18;--bg2:#0a1b35;--panel:rgba(9,22,43,.9);--line:rgba(119,208,255,.22);
+  --cyan:#70e8ff;--gold:#ffd56b;--green:#86ffb0;--red:#ff7c7c;--violet:#b99cff;
+  --text:#eef8ff;--muted:#a9c3da;--shadow:0 18px 50px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%,rgba(112,232,255,.12),transparent 28%),
+    radial-gradient(circle at 80% 20%,rgba(185,156,255,.15),transparent 30%),
+    radial-gradient(circle at 48% 92%,rgba(255,213,107,.08),transparent 30%),
+    linear-gradient(135deg,var(--bg),var(--bg2));
+  color:var(--text);min-height:100%;overflow-x:hidden;user-select:none
+}
+body:before{content:"";position:fixed;inset:0;background-image:radial-gradient(rgba(255,255,255,.55) 1px,transparent 1px);background-size:38px 38px;opacity:.18;pointer-events:none}
+.wm-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.04);font-size:42px;font-weight:900;letter-spacing:2px;white-space:nowrap;transform:rotate(-26deg)}
+.wrap{max-width:1450px;margin:auto;padding:16px;position:relative;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.hero{padding:22px;position:relative;overflow:hidden}
+.logo{position:absolute;right:18px;top:18px;padding:10px 14px;border-radius:14px;background:rgba(5,16,30,.76);border:1px solid rgba(112,232,255,.24);text-align:right}
+.logo b{display:block;color:#fff}.logo span{font-size:.78rem;color:var(--cyan);font-weight:800}
+.badge{display:inline-block;padding:9px 14px;border-radius:999px;background:rgba(112,232,255,.10);border:1px solid rgba(112,232,255,.22);color:var(--cyan);font-weight:900;font-size:.8rem;letter-spacing:.5px}
+h1{font-size:clamp(2rem,4.2vw,4.4rem);line-height:1.02;margin:14px 0 10px;max-width:1000px}
+.sub{max-width:1000px;color:var(--muted);line-height:1.6}
+button,select,input{font:inherit}
+.btn{border:0;border-radius:14px;padding:11px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;box-shadow:0 10px 22px rgba(112,232,255,.14)}
+.btn.secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.12);box-shadow:none}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.topGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.box{padding:18px}
+.rules,.levels{display:grid;gap:10px}
+.rule,.level{
+  display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px
+}
+.rule .n,.level .n{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(112,232,255,.12);color:var(--cyan);font-weight:1000}
+.level.active{border-color:rgba(255,213,107,.44);background:rgba(255,213,107,.08)}
+.level.done{border-color:rgba(134,255,176,.44);background:rgba(134,255,176,.09)}
+.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.07);font-size:.78rem;font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.stat{padding:12px;text-align:center;border-radius:15px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.stat b{display:block;font-size:1.32rem;color:var(--cyan)} .stat span{font-size:.8rem;color:var(--muted)}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.nav button.active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.section{display:none}
+.section.active{display:block}
+.theoryGrid{display:grid;grid-template-columns:.9fr 1.1fr;gap:16px}
+.storyPanel,.bridgePanel,.skyPanel,.quizPanel,.certPanel{padding:18px}
+.storyBox,.briefBox{min-height:300px;padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(112,232,255,.09),rgba(255,255,255,.035));border:1px solid rgba(112,232,255,.16);line-height:1.7}
+.storyBox h2{margin:0 0 8px}
+.storyBox ul{margin:8px 0 0 20px;padding:0}
+.storyBox li{margin:7px 0;color:#d8edff}
+.storyBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-top:12px}
+.bridgeRows{display:grid;gap:10px}
+.bridgeRow{display:grid;grid-template-columns:145px 1fr;gap:10px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.bridgeRow b{color:var(--gold)}
+.skyGrid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+.spaceScene{position:relative;min-height:420px;border-radius:24px;overflow:hidden;background:
+radial-gradient(circle at 16% 22%,rgba(255,213,107,.18),transparent 10%),
+radial-gradient(circle at 70% 35%,rgba(112,232,255,.12),transparent 28%),
+linear-gradient(180deg,#061326,#020712);border:1px solid rgba(255,255,255,.08)}
+.sun{position:absolute;left:8%;top:32%;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,#fff7b8,#ffbd36 70%,#f97316);box-shadow:0 0 60px rgba(255,189,54,.55)}
+.earth{position:absolute;left:52%;top:45%;width:86px;height:86px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8df3ff,#2563eb 60%,#073766);box-shadow:0 0 30px rgba(112,232,255,.28)}
+.orbit{position:absolute;left:50%;top:43%;width:250px;height:250px;border:1px dashed rgba(255,255,255,.2);border-radius:50%;transform:translate(-50%,-50%)}
+.moon{position:absolute;width:54px;height:54px;border-radius:50%;background:#dbeafe;box-shadow:0 0 24px rgba(219,234,254,.3);transition:.35s}
+.moon:after{content:"";position:absolute;inset:0;border-radius:50%;background:rgba(2,8,23,.78);transform:translateX(var(--shadowX,0));opacity:var(--shadowOpacity,.55)}
+.skyLabel{position:absolute;left:14px;top:14px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);font-weight:900}
+.panelScreen{position:absolute;right:14px;top:14px;width:245px;padding:13px;border-radius:16px;background:rgba(5,14,25,.78);border:1px solid rgba(112,232,255,.14)}
+.phaseName{font-size:1.3rem;color:var(--gold);font-weight:1000}
+.controlBox{padding:16px}
+.dayControl{display:grid;grid-template-columns:1fr 86px;gap:10px;align-items:center;margin:12px 0;padding:10px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+input[type=range]{width:100%}
+output{padding:7px 8px;border-radius:999px;background:rgba(112,232,255,.10);border:1px solid rgba(112,232,255,.18);color:var(--cyan);text-align:center;font-weight:800}
+.logGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.logCard{padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.logCard b{color:var(--gold)}
+.explainBox{margin-top:12px;border-radius:18px;padding:16px;background:linear-gradient(180deg,rgba(112,232,255,.10),rgba(255,255,255,.035));border:1px solid rgba(112,232,255,.18);line-height:1.65}
+.explainGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.explainItem{background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:11px}
+.explainItem b{color:var(--gold)}
+.tableWrap{margin-top:14px;overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.08)}
+table{width:100%;border-collapse:collapse;background:rgba(7,14,24,.72)}
+th,td{padding:10px;font-size:.9rem;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
+th{background:rgba(112,232,255,.08);color:var(--cyan);position:sticky;top:0}
+.quizGrid{display:grid;gap:14px}
+.q{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);border-radius:16px;padding:14px}
+.opt{padding:11px 13px;margin-top:8px;border-radius:13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);cursor:pointer}
+.opt.correct{border-color:rgba(134,255,176,.6);background:rgba(134,255,176,.12)}
+.opt.wrong{border-color:rgba(255,124,124,.6);background:rgba(255,124,124,.1)}
+.certCard{background:linear-gradient(135deg,rgba(112,232,255,.15),rgba(255,213,107,.12));border:2px solid rgba(255,213,107,.45);border-radius:22px;padding:24px;text-align:center}
+.certCard h2{font-size:2rem;margin:8px 0}
+.certCard .seal{font-size:56px}
+.certCard input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:#fff;text-align:center;margin:10px 0}
+footer{margin:20px 0 6px;border:1px solid var(--line);border-radius:20px;padding:16px 20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}
+footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:1100px){.topGrid,.theoryGrid,.skyGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 12px auto}}
+@media(max-width:760px){
+  .wrap{padding:10px}.hero{padding:16px}.rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2/3;width:max-content}.stats{grid-template-columns:1fr 1fr}
+  .bridgeRow{grid-template-columns:1fr}.explainGrid,.logGrid{grid-template-columns:1fr}.spaceScene{min-height:500px}.panelScreen{position:relative;right:auto;top:auto;width:auto;margin:14px}.sun{width:80px;height:80px}.earth{left:48%;top:58%}.orbit{left:48%;top:55%;width:210px;height:210px}
+}
+@media(max-width:480px){h1{font-size:1.8rem}.badge{font-size:11px}.btn{font-size:.9rem;padding:10px 12px}.wm{font-size:32px}}
+@media print{
+  body{background:white;color:#111}.hero,.nav,.section:not(#certificate),footer,.wm-layer{display:none!important}
+  #certificate{display:block!important}.certCard{color:#111;background:white;border:4px solid #111}.certCard input{border:0;color:#111}.noPrint,.certActions,.shareNote{display:none!important}
+}
+
+.certActions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  margin-top:16px;
+}
+.noPrint{display:block}
+.shareNote{
+  margin-top:10px;
+  color:#fff7dc;
+  font-size:.92rem;
+  line-height:1.5;
+}
+
+</style>
+</head>
+<body>
+<div class="wm-layer">
+  <div class="wm" style="top:6%;left:-4%">Dr AI Academy</div>
+  <div class="wm" style="top:21%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:39%;left:61%">Dr AI Academy</div>
+  <div class="wm" style="top:55%;left:8%">Dr AI Academy</div>
+  <div class="wm" style="top:72%;left:38%">Dr AI Academy</div>
+  <div class="wm" style="top:86%;left:66%">Dr AI Academy</div>
+</div>
+
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Science GameLab</span></div>
+  <div class="badge">LAB 4 • CLASS 8 NCERT SCIENCE CHAPTER 1 • LONG-TERM OBSERVATION</div>
+  <h1>MOON PHASE INVESTIGATOR:<br>THE SKY PATTERN MISSION</h1>
+  <p class="sub">A simple English astronomy investigation game for Indian students. Students observe the Moon over many days, record phase changes, find patterns, and learn how careful observation connects science, calendars, and Olympiad-style reasoning.</p>
+  <div class="actions">
+    <button class="btn gold" id="startBtn">🎮 Start Lab 4</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select>
+  </div>
+
+  <div class="topGrid">
+    <div class="panel box">
+      <h3>Game Rules</h3>
+      <div class="rules">
+        <div class="rule"><div class="n">1</div><div><b>Learn Moon Observation Theory</b><br>Understand phase, orbit, illumination, and pattern.</div><div class="tag">Level 1</div></div>
+        <div class="rule"><div class="n">2</div><div><b>Observe 6 Moon Days</b><br>Move the day slider and record Moon phases.</div><div class="tag">Level 2</div></div>
+        <div class="rule"><div class="n">3</div><div><b>Solve Pattern Quiz</b><br>Answer astronomy reasoning questions.</div><div class="tag">Level 3</div></div>
+        <div class="rule"><div class="n">4</div><div><b>Unlock Certificate</b><br>Complete theory, observations, and quiz.</div><div class="tag">Final</div></div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Level Transition Map</h3>
+      <div class="levels">
+        <div class="level active" id="lvl1"><div class="n">1</div><div><b>Theory Briefing</b><br><small>Complete 4 theory cards.</small></div><div class="tag" id="tag1">Active</div></div>
+        <div class="level" id="lvl2"><div class="n">2</div><div><b>Moon Observation</b><br><small>Record 6 observations.</small></div><div class="tag" id="tag2">Locked</div></div>
+        <div class="level" id="lvl3"><div class="n">3</div><div><b>Pattern Quiz</b><br><small>Answer 3 reasoning questions.</small></div><div class="tag" id="tag3">Locked</div></div>
+        <div class="level" id="lvl4"><div class="n">4</div><div><b>Certificate</b><br><small>Unlock after full mission.</small></div><div class="tag" id="tag4">Locked</div></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="theoryCount">0/4</b><span>Theory</span></div>
+        <div class="stat"><b id="obsCount">0/6</b><span>Observations</span></div>
+        <div class="stat"><b id="quizCount">0/3</b><span>Quiz</span></div>
+        <div class="stat"><b id="score">0</b><span>Score</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="btn gold active" data-go="theory">Level 1: Theory</button>
+  <button class="btn secondary" data-go="sky" id="navSky" disabled>Level 2: Sky Lab</button>
+  <button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Level 3: Quiz</button>
+  <button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button>
+</div>
+
+<section class="section active" id="theory">
+  <div class="theoryGrid">
+    <div class="panel storyPanel">
+      <h3>Dr AI Theory Briefing</h3>
+      <div class="storyBox" id="storyBox"></div>
+      <div class="storyBtns">
+        <button class="btn secondary" id="prevStory">← Previous</button>
+        <button class="btn" id="nextStory">Next Theory →</button>
+        <button class="btn gold" id="markTheory">Mark Theory Complete</button>
+      </div>
+    </div>
+
+    <div class="panel bridgePanel">
+      <h3>What Student Learns + Exam Link</h3>
+      <div class="bridgeRows">
+        <div class="bridgeRow"><b>NCERT Skill</b><span>Long-term observation, pattern recognition, and explanation from evidence.</span></div>
+        <div class="bridgeRow"><b>Physics Link</b><span>Light, shadow, reflection, relative position, periodic motion.</span></div>
+        <div class="bridgeRow"><b>Astronomy Link</b><span>Moon phases, lunar cycle, Sun-Earth-Moon geometry, calendar thinking.</span></div>
+        <div class="bridgeRow"><b>Olympiad Link</b><span>Sequence reasoning, cycle prediction, model-based explanation.</span></div>
+        <div class="bridgeRow"><b>JEE / NEET Seed</b><span>Periodic motion, angular thinking, light reflection, scientific modelling.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="sky">
+  <div class="skyGrid">
+    <div class="panel skyPanel">
+      <h3>Level 2: Sky Observation Lab</h3>
+      <p style="color:var(--muted);line-height:1.55">Move the day slider and observe the Moon. Record 6 observations to unlock the pattern quiz.</p>
+      <div class="spaceScene">
+        <div class="skyLabel">Sun-Earth-Moon Model</div>
+        <div class="sun"></div>
+        <div class="orbit"></div>
+        <div class="earth"></div>
+        <div class="moon" id="moon"></div>
+        <div class="panelScreen">
+          <div>Current Phase</div>
+          <div class="phaseName" id="phaseName">New Moon</div>
+          <div style="margin-top:8px;color:var(--muted)" id="phaseExplain">The Moon is between Earth and Sun, so the bright side is mostly away from us.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel skyPanel">
+      <h3>Mission Controls</h3>
+      <div class="dayControl">
+        <input type="range" id="daySlider" min="0" max="29" value="0">
+        <output id="dayOut">Day 0</output>
+      </div>
+      <button class="btn" id="recordObs">🔭 Record Observation</button>
+      <button class="btn secondary" id="explainBtn">🗣 Explain Phase</button>
+
+      <div class="explainBox" id="phaseDetails">
+        <h4>Result Explanation</h4>
+        <div>Move the day slider and record the Moon phase to see detailed explanation.</div>
+      </div>
+
+      <div class="logGrid">
+        <div class="logCard"><b>Observation Goal</b><br>Record 6 different days.</div>
+        <div class="logCard"><b>Science Skill</b><br>Find a repeating pattern over time.</div>
+      </div>
+
+      <div class="tableWrap">
+        <table>
+          <thead><tr><th>#</th><th>Day</th><th>Phase</th><th>Observation</th></tr></thead>
+          <tbody id="obsRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel quizPanel">
+    <h3>Level 3: Moon Pattern Quiz</h3>
+    <p style="color:var(--muted);line-height:1.55">Use the model and your observation table to answer these questions.</p>
+    <div class="quizGrid">
+      <div class="q">
+        <b>Q1. Why do Moon phases change?</b>
+        <div class="opt" data-q="q1" data-correct="1">Because the relative positions of Sun, Earth, and Moon change, so we see different parts of the lit half.</div>
+        <div class="opt" data-q="q1">Because the Moon produces its own light.</div>
+        <div class="opt" data-q="q1">Because clouds permanently cover the Moon.</div>
+      </div>
+      <div class="q">
+        <b>Q2. What skill does this lab build?</b>
+        <div class="opt" data-q="q2" data-correct="1">Long-term observation and pattern recognition.</div>
+        <div class="opt" data-q="q2">Only memorising names of phases.</div>
+        <div class="opt" data-q="q2">Guessing without evidence.</div>
+      </div>
+      <div class="q">
+        <b>Q3. How is this linked to Olympiad reasoning?</b>
+        <div class="opt" data-q="q3" data-correct="1">It uses cyclic patterns, prediction, model-based explanation, and evidence.</div>
+        <div class="opt" data-q="q3">It avoids data and observation.</div>
+        <div class="opt" data-q="q3">It is only about drawing a circle.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="certificate">
+  <div class="panel certPanel">
+    <div class="certCard">
+      <div class="seal">🌙🏅</div>
+      <h2>Certificate of Sky Investigation</h2>
+      <p>This certifies that</p>
+      <input id="studentName" placeholder="Enter Student Name" />
+      <p>has completed <b>Lab 4: Moon Phase Investigator</b></p>
+      <p>Skills: Long-Term Observation • Pattern Recognition • Moon Phases • Model-Based Reasoning</p>
+      <p><b>Developed by Dr AI Academy</b></p>
+      
+    </div>
+      <div class="noPrint" style="margin-top:16px;text-align:center">
+        <h3 style="margin:0 0 10px">Certificate Actions</h3>
+      </div>
+<div class="certActions noPrint">
+        <button class="btn gold" id="downloadPdfBtn">📄 Download PDF Certificate</button>
+        <button class="btn" id="shareNativeBtn">📤 Share</button>
+        <button class="btn secondary" id="shareWhatsAppBtn">WhatsApp</button>
+        <button class="btn secondary" id="shareFacebookBtn">Facebook</button>
+        <button class="btn secondary" id="shareGmailBtn">Gmail</button>
+      </div>
+      <div class="shareNote noPrint">
+        Tip: Use <b>Download PDF Certificate</b> to save the certificate as PDF.<br>
+        On most browsers, this opens the print window where you can choose <b>Save as PDF</b>.
+      </div>
+  </div>
+</section>
+
+<footer>
+  <div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div>
+  <div><a href="https://courses.draiacademy.com" target="_blank" rel="noopener">AI Courses @ Dr AI Academy</a></div>
+</footer>
+</div>
+
+<script>
+(()=>{
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{if((e.ctrlKey&&["u","s","c","x"].includes(e.key.toLowerCase()))||e.key==="F12")e.preventDefault()});
+const $=id=>document.getElementById(id);
+const state={voice:true,style:"standard",storyIndex:0,theoryDone:0,observations:{},quizCorrect:{},score:0,unlocked:{theory:true,sky:false,quiz:false,certificate:false}};
+
+const stories=[
+ {title:"Theory 1: Science Also Needs Long-Term Observation",body:"Some science questions cannot be answered in one minute. We need to observe for many days. Moon phases are a perfect example of long-term observation.",points:["Observe the same object repeatedly.","Record date or day number.","Look for a pattern."]},
+ {title:"Theory 2: The Moon Does Not Make Its Own Light",body:"The Moon shines because it reflects sunlight. Half of the Moon is always lit by the Sun, but from Earth we see different parts of that lit half.",points:["Sunlight falls on the Moon.","Moon reflects light.","Visible shape depends on position."]},
+ {title:"Theory 3: Phases Are a Repeating Pattern",body:"As the Moon moves around Earth, the visible bright part changes. The sequence repeats roughly every month.",points:["New Moon to Full Moon: bright part increases.","Full Moon to New Moon: bright part decreases.","This is a cyclic pattern."]},
+ {title:"Theory 4: Calendars Came from Careful Sky Observation",body:"Humans used Moon phases and Sun movement to make calendars. This shows how observation, measurement, and pattern recognition became useful science.",points:["Observation leads to prediction.","Prediction helps calendars.","This links everyday life with astronomy."]}
+];
+
+function speak(txt){
+ if(!state.voice||!("speechSynthesis"in window))return;
+ speechSynthesis.cancel();
+ let u=new SpeechSynthesisUtterance(txt);
+ u.lang="en-IN"; u.rate=state.style==="indian"?.88:.98; u.pitch=state.style==="indian"?1.05:1;
+ let voices=speechSynthesis.getVoices();
+ let v=state.style==="indian"?voices.find(x=>/india|en-IN/i.test((x.lang||"")+" "+x.name)):voices.find(x=>/en-US|en-GB|english|google|zira|samantha/i.test((x.lang||"")+" "+x.name));
+ if(v)u.voice=v; speechSynthesis.speak(u);
+}
+function stop(){if("speechSynthesis"in window)speechSynthesis.cancel()}
+function showSection(id){
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active")); $(id).classList.add("active");
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+ $(id).scrollIntoView({behavior:"smooth",block:"start"});
+}
+function updateStatus(){
+ $("theoryCount").textContent=Math.min(state.theoryDone,4)+"/4";
+ $("obsCount").textContent=Object.keys(state.observations).length+"/6";
+ $("quizCount").textContent=Object.keys(state.quizCorrect).length+"/3";
+ $("score").textContent=state.score;
+ const map=[["lvl1","tag1",state.theoryDone>=4,state.unlocked.theory],["lvl2","tag2",Object.keys(state.observations).length>=6,state.unlocked.sky],["lvl3","tag3",Object.keys(state.quizCorrect).length>=3,state.unlocked.quiz],["lvl4","tag4",state.unlocked.certificate,state.unlocked.certificate]];
+ map.forEach(([id,tag,done,active])=>{ $(id).classList.toggle("done",done); $(id).classList.toggle("active",active&&!done); $(tag).textContent=done?"Done":active?"Active":"Locked"; });
+ $("navSky").disabled=!state.unlocked.sky; $("navQuiz").disabled=!state.unlocked.quiz; $("navCert").disabled=!state.unlocked.certificate;
+}
+function checkUnlocks(){
+ if(state.theoryDone>=4&&!state.unlocked.sky){state.unlocked.sky=true;speak("Level one complete. Sky Observation Lab is now unlocked.");showSection("sky")}
+ if(Object.keys(state.observations).length>=6&&!state.unlocked.quiz){state.unlocked.quiz=true;speak("Six observations recorded. Pattern Quiz is now unlocked.");showSection("quiz")}
+ if(Object.keys(state.quizCorrect).length>=3&&!state.unlocked.certificate){state.unlocked.certificate=true;speak("Mission complete. Certificate unlocked.");showSection("certificate")}
+ updateStatus();
+}
+function renderStory(){
+ let s=stories[state.storyIndex];
+ $("storyBox").innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(p=>`<li>${p}</li>`).join("")}</ul>`;
+ speak(s.title+". "+s.body);
+}
+function markTheory(){
+ if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1;state.score+=15}
+ if(state.storyIndex<stories.length-1){state.storyIndex++;renderStory()}else{speak("All theory cards are complete. Now open the sky lab.")}
+ checkUnlocks();
+}
+function phaseFromDay(day){
+ const d=((day%30)+30)%30;
+ if(d<=1||d>=29)return {name:"New Moon",shadowX:"0px",op:.92,ex:"The Moon is almost between Earth and Sun. The bright half is mostly away from us, so it looks dark."};
+ if(d<=6)return {name:"Waxing Crescent",shadowX:"-18px",op:.72,ex:"A small bright part is visible and increasing. This is called waxing crescent."};
+ if(d<=9)return {name:"First Quarter",shadowX:"-27px",op:.55,ex:"About half of the Moon looks bright. The bright part is increasing."};
+ if(d<=13)return {name:"Waxing Gibbous",shadowX:"-44px",op:.32,ex:"More than half is bright and it is moving toward Full Moon."};
+ if(d<=16)return {name:"Full Moon",shadowX:"-90px",op:.02,ex:"The Moon is opposite the Sun from Earth, so the full bright side faces us."};
+ if(d<=21)return {name:"Waning Gibbous",shadowX:"42px",op:.32,ex:"The bright part is now decreasing after Full Moon."};
+ if(d<=24)return {name:"Last Quarter",shadowX:"27px",op:.55,ex:"About half is bright again, but now the bright part is decreasing."};
+ return {name:"Waning Crescent",shadowX:"18px",op:.72,ex:"Only a small bright part remains before New Moon."};
+}
+function updateMoon(){
+ const day=+$("daySlider").value,p=phaseFromDay(day);
+ $("dayOut").textContent="Day "+day;
+ $("phaseName").textContent=p.name;
+ $("phaseExplain").textContent=p.ex;
+ const angle=(day/30)*Math.PI*2;
+ const cx=window.innerWidth<760?48:50, cy=window.innerWidth<760?55:43, rad=window.innerWidth<760?105:125;
+ const x=`calc(${cx}% + ${Math.cos(angle)*rad}px)`;
+ const y=`calc(${cy}% + ${Math.sin(angle)*rad}px)`;
+ $("moon").style.left=x; $("moon").style.top=y;
+ $("moon").style.setProperty("--shadowX",p.shadowX);
+ $("moon").style.setProperty("--shadowOpacity",p.op);
+ $("phaseDetails").innerHTML=`<h4>Result Explanation</h4>
+ <div><b>Day ${day}: ${p.name}</b></div>
+ <div style="margin-top:8px">${p.ex}</div>
+ <div class="explainGrid">
+  <div class="explainItem"><b>Observation</b><br>Visible bright part changes with Moon's position.</div>
+  <div class="explainItem"><b>Concept</b><br>Moon reflects sunlight; it does not make its own light.</div>
+  <div class="explainItem"><b>Pattern Skill</b><br>Record days and compare phases to find a repeating cycle.</div>
+  <div class="explainItem"><b>Exam Link</b><br>Olympiad: cyclic patterns. JEE/NEET seed: relative motion and light reflection.</div>
+ </div>`;
+}
+function recordObs(){
+ if(!state.unlocked.sky){speak("Complete theory first.");return}
+ const day=+$("daySlider").value,p=phaseFromDay(day);
+ if(state.observations[day]){speak("This day is already recorded. Move the slider to another day.");return}
+ state.observations[day]=true;state.score+=18;
+ $("obsRows").innerHTML+=`<tr><td>${Object.keys(state.observations).length}</td><td>${day}</td><td>${p.name}</td><td>${p.ex}</td></tr>`;
+ speak("Observation recorded. "+p.name+". "+p.ex);
+ checkUnlocks();
+}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{if(!b.disabled)showSection(b.dataset.go)});
+$("startBtn").onclick=()=>{showSection("theory");speak("Welcome to Lab 4, Moon Phase Investigator. First complete the theory briefing.")};
+$("voiceBtn").onclick=()=>{state.voice=!state.voice;$("voiceBtn").textContent=state.voice?"🔊 Voice ON":"🔇 Voice OFF";if(state.voice)speak("Voice is on.")};
+$("stopVoiceBtn").onclick=stop;$("voiceStyle").onchange=e=>{state.style=e.target.value;speak(state.style==="indian"?"Indian English voice selected. Let us begin.":"Standard English voice selected. Let us begin.")};
+$("nextStory").onclick=()=>{state.storyIndex=Math.min(stories.length-1,state.storyIndex+1);renderStory()};
+$("prevStory").onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1);renderStory()};
+$("markTheory").onclick=markTheory;
+$("daySlider").oninput=updateMoon;$("recordObs").onclick=recordObs;$("explainBtn").onclick=()=>{let p=phaseFromDay(+$("daySlider").value);speak(p.name+". "+p.ex)};
+$("downloadPdfBtn").onclick=downloadCertificatePDF;
+$("shareNativeBtn").onclick=shareNative;
+$("shareWhatsAppBtn").onclick=shareWhatsApp;
+$("shareFacebookBtn").onclick=shareFacebook;
+$("shareGmailBtn").onclick=shareGmail;
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{
+ if(!state.unlocked.quiz){speak("Record six Moon observations first.");return}
+ let q=o.dataset.q;if(state.quizCorrect[q])return;
+ let group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)];group.forEach(x=>x.classList.remove("correct","wrong"));
+ if(o.dataset.correct){o.classList.add("correct");state.quizCorrect[q]=true;state.score+=25;speak("Correct. Excellent pattern reasoning.")}
+ else{o.classList.add("wrong");group.forEach(x=>{if(x.dataset.correct)x.classList.add("correct")});speak("Not quite. Think about Sun, Earth, Moon positions and visible bright part.")}
+ checkUnlocks();
+});
+
+function getStudentName(){
+  return ($("studentName").value||"a student").trim();
+}
+function getShareUrl(){
+  const current=window.location.href||"";
+  if(current.startsWith("http")) return current;
+  return "https://courses.draiacademy.com";
+}
+function getShareText(){
+  return `I completed Lab 4: Moon Phase Investigator by Dr AI Academy. My name is ${getStudentName()}. Explore more at ${getShareUrl()}`;
+}
+function downloadCertificatePDF(){
+  showSection("certificate");
+  setTimeout(()=>window.print(),150);
+}
+function shareNative(){
+  const shareData={
+    title:"Lab 4 Certificate - Dr AI Academy",
+    text:getShareText(),
+    url:getShareUrl()
+  };
+  if(navigator.share){
+    navigator.share(shareData).catch(()=>{});
+  }else{
+    speak("Native sharing is not available on this device. Please use WhatsApp, Facebook, or Gmail buttons.");
+  }
+}
+function shareWhatsApp(){
+  const url=`https://wa.me/?text=${encodeURIComponent(getShareText())}`;
+  window.open(url,"_blank");
+}
+function shareFacebook(){
+  const shareUrl=getShareUrl();
+  const url=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(getShareText())}`;
+  window.open(url,"_blank");
+}
+function shareGmail(){
+  const subject=encodeURIComponent("I completed Lab 4: Moon Phase Investigator");
+  const body=encodeURIComponent(getShareText());
+  window.location.href=`mailto:?subject=${subject}&body=${body}`;
+}
+
+renderStory();updateMoon();updateStatus();
+})();
+</script>
+</body>
+</html>

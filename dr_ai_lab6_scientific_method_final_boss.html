@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Lab 6: Scientific Method Final Boss | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#050b18;--bg2:#0b1d36;--panel:rgba(9,22,43,.91);--line:rgba(119,208,255,.23);
+  --cyan:#70e8ff;--gold:#ffd56b;--green:#86ffb0;--red:#ff7c7c;--violet:#b99cff;
+  --text:#eef8ff;--muted:#a9c3da;--shadow:0 18px 50px rgba(0,0,0,.36)
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 12% 12%,rgba(112,232,255,.13),transparent 28%),
+    radial-gradient(circle at 86% 18%,rgba(185,156,255,.15),transparent 30%),
+    radial-gradient(circle at 50% 90%,rgba(255,213,107,.08),transparent 30%),
+    linear-gradient(135deg,var(--bg),var(--bg2));
+  color:var(--text);min-height:100%;overflow-x:hidden;user-select:none
+}
+body:before{
+  content:"";position:fixed;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:30px 30px;pointer-events:none
+}
+.wm-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.045);font-size:42px;font-weight:900;letter-spacing:2px;white-space:nowrap;transform:rotate(-26deg)}
+.wrap{max-width:1480px;margin:auto;padding:16px;position:relative;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.hero{padding:22px;position:relative;overflow:hidden}
+.logo{position:absolute;right:18px;top:18px;padding:10px 14px;border-radius:14px;background:rgba(5,16,30,.78);border:1px solid rgba(112,232,255,.24);text-align:right}
+.logo b{display:block;color:#fff}.logo span{font-size:.78rem;color:var(--cyan);font-weight:800}
+.badge{display:inline-block;padding:9px 14px;border-radius:999px;background:rgba(112,232,255,.10);border:1px solid rgba(112,232,255,.22);color:var(--cyan);font-weight:900;font-size:.8rem;letter-spacing:.5px}
+h1{font-size:clamp(2rem,4.2vw,4.3rem);line-height:1.03;margin:14px 0 10px;max-width:1080px}
+.sub{max-width:1050px;color:var(--muted);line-height:1.6}
+button,select,input,textarea{font:inherit}
+.btn{border:0;border-radius:14px;padding:11px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;box-shadow:0 10px 22px rgba(112,232,255,.14)}
+.btn.secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.12);box-shadow:none}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}
+.btn.red{background:linear-gradient(135deg,var(--red),#ffd2d2);color:#310808}
+.btn:disabled{opacity:.52;cursor:not-allowed}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.topGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.box{padding:18px}
+.rules,.levels{display:grid;gap:10px}
+.rule,.level{
+  display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px
+}
+.rule .n,.level .n{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(112,232,255,.12);color:var(--cyan);font-weight:1000}
+.level.active{border-color:rgba(255,213,107,.44);background:rgba(255,213,107,.08)}
+.level.done{border-color:rgba(134,255,176,.44);background:rgba(134,255,176,.09)}
+.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.07);font-size:.78rem;font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.stat{padding:12px;text-align:center;border-radius:15px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.stat b{display:block;font-size:1.32rem;color:var(--cyan)} .stat span{font-size:.8rem;color:var(--muted)}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.nav button.active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.section{display:none}
+.section.active{display:block}
+.theoryGrid{display:grid;grid-template-columns:.9fr 1.1fr;gap:16px}
+.storyPanel,.bridgePanel,.bossPanel,.quizPanel,.certPanel{padding:18px}
+.storyBox{min-height:310px;padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(112,232,255,.09),rgba(255,255,255,.035));border:1px solid rgba(112,232,255,.16);line-height:1.7}
+.storyBox h2{margin:0 0 8px}
+.storyBox ul{margin:8px 0 0 20px;padding:0}
+.storyBox li{margin:7px 0;color:#d8edff}
+.storyBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-top:12px}
+.bridgeRows{display:grid;gap:10px}
+.bridgeRow{display:grid;grid-template-columns:145px 1fr;gap:10px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.bridgeRow b{color:var(--gold)}
+.bossGrid{display:grid;grid-template-columns:1.02fr .98fr;gap:16px}
+.caseGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.caseCard{padding:15px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:.2s}
+.caseCard:hover{transform:translateY(-2px);border-color:rgba(112,232,255,.35)}
+.caseCard.active{border-color:rgba(255,213,107,.52);background:rgba(255,213,107,.09)}
+.caseCard b{display:block;margin-bottom:6px;color:#fff}
+.stepBox{margin-top:14px;padding:16px;border-radius:18px;background:linear-gradient(180deg,rgba(112,232,255,.08),rgba(255,255,255,.03));border:1px solid rgba(112,232,255,.16)}
+.stepTitle{font-size:1.05rem;font-weight:900;color:#fff;margin-bottom:8px}
+.choiceGroup{display:grid;gap:10px;margin-top:8px}
+.choice{padding:12px 13px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);cursor:pointer;line-height:1.48}
+.choice.selected{border-color:rgba(112,232,255,.55);background:rgba(112,232,255,.12)}
+.choice.correct{border-color:rgba(134,255,176,.62);background:rgba(134,255,176,.12)}
+.choice.wrong{border-color:rgba(255,124,124,.62);background:rgba(255,124,124,.12)}
+.consoleScene{position:relative;min-height:360px;border-radius:22px;overflow:hidden;background:
+radial-gradient(circle at 22% 20%,rgba(112,232,255,.12),transparent 28%),
+radial-gradient(circle at 82% 18%,rgba(255,213,107,.11),transparent 24%),
+linear-gradient(180deg,#0d213e,#0a1528 64%,#09101e);
+border:1px solid rgba(255,255,255,.08)}
+.aiChar{position:absolute;left:28px;bottom:44px;width:140px;height:215px}
+.head{position:absolute;left:32px;top:0;width:68px;height:68px;border-radius:50%;background:linear-gradient(#dff9ff,#70e8ff)}
+.face{position:absolute;left:43px;top:26px;color:#062033;font-weight:1000}
+.body{position:absolute;left:8px;top:70px;width:122px;height:130px;border-radius:24px;background:linear-gradient(#faffff,#ccecff)}
+.arm{position:absolute;top:112px;width:85px;height:15px;border-radius:15px;background:#b8f3ff}.arm.a{left:-6px;transform:rotate(20deg)}.arm.b{left:70px;transform:rotate(-23deg)}
+.board{position:absolute;right:18px;top:18px;width:58%;min-height:255px;border-radius:18px;background:rgba(3,12,24,.74);border:1px solid rgba(112,232,255,.18);padding:15px}
+.board h3{margin:0 0 8px}
+.boardLine{margin:8px 0;padding:9px;border-radius:12px;background:rgba(255,255,255,.05)}
+.progressBar{height:12px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:8px}
+.progressBar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));transition:.3s}
+.explainBox{margin-top:12px;border-radius:18px;padding:16px;background:linear-gradient(180deg,rgba(112,232,255,.10),rgba(255,255,255,.035));border:1px solid rgba(112,232,255,.18);line-height:1.65}
+.explainBox h4{margin:0 0 8px}
+.explainGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.explainItem{background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:11px}
+.explainItem b{color:var(--gold)}
+.reportCard{margin-top:14px;padding:16px;border-radius:18px;background:#f7f0d8;color:#132235;line-height:1.55}
+.reportCard h3{color:#132235;margin:0 0 8px}
+.reportLine{border-bottom:1px dashed rgba(0,0,0,.2);padding:8px 0}
+.quizGrid{display:grid;gap:14px}
+.q{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);border-radius:16px;padding:14px}
+.opt{padding:11px 13px;margin-top:8px;border-radius:13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);cursor:pointer}
+.opt.correct{border-color:rgba(134,255,176,.6);background:rgba(134,255,176,.12)}
+.opt.wrong{border-color:rgba(255,124,124,.6);background:rgba(255,124,124,.1)}
+.certCard{background:linear-gradient(135deg,rgba(112,232,255,.15),rgba(255,213,107,.12));border:2px solid rgba(255,213,107,.45);border-radius:22px;padding:24px;text-align:center}
+.certCard h2{font-size:2rem;margin:8px 0}
+.certCard .seal{font-size:56px}
+.certCard input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:#fff;text-align:center;margin:10px 0}
+footer{margin:20px 0 6px;border:1px solid var(--line);border-radius:20px;padding:16px 20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}
+footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:1100px){.topGrid,.theoryGrid,.bossGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 12px auto}}
+@media(max-width:760px){
+  .wrap{padding:10px}.hero{padding:16px}.rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2/3;width:max-content}.stats{grid-template-columns:1fr 1fr}
+  .bridgeRow{grid-template-columns:1fr}.caseGrid,.explainGrid{grid-template-columns:1fr}.board{position:relative;right:auto;top:auto;width:auto;margin:14px}.consoleScene{min-height:500px}.aiChar{left:50%;transform:translateX(-50%);bottom:26px}
+}
+@media(max-width:480px){h1{font-size:1.8rem}.badge{font-size:11px}.btn{font-size:.9rem;padding:10px 12px}.wm{font-size:32px}}
+@media print{
+  body{background:white;color:#111}.hero,.nav,.section:not(#certificate),footer,.wm-layer{display:none!important}
+  #certificate{display:block!important}.certCard{color:#111;background:white;border:4px solid #111}.certCard input{border:0;color:#111}
+}
+</style>
+</head>
+<body>
+<div class="wm-layer">
+  <div class="wm" style="top:6%;left:-4%">Dr AI Academy</div>
+  <div class="wm" style="top:21%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:39%;left:61%">Dr AI Academy</div>
+  <div class="wm" style="top:55%;left:8%">Dr AI Academy</div>
+  <div class="wm" style="top:72%;left:38%">Dr AI Academy</div>
+  <div class="wm" style="top:86%;left:66%">Dr AI Academy</div>
+</div>
+
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Science GameLab</span></div>
+  <div class="badge">LAB 6 • CLASS 8 NCERT SCIENCE CHAPTER 1 • SCIENTIFIC METHOD FINAL BOSS</div>
+  <h1>SCIENTIFIC METHOD FINAL BOSS:<br>THE GRAND INVESTIGATION ARENA</h1>
+  <p class="sub">A final boss game that combines all previous skills: observation, fair testing, evidence notebook, long-term pattern, hypothesis, variables, prediction, and conclusion. This lab trains students to think like scientists and builds strong JEE / NEET / Olympiad reasoning.</p>
+  <div class="actions">
+    <button class="btn gold" id="startBtn">🎮 Start Lab 6</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select>
+  </div>
+
+  <div class="topGrid">
+    <div class="panel box">
+      <h3>Game Rules</h3>
+      <div class="rules">
+        <div class="rule"><div class="n">1</div><div><b>Complete Theory</b><br>Revise the full scientific method in simple story form.</div><div class="tag">Level 1</div></div>
+        <div class="rule"><div class="n">2</div><div><b>Select Final Boss Case</b><br>Choose a complex science mystery to investigate.</div><div class="tag">Level 2</div></div>
+        <div class="rule"><div class="n">3</div><div><b>Build Full Investigation</b><br>Choose question, hypothesis, variable, control, observation, data, conclusion.</div><div class="tag">Level 3</div></div>
+        <div class="rule"><div class="n">4</div><div><b>Boss Quiz + Certificate</b><br>Answer reasoning questions and unlock certificate.</div><div class="tag">Final</div></div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Level Transition Map</h3>
+      <div class="levels">
+        <div class="level active" id="lvl1"><div class="n">1</div><div><b>Theory Briefing</b><br><small>Complete 5 theory cards.</small></div><div class="tag" id="tag1">Active</div></div>
+        <div class="level" id="lvl2"><div class="n">2</div><div><b>Final Boss Case</b><br><small>Select one grand investigation.</small></div><div class="tag" id="tag2">Locked</div></div>
+        <div class="level" id="lvl3"><div class="n">3</div><div><b>Investigation Report</b><br><small>Build one complete correct report.</small></div><div class="tag" id="tag3">Locked</div></div>
+        <div class="level" id="lvl4"><div class="n">4</div><div><b>Boss Quiz</b><br><small>Answer 4 reasoning questions.</small></div><div class="tag" id="tag4">Locked</div></div>
+        <div class="level" id="lvl5"><div class="n">5</div><div><b>Certificate</b><br><small>Unlock after full mission.</small></div><div class="tag" id="tag5">Locked</div></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="theoryCount">0/5</b><span>Theory</span></div>
+        <div class="stat"><b id="reportCount">0/1</b><span>Report</span></div>
+        <div class="stat"><b id="quizCount">0/4</b><span>Quiz</span></div>
+        <div class="stat"><b id="score">0</b><span>Score</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="btn gold active" data-go="theory">Level 1: Theory</button>
+  <button class="btn secondary" data-go="boss" id="navBoss" disabled>Level 2-3: Boss Arena</button>
+  <button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Level 4: Quiz</button>
+  <button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button>
+</div>
+
+<section class="section active" id="theory">
+  <div class="theoryGrid">
+    <div class="panel storyPanel">
+      <h3>Dr AI Final Theory Briefing</h3>
+      <div class="storyBox" id="storyBox"></div>
+      <div class="storyBtns">
+        <button class="btn secondary" id="prevStory">← Previous</button>
+        <button class="btn" id="nextStory">Next Theory →</button>
+        <button class="btn gold" id="markTheory">Mark Theory Complete</button>
+      </div>
+    </div>
+
+    <div class="panel bridgePanel">
+      <h3>What Student Learns + Exam Link</h3>
+      <div class="bridgeRows">
+        <div class="bridgeRow"><b>NCERT Skill</b><span>Complete scientific method: observe, question, hypothesize, test, record, conclude.</span></div>
+        <div class="bridgeRow"><b>Physics Link</b><span>Heat, pressure, light, motion, electricity, and force experiments need this method.</span></div>
+        <div class="bridgeRow"><b>Chemistry Link</b><span>Reaction conditions, evaporation, rusting, spoilage, and solution testing need controlled experiments.</span></div>
+        <div class="bridgeRow"><b>Olympiad Link</b><span>Invalid conclusion detection, data interpretation, variables, controls, evidence reasoning.</span></div>
+        <div class="bridgeRow"><b>JEE / NEET Seed</b><span>Assertion-reason, experimental error, trend analysis, prediction and scientific modelling.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="boss">
+  <div class="bossGrid">
+    <div class="panel bossPanel">
+      <h3>Final Boss Arena</h3>
+      <p style="color:var(--muted);line-height:1.55">Choose one grand case. Then build the complete scientific investigation report.</p>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 1: Choose Final Boss Case</div>
+        <div class="caseGrid" id="caseGrid"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 2: Scientific Question</div>
+        <div class="choiceGroup" id="questionChoices"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 3: Hypothesis</div>
+        <div class="choiceGroup" id="hypothesisChoices"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 4: Independent Variable</div>
+        <div class="choiceGroup" id="variableChoices"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 5: Controlled Variables</div>
+        <div class="choiceGroup" id="controlChoices"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 6: Best Observation / Data</div>
+        <div class="choiceGroup" id="dataChoices"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 7: Evidence-Based Conclusion</div>
+        <div class="choiceGroup" id="conclusionChoices"></div>
+      </div>
+
+      <div class="storyBtns">
+        <button class="btn green" id="submitReport">✅ Submit Final Report</button>
+        <button class="btn secondary" id="resetReport">↺ Reset Report</button>
+      </div>
+
+      <div class="explainBox" id="feedbackBox">
+        <h4>Boss Feedback</h4>
+        <div>Select a final boss case and build the complete scientific report.</div>
+      </div>
+    </div>
+
+    <div class="panel bossPanel">
+      <h3>Dr AI Grand Investigation Console</h3>
+      <div class="consoleScene">
+        <div class="aiChar"><div class="head"></div><div class="face">AI</div><div class="body"></div><div class="arm a"></div><div class="arm b"></div></div>
+        <div class="board">
+          <h3>Report Scanner</h3>
+          <div class="boardLine">Selected Case: <b id="selectedCase">None</b></div>
+          <div class="boardLine">Current Step: <b id="currentStep">Choose a case</b></div>
+          <div class="boardLine">Boss Skill: <span id="bossSkill">Combine all science investigation skills.</span></div>
+          <div class="boardLine">Exam Bridge: <span id="examBridge">JEE / NEET / Olympiad scientific reasoning.</span></div>
+          <div class="progressBar"><span id="progressFill"></span></div>
+        </div>
+      </div>
+
+      <div class="explainBox">
+        <h4>Final Boss Rule</h4>
+        <div>
+          A complete investigation needs: <b>question → hypothesis → variable → control → data → conclusion</b>.  
+          If any one part is weak, the final conclusion becomes weak. This is the exact thinking used in Olympiad experiment questions.
+        </div>
+      </div>
+
+      <div class="reportCard" id="reportPreview">
+        <h3>Scientific Report Preview</h3>
+        <div class="reportLine"><b>Case:</b> Not selected</div>
+        <div class="reportLine"><b>Status:</b> Build your report step by step.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel quizPanel">
+    <h3>Level 4: Final Boss Reasoning Quiz</h3>
+    <p style="color:var(--muted);line-height:1.55">Answer all four questions to unlock the final certificate.</p>
+    <div class="quizGrid">
+      <div class="q">
+        <b>Q1. A strong conclusion must be based on:</b>
+        <div class="opt" data-q="q1" data-correct="1">Evidence from observation or experiment.</div>
+        <div class="opt" data-q="q1">A guess without data.</div>
+        <div class="opt" data-q="q1">Changing many variables together.</div>
+      </div>
+      <div class="q">
+        <b>Q2. Why is changing only one variable important?</b>
+        <div class="opt" data-q="q2" data-correct="1">It helps identify the real cause of the result.</div>
+        <div class="opt" data-q="q2">It makes the experiment confusing.</div>
+        <div class="opt" data-q="q2">It removes the need for observation.</div>
+      </div>
+      <div class="q">
+        <b>Q3. Which is a complete scientific method sequence?</b>
+        <div class="opt" data-q="q3" data-correct="1">Observe → Question → Hypothesis → Test → Record → Conclude.</div>
+        <div class="opt" data-q="q3">Guess → Ignore data → Conclude.</div>
+        <div class="opt" data-q="q3">Memorise → Skip experiment → Final answer.</div>
+      </div>
+      <div class="q">
+        <b>Q4. What is the Olympiad-level skill in this final lab?</b>
+        <div class="opt" data-q="q4" data-correct="1">Detecting valid experiments, interpreting data, and choosing evidence-based conclusions.</div>
+        <div class="opt" data-q="q4">Only reading the title.</div>
+        <div class="opt" data-q="q4">Avoiding reasoning and using random answers.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="certificate">
+  <div class="panel certPanel">
+    <div class="certCard">
+      <div class="seal">🔬🏆</div>
+      <h2>Certificate of Scientific Method Mastery</h2>
+      <p>This certifies that</p>
+      <input id="studentName" placeholder="Enter Student Name" />
+      <p>has completed <b>Lab 6: Scientific Method Final Boss</b></p>
+      <p>Skills: Observation • Hypothesis • Fair Test • Data • Pattern • Evidence-Based Conclusion</p>
+      <p><b>Developed by Dr AI Academy</b></p>
+      <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div>
+  <div><a href="https://courses.draiacademy.com" target="_blank" rel="noopener">AI Courses @ Dr AI Academy</a></div>
+</footer>
+</div>
+
+<script>
+(()=>{
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{if((e.ctrlKey&&["u","s","c","x"].includes(e.key.toLowerCase()))||e.key==="F12")e.preventDefault()});
+const $=id=>document.getElementById(id);
+
+const state={
+  voice:true,style:"standard",storyIndex:0,theoryDone:0,reportSolved:false,quizCorrect:{},
+  selectedCase:null,
+  answers:{question:null,hypothesis:null,variable:null,control:null,data:null,conclusion:null},
+  score:0,
+  unlocked:{theory:true,boss:false,quiz:false,certificate:false}
+};
+
+const stories=[
+ {title:"Theory 1: The Complete Scientific Method",body:"A complete science investigation follows a logical path: observe, ask a question, make a hypothesis, test it, record evidence, and write a conclusion.",points:["Observation starts the investigation.","Hypothesis gives a testable explanation.","Conclusion must come from evidence."]},
+ {title:"Theory 2: Fair Test is the Backbone",body:"A fair test changes only one variable at a time. If many variables change together, we cannot know the real cause.",points:["Independent variable: what changes.","Controlled variables: what stays same.","Dependent variable: what is measured."]},
+ {title:"Theory 3: Data is Stronger than Guessing",body:"Science becomes stronger when we record observations, numbers, time, temperature, and results in a table.",points:["Data helps find patterns.","Patterns support conclusions.","Evidence beats opinion."]},
+ {title:"Theory 4: Long-Term Observation Matters",body:"Some questions need repeated observation over time, like Moon phases, plant growth, drying time, food spoilage, and weather patterns.",points:["Observe repeatedly.","Record changes over time.","Use patterns to predict."]},
+ {title:"Theory 5: Competitive Exam Bridge",body:"JEE, NEET and Olympiad questions often test scientific reasoning: variables, controls, valid conclusions, assertion-reason, and experimental errors.",points:["Reason from data.","Find invalid conclusions.","Choose the best experiment design."]}
+];
+
+const cases=[
+ {
+  id:"plant",
+  title:"Plant Growth Crisis",
+  blurb:"Why did one plant grow faster than another?",
+  question:["Does amount of sunlight affect plant growth?","Why are plants green?","Which plant looks cute?"],
+  hypothesis:["If a plant receives more sunlight, then it may grow faster because photosynthesis gets more energy.","Plants grow because they like the window.","Water has no role in plant growth."],
+  variable:["Amount of sunlight","Colour of the pot","Name of the plant"],
+  control:["Keep plant type, soil amount, water amount, and pot size same.","Change plant type, soil and water together.","Do not keep any condition same."],
+  data:["Measure plant height every day for 7 days.","Only look at the plant once and guess.","Ask someone which plant is better."],
+  conclusion:["If data shows more sunlight gave more height with other conditions same, sunlight affected growth.","The tallest plant is magical.","Conclusion does not need data."],
+  correct:[0,0,0,0,0,0],
+  skill:"Photosynthesis, growth data, controlled variables, repeated measurement."
+ },
+ {
+  id:"rust",
+  title:"Rust Mystery",
+  blurb:"Why did one iron nail rust faster?",
+  question:["Does moisture affect rusting of iron?","Why is iron hard?","Which nail is expensive?"],
+  hypothesis:["If iron is exposed to water, then rusting may increase because moisture supports rust formation.","Rust happens because iron feels old.","Dry nails always rust faster."],
+  variable:["Moisture / water exposure","Nail brand only","Table colour"],
+  control:["Keep same type of nail, same time duration, and same air exposure.","Use different nails, different places, and different times.","Change every condition together."],
+  data:["Observe and record rust colour or rust amount each day.","Do not record anything.","Only smell the nail."],
+  conclusion:["If wet nail rusts more while other conditions are same, moisture increased rusting.","Rusting has no cause.","The conclusion can be written without observation."],
+  correct:[0,0,0,0,0,0],
+  skill:"Chemistry of rusting, moisture effect, controlled experiment, observation over time."
+ },
+ {
+  id:"shadow",
+  title:"Shadow Length Puzzle",
+  blurb:"Why does shadow length change during the day?",
+  question:["Does Sun position affect shadow length?","Why are shadows black?","Which shadow is beautiful?"],
+  hypothesis:["If the Sun is lower in the sky, then shadow becomes longer because light strikes at a smaller angle.","Shadow length changes because the ground is tired.","Shadow length never changes."],
+  variable:["Time of day / Sun position","Colour of shoes","Student name"],
+  control:["Use same object and same place, and measure shadow at different times.","Use different objects and different places each time.","Do not measure shadow length."],
+  data:["Measure shadow length at fixed times and record values.","Guess shadow length without measuring.","Draw random lines."],
+  conclusion:["If measured data shows shadow length changes with time, Sun position affects shadow length.","Shadow has no pattern.","Conclusion is based on drawing only."],
+  correct:[0,0,0,0,0,0],
+  skill:"Light, angle, measurement, pattern, periodic observation."
+ }
+];
+
+function speak(txt){
+ if(!state.voice||!("speechSynthesis" in window)) return;
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(txt);
+ u.lang="en-IN"; u.rate=state.style==="indian"?0.88:0.98; u.pitch=state.style==="indian"?1.05:1;
+ const voices=speechSynthesis.getVoices();
+ const v=state.style==="indian"
+  ? voices.find(x=>/india|en-IN/i.test((x.lang||"")+" "+x.name))
+  : voices.find(x=>/en-US|en-GB|english|google|zira|samantha/i.test((x.lang||"")+" "+x.name));
+ if(v)u.voice=v;
+ speechSynthesis.speak(u);
+}
+function stop(){if("speechSynthesis" in window)speechSynthesis.cancel();}
+function showSection(id){
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+ $(id).classList.add("active");
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+ $(id).scrollIntoView({behavior:"smooth",block:"start"});
+}
+function getCase(){return cases.find(c=>c.id===state.selectedCase);}
+function updateStatus(){
+ $("theoryCount").textContent=Math.min(state.theoryDone,5)+"/5";
+ $("reportCount").textContent=(state.reportSolved?1:0)+"/1";
+ $("quizCount").textContent=Object.keys(state.quizCorrect).length+"/4";
+ $("score").textContent=state.score;
+ const map=[
+  ["lvl1","tag1",state.theoryDone>=5,state.unlocked.theory],
+  ["lvl2","tag2",!!state.selectedCase,state.unlocked.boss],
+  ["lvl3","tag3",state.reportSolved,state.unlocked.boss],
+  ["lvl4","tag4",Object.keys(state.quizCorrect).length>=4,state.unlocked.quiz],
+  ["lvl5","tag5",state.unlocked.certificate,state.unlocked.certificate]
+ ];
+ map.forEach(([id,tag,done,active])=>{
+   $(id).classList.toggle("done",done);
+   $(id).classList.toggle("active",active&&!done);
+   $(tag).textContent=done?"Done":active?"Active":"Locked";
+ });
+ $("navBoss").disabled=!state.unlocked.boss;
+ $("navQuiz").disabled=!state.unlocked.quiz;
+ $("navCert").disabled=!state.unlocked.certificate;
+ updateProgress();
+}
+function updateProgress(){
+ const steps=[!!state.selectedCase,state.answers.question!==null,state.answers.hypothesis!==null,state.answers.variable!==null,state.answers.control!==null,state.answers.data!==null,state.answers.conclusion!==null];
+ const done=steps.filter(Boolean).length;
+ $("progressFill").style.width=(done/7*100)+"%";
+ $("selectedCase").textContent=state.selectedCase?getCase().title:"None";
+ const labels=["Choose a case","Choose question","Choose hypothesis","Choose variable","Choose control","Choose data","Choose conclusion","Ready to submit"];
+ $("currentStep").textContent=labels[done];
+ if(state.selectedCase){
+   $("bossSkill").textContent=getCase().skill;
+   $("examBridge").textContent="Final integrated skill: variables, data, pattern, hypothesis and conclusion.";
+ }else{
+   $("bossSkill").textContent="Combine all science investigation skills.";
+   $("examBridge").textContent="JEE / NEET / Olympiad scientific reasoning.";
+ }
+ updateReportPreview();
+}
+function checkUnlocks(){
+ if(state.theoryDone>=5&&!state.unlocked.boss){
+   state.unlocked.boss=true;
+   speak("Theory complete. Final Boss Arena is now unlocked.");
+   showSection("boss");
+ }
+ if(state.reportSolved&&!state.unlocked.quiz){
+   state.unlocked.quiz=true;
+   speak("Final report solved. Boss quiz is now unlocked.");
+   showSection("quiz");
+ }
+ if(Object.keys(state.quizCorrect).length>=4&&!state.unlocked.certificate){
+   state.unlocked.certificate=true;
+   speak("Final mission complete. Certificate unlocked.");
+   showSection("certificate");
+ }
+ updateStatus();
+}
+function renderStory(){
+ const s=stories[state.storyIndex];
+ $("storyBox").innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+ speak(s.title+". "+s.body);
+}
+function markTheory(){
+ if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1;state.score+=12}
+ if(state.storyIndex<stories.length-1){state.storyIndex++;renderStory()}else{speak("All theory cards are complete. Enter the final boss arena.");}
+ checkUnlocks();
+}
+function renderCases(){
+ $("caseGrid").innerHTML=cases.map(c=>`
+  <div class="caseCard ${state.selectedCase===c.id?"active":""}" data-cid="${c.id}">
+    <b>${c.title}</b><div>${c.blurb}</div>
+  </div>
+ `).join("");
+ document.querySelectorAll(".caseCard").forEach(card=>{
+   card.onclick=()=>{
+     state.selectedCase=card.dataset.cid;
+     state.answers={question:null,hypothesis:null,variable:null,control:null,data:null,conclusion:null};
+     state.reportSolved=false;
+     renderCases();
+     renderReportChoices();
+     $("feedbackBox").innerHTML=`<h4>Boss Feedback</h4><div>Case selected: <b>${getCase().title}</b>. Now build the full scientific report.</div>`;
+     speak("Case selected. Now build the full scientific report.");
+     updateStatus();
+   };
+ });
+}
+function choiceBlock(containerId,key,arr){
+ const container=$(containerId);
+ if(!state.selectedCase){
+   container.innerHTML=`<div class="choice">Select a final boss case first.</div>`;
+   return;
+ }
+ container.innerHTML=arr.map((opt,idx)=>`
+   <div class="choice ${state.answers[key]===idx?"selected":""}" data-key="${key}" data-idx="${idx}">${opt}</div>
+ `).join("");
+ container.querySelectorAll(".choice").forEach(ch=>{
+   ch.onclick=()=>{
+     state.answers[key]=+ch.dataset.idx;
+     renderReportChoices();
+     updateStatus();
+   };
+ });
+}
+function renderReportChoices(){
+ if(!state.selectedCase){
+   ["questionChoices","hypothesisChoices","variableChoices","controlChoices","dataChoices","conclusionChoices"].forEach(id=>$(id).innerHTML=`<div class="choice">Select a final boss case first.</div>`);
+   updateProgress();
+   return;
+ }
+ const c=getCase();
+ choiceBlock("questionChoices","question",c.question);
+ choiceBlock("hypothesisChoices","hypothesis",c.hypothesis);
+ choiceBlock("variableChoices","variable",c.variable);
+ choiceBlock("controlChoices","control",c.control);
+ choiceBlock("dataChoices","data",c.data);
+ choiceBlock("conclusionChoices","conclusion",c.conclusion);
+ updateProgress();
+}
+function updateReportPreview(){
+ const c=getCase();
+ if(!c){
+   $("reportPreview").innerHTML=`<h3>Scientific Report Preview</h3><div class="reportLine"><b>Case:</b> Not selected</div><div class="reportLine"><b>Status:</b> Build your report step by step.</div>`;
+   return;
+ }
+ const get=(key)=>state.answers[key]!==null ? c[key][state.answers[key]] : "Not selected";
+ $("reportPreview").innerHTML=`
+   <h3>Scientific Report Preview</h3>
+   <div class="reportLine"><b>Case:</b> ${c.title}</div>
+   <div class="reportLine"><b>Question:</b> ${get("question")}</div>
+   <div class="reportLine"><b>Hypothesis:</b> ${get("hypothesis")}</div>
+   <div class="reportLine"><b>Variable:</b> ${get("variable")}</div>
+   <div class="reportLine"><b>Control:</b> ${get("control")}</div>
+   <div class="reportLine"><b>Data:</b> ${get("data")}</div>
+   <div class="reportLine"><b>Conclusion:</b> ${get("conclusion")}</div>
+ `;
+}
+function markChoice(containerId,key,correctIndex){
+ [...$(containerId).querySelectorAll(".choice")].forEach((op,idx)=>{
+   op.classList.remove("correct","wrong");
+   if(state.answers[key]===idx && idx!==correctIndex) op.classList.add("wrong");
+   if(idx===correctIndex) op.classList.add("correct");
+ });
+}
+function submitReport(){
+ if(!state.unlocked.boss){speak("Complete theory first.");showSection("theory");return;}
+ if(!state.selectedCase){$("feedbackBox").innerHTML=`<h4>Select a Case</h4><div>Please select one final boss case first.</div>`;speak("Select a case first.");return;}
+ const c=getCase(), keys=["question","hypothesis","variable","control","data","conclusion"];
+ if(!keys.every(k=>state.answers[k]!==null)){
+   $("feedbackBox").innerHTML=`<h4>Report Incomplete</h4><div>Please complete all report parts before submitting.</div>`;
+   speak("Report incomplete. Please complete all parts.");
+   return;
+ }
+ const containers={question:"questionChoices",hypothesis:"hypothesisChoices",variable:"variableChoices",control:"controlChoices",data:"dataChoices",conclusion:"conclusionChoices"};
+ keys.forEach((k,i)=>markChoice(containers[k],k,c.correct[i]));
+ const total=keys.filter((k,i)=>state.answers[k]===c.correct[i]).length;
+ if(total===6){
+   if(!state.reportSolved){state.reportSolved=true;state.score+=60}
+   $("feedbackBox").innerHTML=`
+    <h4>Final Boss Defeated!</h4>
+    <div>Your scientific report is complete and correct. You combined all skills from Lab 1 to Lab 5.</div>
+    <div class="explainGrid">
+      <div class="explainItem"><b>Observation Skill</b><br>You started from a real science problem.</div>
+      <div class="explainItem"><b>Hypothesis Skill</b><br>You selected a testable explanation.</div>
+      <div class="explainItem"><b>Fair Test Skill</b><br>You selected one variable and proper controls.</div>
+      <div class="explainItem"><b>Evidence Skill</b><br>You selected measurable data.</div>
+      <div class="explainItem"><b>Conclusion Skill</b><br>Your conclusion followed from evidence.</div>
+      <div class="explainItem"><b>Exam Link</b><br>This is Olympiad, JEE and NEET foundation reasoning.</div>
+    </div>
+   `;
+   speak("Final boss defeated. Your scientific report is complete and correct.");
+ }else{
+   $("feedbackBox").innerHTML=`
+    <h4>Boss Still Standing</h4>
+    <div>You got <b>${total} out of 6</b> report parts correct. Review the highlighted answers and try again.</div>
+    <div class="explainGrid">
+      <div class="explainItem"><b>Tip 1</b><br>Question must be testable.</div>
+      <div class="explainItem"><b>Tip 2</b><br>Hypothesis should explain cause and effect.</div>
+      <div class="explainItem"><b>Tip 3</b><br>Only one variable should change.</div>
+      <div class="explainItem"><b>Tip 4</b><br>Data must be measurable or observable.</div>
+      <div class="explainItem"><b>Tip 5</b><br>Conclusion must follow evidence.</div>
+      <div class="explainItem"><b>Tip 6</b><br>A strong report connects all parts logically.</div>
+    </div>
+   `;
+   speak("Good try. Review the highlighted answers and try again.");
+ }
+ checkUnlocks();
+}
+function resetReport(){
+ state.selectedCase=null;
+ state.answers={question:null,hypothesis:null,variable:null,control:null,data:null,conclusion:null};
+ state.reportSolved=false;
+ renderCases();
+ renderReportChoices();
+ $("feedbackBox").innerHTML=`<h4>Boss Feedback</h4><div>Report reset. Select a case and build again.</div>`;
+ speak("Report reset.");
+ updateStatus();
+}
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{if(!b.disabled)showSection(b.dataset.go);});
+$("startBtn").onclick=()=>{showSection("theory");speak("Welcome to Lab 6. This is the Scientific Method Final Boss. First complete the theory briefing.");};
+$("voiceBtn").onclick=()=>{state.voice=!state.voice;$("voiceBtn").textContent=state.voice?"🔊 Voice ON":"🔇 Voice OFF";if(state.voice)speak("Voice is on.");};
+$("stopVoiceBtn").onclick=stop;
+$("voiceStyle").onchange=e=>{state.style=e.target.value;speak(state.style==="indian"?"Indian English voice selected. Let us begin.":"Standard English voice selected. Let us begin.");};
+$("nextStory").onclick=()=>{state.storyIndex=Math.min(stories.length-1,state.storyIndex+1);renderStory();};
+$("prevStory").onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1);renderStory();};
+$("markTheory").onclick=markTheory;
+$("submitReport").onclick=submitReport;
+$("resetReport").onclick=resetReport;
+
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{
+ if(!state.unlocked.quiz){speak("Complete the final report first.");return;}
+ const q=o.dataset.q;if(state.quizCorrect[q])return;
+ const group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)];
+ group.forEach(x=>x.classList.remove("correct","wrong"));
+ if(o.dataset.correct){
+   o.classList.add("correct");
+   state.quizCorrect[q]=true;
+   state.score+=25;
+   speak("Correct. Excellent final boss reasoning.");
+ }else{
+   o.classList.add("wrong");
+   group.forEach(x=>{if(x.dataset.correct)x.classList.add("correct");});
+   speak("Not correct. Think about evidence, variables, and valid conclusions.");
+ }
+ checkUnlocks();
+});
+
+renderStory();
+renderCases();
+renderReportChoices();
+updateStatus();
+})();
+</script>
+</body>
+</html>

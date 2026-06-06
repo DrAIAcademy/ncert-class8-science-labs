@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Lab 5: Microbe Classification Arena | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#07122d;--bg2:#123b7a;--panel:rgba(12,30,62,.92);--line:rgba(99,244,255,.25);
+  --cyan:#63f4ff;--gold:#ffe066;--green:#8cffc1;--red:#ff8aa0;--violet:#d3a5ff;
+  --text:#eef8ff;--muted:#b5cbe4;--shadow:0 18px 50px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%,rgba(99,244,255,.20),transparent 26%),
+    radial-gradient(circle at 88% 12%,rgba(255,224,102,.18),transparent 27%),
+    radial-gradient(circle at 50% 92%,rgba(211,165,255,.16),transparent 30%),
+    linear-gradient(135deg,var(--bg),var(--bg2) 55%,#0a2248);
+  color:var(--text);min-height:100%;overflow-x:hidden;-webkit-text-size-adjust:100%;
+}
+body:before{
+  content:"";position:fixed;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.52) 1.2px,transparent 1.2px),radial-gradient(rgba(99,244,255,.20) 2px,transparent 2px);
+  background-size:42px 42px,90px 90px;opacity:.25;pointer-events:none;
+}
+.wm-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.04);font-size:42px;font-weight:900;letter-spacing:2px;white-space:nowrap;transform:rotate(-26deg)}
+.wrap{max-width:1500px;margin:auto;padding:16px;position:relative;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+.hero{padding:22px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(23,63,125,.86),rgba(9,25,57,.88))}
+.hero:after{content:"🧩 🦠 🔍 🧠 ✨";position:absolute;right:22px;bottom:18px;font-size:34px;letter-spacing:10px;opacity:.30;pointer-events:none}
+.logo{position:absolute;right:18px;top:18px;padding:10px 14px;border-radius:18px;background:rgba(5,16,30,.76);border:1px solid rgba(99,244,255,.28);text-align:right}
+.logo b{display:block;color:#fff}.logo span{font-size:.78rem;color:var(--cyan);font-weight:800}
+.badge{display:inline-block;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,rgba(99,244,255,.16),rgba(255,224,102,.13));border:1px solid rgba(99,244,255,.24);color:var(--cyan);font-weight:900;font-size:.8rem;letter-spacing:.5px}
+h1{font-size:clamp(2rem,4.2vw,4.4rem);line-height:1.03;margin:14px 0 10px;max-width:1100px;text-shadow:0 4px 0 rgba(0,0,0,.18),0 0 26px rgba(99,244,255,.18)}
+.sub{max-width:1100px;color:var(--muted);line-height:1.6}
+button,select,input{font:inherit}
+.btn{border:0;border-radius:18px;padding:12px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;box-shadow:0 10px 22px rgba(99,244,255,.14);min-height:46px;touch-action:manipulation}
+.btn.secondary{background:rgba(255,255,255,.07);color:var(--text);border:1px solid rgba(255,255,255,.13);box-shadow:none}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.funRibbon{margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.funRibbon div{padding:10px;border-radius:16px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.09);text-align:center;font-weight:900}
+.topGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.box{padding:18px}
+.rules,.levels{display:grid;gap:10px}
+.rule,.level{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px}
+.rule .n,.level .n{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,rgba(99,244,255,.22),rgba(255,224,102,.16));color:var(--cyan);font-weight:1000}
+.level.active{border-color:rgba(255,224,102,.45);background:rgba(255,224,102,.09)}
+.level.done{border-color:rgba(140,255,193,.45);background:rgba(140,255,193,.09)}
+.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:.78rem;font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.stat{padding:12px;text-align:center;border-radius:15px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}
+.stat b{display:block;font-size:1.32rem;color:var(--cyan)} .stat span{font-size:.8rem;color:var(--muted)}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0;position:sticky;top:0;z-index:50;background:rgba(7,18,45,.92);backdrop-filter:blur(10px);padding:8px;border-radius:18px}
+.nav button.active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.section{display:none}
+.section.active{display:block}
+.theoryGrid,.cardGrid,.featureGrid,.sortGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.storyPanel,.bridgePanel,.simPanel,.quizPanel,.certPanel{padding:18px}
+.storyBox{min-height:320px;padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(99,244,255,.12),rgba(255,255,255,.045));border:1px solid rgba(99,244,255,.22);line-height:1.7}
+.storyBox h2{margin:0 0 8px}.storyBox h2:before{content:"🚀 "}
+.storyBox ul{margin:8px 0 0 20px;padding:0}
+.storyBox li{margin:7px 0;color:#d8edff}
+.storyBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-top:12px}
+.bridgeRows{display:grid;gap:10px}
+.bridgeRow{display:grid;grid-template-columns:145px 1fr;gap:10px;padding:12px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}
+.bridgeRow b{color:var(--gold)}.bridgeRow b:before{content:"⭐ "}
+.explainBox{margin-top:12px;border-radius:18px;padding:16px;background:linear-gradient(180deg,rgba(99,244,255,.12),rgba(255,255,255,.045));border:1px solid rgba(99,244,255,.22);line-height:1.65}
+.explainBox h4{margin:0 0 8px}.explainBox h4:before{content:"💡 "}
+.explainGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.explainItem{background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:11px}
+.explainItem b{color:var(--gold)}
+.microbeCardGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.microbeCard{padding:15px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);cursor:pointer;min-height:126px;touch-action:manipulation}
+.microbeCard.active{border-color:rgba(255,224,102,.55);background:rgba(255,224,102,.10)}
+.microbeCard.done{border-color:rgba(140,255,193,.55);background:rgba(140,255,193,.10)}
+.microbeCard .icon{font-size:2.2rem}.microbeCard b{display:block;color:var(--gold);margin:6px 0}
+.screenLine{margin:8px 0;padding:10px;border-radius:12px;background:rgba(255,255,255,.065)}
+.featureChoices,.sortChoices,.bucketGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.choice,.bucket{padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.065);color:#fff;cursor:pointer;text-align:left;line-height:1.45;min-height:52px;touch-action:manipulation}
+.choice.selected{border-color:rgba(255,224,102,.55);background:rgba(255,224,102,.11)}
+.choice.correct,.bucket.correct{border-color:rgba(140,255,193,.6);background:rgba(140,255,193,.12)}
+.choice.wrong,.bucket.wrong{border-color:rgba(255,138,160,.6);background:rgba(255,138,160,.12)}
+.bucket h3{margin:0 0 8px;color:var(--gold)}
+.bucketItems{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;min-height:34px}
+.badgeItem{padding:7px 10px;border-radius:999px;background:rgba(99,244,255,.12);border:1px solid rgba(99,244,255,.22);font-weight:900}
+.dataTable{overflow:auto;border-radius:18px;border:1px solid rgba(255,255,255,.09);margin-top:12px}
+table{width:100%;border-collapse:collapse;background:rgba(4,13,24,.55)}
+th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,.07);text-align:left;font-size:.92rem}
+th{color:var(--cyan);background:rgba(99,244,255,.08)}
+.quizGrid{display:grid;gap:14px}
+.q{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.055);border-radius:16px;padding:14px}
+.opt{padding:13px;margin-top:8px;border-radius:13px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.1);cursor:pointer;min-height:48px;touch-action:manipulation}
+.opt.correct{border-color:rgba(140,255,193,.6);background:rgba(140,255,193,.12)}
+.opt.wrong{border-color:rgba(255,138,160,.6);background:rgba(255,138,160,.12)}
+.certCard{background:radial-gradient(circle at 20% 20%,rgba(99,244,255,.22),transparent 30%),linear-gradient(135deg,rgba(99,244,255,.18),rgba(255,224,102,.16));border:2px solid rgba(255,224,102,.45);border-radius:22px;padding:24px;text-align:center}
+.certCard h2{font-size:2rem;margin:8px 0}
+.certCard .seal{font-size:56px}
+.certCard input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:#fff;text-align:center;margin:10px 0}
+.noPrint{display:block}
+footer{margin:20px 0 6px;border:1px solid var(--line);border-radius:20px;padding:16px 20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}
+footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:1100px){.topGrid,.theoryGrid,.cardGrid,.featureGrid,.sortGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 12px auto}}
+@media(max-width:760px){
+  .wrap{padding:8px}.hero{padding:14px}.hero:after{display:none}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.actions .btn,.actions select{width:100%}
+  .funRibbon{grid-template-columns:1fr 1fr}
+  .rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2/3;width:max-content}.stats{grid-template-columns:1fr 1fr}
+  .nav{display:grid;grid-template-columns:1fr 1fr;gap:8px}.nav button{width:100%;white-space:normal;padding:12px 8px;font-size:.9rem}
+  .bridgeRow,.explainGrid,.microbeCardGrid,.featureChoices,.sortChoices,.bucketGrid{grid-template-columns:1fr}
+}
+@media(max-width:430px){.nav,.actions{grid-template-columns:1fr}}
+@media print{
+  body{background:white;color:#111}
+  .hero,.nav,.section:not(#certificate),footer,.wm-layer,.noPrint{display:none!important}
+  #certificate{display:block!important}
+  .certCard{color:#111;background:white;border:4px solid #111}
+  .certCard input{border:0;color:#111}
+}
+</style>
+</head>
+<body>
+<div class="wm-layer">
+  <div class="wm" style="top:6%;left:-4%">Dr AI Academy</div>
+  <div class="wm" style="top:21%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:39%;left:61%">Dr AI Academy</div>
+  <div class="wm" style="top:55%;left:8%">Dr AI Academy</div>
+  <div class="wm" style="top:72%;left:38%">Dr AI Academy</div>
+  <div class="wm" style="top:86%;left:66%">Dr AI Academy</div>
+</div>
+
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Invisible World Lab Series</span></div>
+  <div class="badge">LAB 5 • CHAPTER 2 • ACTIVITY 2.6 • MICROBE CLASSIFICATION</div>
+  <h1>MICROBE CLASSIFICATION ARENA:<br>THE BIOLOGY CARD BATTLE</h1>
+  <p class="sub">A fun Class 8 classification game. Dr AI gives microbe cards with clues. Students identify features, sort microbes into correct groups, read data tables, and build strong NEET / Olympiad classification reasoning.</p>
+
+  <div class="actions">
+    <button class="btn gold" id="startBtn">🎮 Start Lab 5</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select>
+  </div>
+
+  <div class="funRibbon">
+    <div>🧩 Classification</div>
+    <div>🦠 Microbe Cards</div>
+    <div>🧠 HOTS Reasoning</div>
+    <div>🏅 Certificate Quest</div>
+  </div>
+
+  <div class="topGrid">
+    <div class="panel box">
+      <h3>Game Rules</h3>
+      <div class="rules">
+        <div class="rule"><div class="n">1</div><div><b>Learn classification story</b><br>Understand why scientists classify microbes.</div><div class="tag">Level 1</div></div>
+        <div class="rule"><div class="n">2</div><div><b>Read microbe cards</b><br>Unlock 6 cards and identify their clues.</div><div class="tag">Level 2</div></div>
+        <div class="rule"><div class="n">3</div><div><b>Feature detector</b><br>Match features like photosynthesis, movement and decomposition.</div><div class="tag">Level 3</div></div>
+        <div class="rule"><div class="n">4</div><div><b>Sort arena</b><br>Place microbes into the correct kingdom-style group buckets.</div><div class="tag">Level 4</div></div>
+        <div class="rule"><div class="n">5</div><div><b>Data quiz</b><br>Solve reasoning questions and unlock certificate.</div><div class="tag">Final</div></div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Level Transition Map</h3>
+      <div class="levels">
+        <div class="level active" id="lvl1"><div class="n">1</div><div><b>Story Briefing</b><br><small>Complete 4 story cards.</small></div><div class="tag" id="tag1">Active</div></div>
+        <div class="level" id="lvl2"><div class="n">2</div><div><b>Card Scanner</b><br><small>Scan all 6 microbe cards.</small></div><div class="tag" id="tag2">Locked</div></div>
+        <div class="level" id="lvl3"><div class="n">3</div><div><b>Feature Detector</b><br><small>Correctly identify 4 feature clues.</small></div><div class="tag" id="tag3">Locked</div></div>
+        <div class="level" id="lvl4"><div class="n">4</div><div><b>Sort Arena</b><br><small>Sort 4 groups correctly.</small></div><div class="tag" id="tag4">Locked</div></div>
+        <div class="level" id="lvl5"><div class="n">5</div><div><b>Quiz + Certificate</b><br><small>Answer all 3 quiz questions.</small></div><div class="tag" id="tag5">Locked</div></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="theoryCount">0/4</b><span>Story</span></div>
+        <div class="stat"><b id="simCount">0/3</b><span>Levels</span></div>
+        <div class="stat"><b id="quizCount">0/3</b><span>Quiz</span></div>
+        <div class="stat"><b id="score">0</b><span>Score</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="btn gold active" data-go="theory">Level 1: Story</button>
+  <button class="btn secondary" data-go="cards" id="navCards" disabled>Level 2: Cards</button>
+  <button class="btn secondary" data-go="features" id="navFeatures" disabled>Level 3: Features</button>
+  <button class="btn secondary" data-go="sort" id="navSort" disabled>Level 4: Sort</button>
+  <button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Level 5: Quiz</button>
+  <button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button>
+</div>
+
+<section class="section active" id="theory">
+  <div class="theoryGrid">
+    <div class="panel storyPanel">
+      <h3>Dr AI Story Briefing</h3>
+      <div class="storyBox" id="storyBox"></div>
+      <div class="storyBtns">
+        <button class="btn secondary" id="prevStory">← Previous</button>
+        <button class="btn" id="nextStory">Next Story →</button>
+        <button class="btn gold" id="markTheory">Mark Story Complete</button>
+      </div>
+    </div>
+    <div class="panel bridgePanel">
+      <h3>What Student Learns + Exam Link</h3>
+      <div class="bridgeRows">
+        <div class="bridgeRow"><b>NCERT Link</b><span>Students compare microorganisms based on features and organise them into groups.</span></div>
+        <div class="bridgeRow"><b>Core Concept</b><span>Classification means grouping organisms using common features.</span></div>
+        <div class="bridgeRow"><b>Biology Seed</b><span>Algae, protozoa, bacteria and fungi show different structures and roles.</span></div>
+        <div class="bridgeRow"><b>Olympiad Link</b><span>Feature-based classification, data table reasoning, elimination logic.</span></div>
+        <div class="bridgeRow"><b>NEET Foundation</b><span>Microbial diversity, unicellular/multicellular idea, ecology and taxonomy basics.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="cards">
+  <div class="cardGrid">
+    <div class="panel simPanel">
+      <h3>Level 2: Microbe Card Scanner</h3>
+      <p style="color:var(--muted);line-height:1.55">Tap each microbe card. Read its features and unlock all 6 cards.</p>
+      <div class="microbeCardGrid" id="microbeCardGrid"></div>
+    </div>
+    <div class="panel simPanel">
+      <h3>Dr AI Card Report</h3>
+      <div class="screenLine">Cards Scanned: <b id="cardCount">0 / 6</b></div>
+      <div class="screenLine">Selected Card: <b id="selectedCard">None</b></div>
+      <div class="explainBox" id="cardExplain">
+        <h4>Card Feedback</h4>
+        <div>Tap any card to learn its features. Scientists classify organisms by comparing such features.</div>
+      </div>
+      <div class="dataTable">
+        <table>
+          <thead><tr><th>Microbe</th><th>Key Feature</th><th>Likely Group</th></tr></thead>
+          <tbody id="cardRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="featureGrid">
+    <div class="panel simPanel">
+      <h3>Level 3: Feature Detector</h3>
+      <p style="color:var(--muted);line-height:1.55">Select the feature shown by Dr AI, then choose the microbe group that best matches it.</p>
+      <div class="screenLine">Feature Clue: <b id="featureClue">Green and photosynthetic</b></div>
+      <div class="featureChoices" id="featureChoices"></div>
+      <div class="storyBtns">
+        <button class="btn secondary" id="nextFeature">Next Feature →</button>
+      </div>
+    </div>
+    <div class="panel simPanel">
+      <h3>Feature Feedback</h3>
+      <div class="screenLine">Correct Features: <b id="featureCount">0 / 4</b></div>
+      <div class="explainBox" id="featureExplain">
+        <h4>Detector Feedback</h4>
+        <div>Choose the best microbe group for the feature clue.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="sort">
+  <div class="sortGrid">
+    <div class="panel simPanel">
+      <h3>Level 4: Sort Arena</h3>
+      <p style="color:var(--muted);line-height:1.55">Select a microbe group, then place it into the correct bucket. Complete all four groups.</p>
+      <div class="sortChoices">
+        <button class="choice" data-group="Algae"><b>🟢 Algae</b><br>Green, photosynthetic, often aquatic</button>
+        <button class="choice" data-group="Protozoa"><b>🧿 Protozoa</b><br>Animal-like, often moving</button>
+        <button class="choice" data-group="Bacteria"><b>🦠 Bacteria</b><br>Tiny single-celled organisms</button>
+        <button class="choice" data-group="Fungi"><b>🍄 Fungi</b><br>Mould-like decomposers</button>
+      </div>
+      <div class="bucketGrid">
+        <button class="bucket" data-bucket="Photo"><h3>Photosynthesis Bucket</h3><div class="bucketItems" id="bPhoto"></div></button>
+        <button class="bucket" data-bucket="Move"><h3>Movement Bucket</h3><div class="bucketItems" id="bMove"></div></button>
+        <button class="bucket" data-bucket="Tiny"><h3>Tiny Single Cell Bucket</h3><div class="bucketItems" id="bTiny"></div></button>
+        <button class="bucket" data-bucket="Decomp"><h3>Decomposer Bucket</h3><div class="bucketItems" id="bDecomp"></div></button>
+      </div>
+    </div>
+    <div class="panel simPanel">
+      <h3>Sort Feedback</h3>
+      <div class="screenLine">Selected Group: <b id="selectedGroup">None</b></div>
+      <div class="screenLine">Sorted Groups: <b id="sortCount">0 / 4</b></div>
+      <div class="explainBox" id="sortExplain">
+        <h4>Arena Feedback</h4>
+        <div>Select a group and choose the correct bucket using its main feature.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel quizPanel">
+    <h3>Level 5: Classification Boss Quiz</h3>
+    <p style="color:var(--muted);line-height:1.55">Answer all three questions to unlock the certificate.</p>
+    <div class="quizGrid">
+      <div class="q">
+        <b>Q1. What is classification?</b>
+        <div class="opt" data-q="q1" data-correct="1">Grouping organisms based on common features.</div>
+        <div class="opt" data-q="q1">Randomly naming organisms without features.</div>
+        <div class="opt" data-q="q1">Ignoring observation and guessing.</div>
+      </div>
+      <div class="q">
+        <b>Q2. Which clue best supports algae classification?</b>
+        <div class="opt" data-q="q2" data-correct="1">Green colour and photosynthesis.</div>
+        <div class="opt" data-q="q2">Only movement like animals.</div>
+        <div class="opt" data-q="q2">Mould-like decomposer body.</div>
+      </div>
+      <div class="q">
+        <b>Q3. Why is feature-based classification important for Olympiad reasoning?</b>
+        <div class="opt" data-q="q3" data-correct="1">It helps identify groups from data and visible clues.</div>
+        <div class="opt" data-q="q3">It removes the need to observe.</div>
+        <div class="opt" data-q="q3">It makes all organisms exactly same.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="certificate">
+  <div class="panel certPanel">
+    <div class="certCard">
+      <div class="seal">🧩🦠🏅</div>
+      <h2>Certificate of Microbe Classification</h2>
+      <p>This certifies that</p>
+      <input id="studentName" placeholder="Enter Student Name" />
+      <p>has successfully completed <b>Lab 5: Microbe Classification Arena</b></p>
+      <p>Skills: Classification • Feature Detection • Microbe Groups • Data Reasoning • Olympiad Biology Thinking</p>
+      <p><b>Developed by Dr AI Academy</b></p>
+      <div class="noPrint" style="margin-top:14px">
+        <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div>
+  <div><a href="https://courses.draiacademy.com" target="_blank" rel="noopener">AI Courses @ Dr AI Academy</a></div>
+</footer>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const state={
+ voice:true,style:"standard",storyIndex:0,theoryDone:0,score:0,
+ scanned:{},featureIndex:0,featuresDone:{},selectedGroup:null,sorted:{},quizCorrect:{},
+ unlocked:{cards:false,features:false,sort:false,quiz:false,certificate:false}
+};
+const stories=[
+ {title:"Story 1: Why Scientists Classify",body:"The invisible world has many different types of microbes. To understand them, scientists group them using common features. This grouping is called classification.",points:["Classification reduces confusion.","Features help us compare organisms.","Groups make study easier."]},
+ {title:"Story 2: Features are Clues",body:"A green microbe may be photosynthetic. A moving animal-like microbe may be protozoa. A tiny single-celled form may be bacteria. A mould-like decomposer may be fungus.",points:["Colour can be a clue.","Movement can be a clue.","Role in nature can be a clue."]},
+ {title:"Story 3: Data Table Thinking",body:"Scientists often use tables to compare organisms. A table can show habitat, shape, food-making ability, movement and role in the ecosystem.",points:["Tables organise evidence.","Patterns become easier to see.","Olympiad questions often use data tables."]},
+ {title:"Story 4: Classification is NEET Foundation",body:"Higher biology uses classification to study diversity of life. This simple microbe classification is the first step towards taxonomy, microbiology and ecology.",points:["Taxonomy begins with grouping.","Microbiology studies tiny organisms.","Ecology studies their roles in nature."]}
+];
+const cards=[
+ {id:"spiro",icon:"🟢",name:"Spirogyra-like Alga",feature:"Green thread-like body; photosynthetic",group:"Algae",ex:"Algae are often green and can make food by photosynthesis."},
+ {id:"amoeba",icon:"🧿",name:"Amoeba-like Protozoan",feature:"Animal-like; changes shape and moves",group:"Protozoa",ex:"Protozoa are animal-like microbes; many move in water."},
+ {id:"bacillus",icon:"🦠",name:"Rod-shaped Bacterium",feature:"Very tiny single-celled organism",group:"Bacteria",ex:"Bacteria are extremely small single-celled organisms."},
+ {id:"mould",icon:"🍄",name:"Bread Mould-like Fungus",feature:"Thread-like decomposer; grows on dead matter",group:"Fungi",ex:"Fungi often act as decomposers."},
+ {id:"diatom",icon:"🔆",name:"Diatom-like Microalga",feature:"Microscopic aquatic photosynthetic form",group:"Algae",ex:"Many microalgae live in water and perform photosynthesis."},
+ {id:"paramecium",icon:"🌀",name:"Paramecium-like Protozoan",feature:"Moves with tiny hair-like structures",group:"Protozoa",ex:"Paramecium-like organisms move actively in water."}
+];
+const featureSet=[
+ {clue:"Green and photosynthetic",answer:"Algae",ex:"Photosynthesis is a key clue for algae."},
+ {clue:"Animal-like and moving in water",answer:"Protozoa",ex:"Movement and animal-like behaviour point towards protozoa."},
+ {clue:"Very tiny single-celled organism",answer:"Bacteria",ex:"Bacteria are among the tiniest single-celled life forms."},
+ {clue:"Mould-like decomposer",answer:"Fungi",ex:"Fungi often decompose dead organic matter."}
+];
+function speak(txt){
+ if(!state.voice||!("speechSynthesis"in window))return;
+ speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang="en-IN";u.rate=state.style==="indian"?0.88:0.98;u.pitch=state.style==="indian"?1.05:1;
+ const voices=speechSynthesis.getVoices();const v=state.style==="indian"?voices.find(x=>/india|en-IN/i.test((x.lang||"")+" "+x.name)):voices.find(x=>/en-US|en-GB|english|google|zira|samantha/i.test((x.lang||"")+" "+x.name));if(v)u.voice=v;speechSynthesis.speak(u);
+}
+function stopVoice(){if("speechSynthesis"in window)speechSynthesis.cancel();}
+function showSection(id){document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));$(id).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));$(id).scrollIntoView({behavior:"smooth",block:"start"});}
+function updateStatus(){
+ $("theoryCount").textContent=Math.min(state.theoryDone,4)+"/4";
+ const sim=(Object.keys(state.scanned).length>=6?1:0)+(Object.keys(state.featuresDone).length>=4?1:0)+(Object.keys(state.sorted).length>=4?1:0);
+ $("simCount").textContent=sim+"/3";$("quizCount").textContent=Object.keys(state.quizCorrect).length+"/3";$("score").textContent=state.score;
+ const map=[["lvl1","tag1",state.theoryDone>=4,true],["lvl2","tag2",sim>=1,state.unlocked.cards],["lvl3","tag3",sim>=2,state.unlocked.features],["lvl4","tag4",sim>=3,state.unlocked.sort],["lvl5","tag5",state.unlocked.certificate,state.unlocked.quiz||state.unlocked.certificate]];
+ map.forEach(([id,tag,done,active])=>{$(id).classList.toggle("done",done);$(id).classList.toggle("active",active&&!done);$(tag).textContent=done?"Done":active?"Active":"Locked";});
+ $("navCards").disabled=!state.unlocked.cards;$("navFeatures").disabled=!state.unlocked.features;$("navSort").disabled=!state.unlocked.sort;$("navQuiz").disabled=!state.unlocked.quiz;$("navCert").disabled=!state.unlocked.certificate;
+}
+function checkUnlocks(){
+ if(state.theoryDone>=4&&!state.unlocked.cards){state.unlocked.cards=true;speak("Story complete. Microbe cards are now unlocked.");showSection("cards")}
+ if(Object.keys(state.scanned).length>=6&&!state.unlocked.features){state.unlocked.features=true;speak("All cards scanned. Feature Detector is now unlocked.");showSection("features")}
+ if(Object.keys(state.featuresDone).length>=4&&!state.unlocked.sort){state.unlocked.sort=true;speak("Feature detector complete. Sort Arena is now unlocked.");showSection("sort")}
+ if(Object.keys(state.sorted).length>=4&&!state.unlocked.quiz){state.unlocked.quiz=true;speak("Sorting complete. Quiz is now unlocked.");showSection("quiz")}
+ if(Object.keys(state.quizCorrect).length>=3&&!state.unlocked.certificate){state.unlocked.certificate=true;speak("Mission complete. Certificate unlocked.");showSection("certificate")}
+ updateStatus();
+}
+function renderStory(){const s=stories[state.storyIndex];$("storyBox").innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(x=>`<li>${x}</li>`).join("")}</ul>`;speak(s.title+". "+s.body);}
+function markTheory(){if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1;state.score+=15}if(state.storyIndex<stories.length-1){state.storyIndex++;renderStory()}else{speak("All story cards complete. Start scanning microbe cards.")}checkUnlocks();}
+function renderCards(){
+ $("microbeCardGrid").innerHTML=cards.map(c=>`<div class="microbeCard ${state.scanned[c.id]?"done":""}" data-id="${c.id}"><div class="icon">${c.icon}</div><b>${c.name}</b><div>${c.feature}</div></div>`).join("");
+ document.querySelectorAll(".microbeCard").forEach(el=>el.onclick=()=>scanCard(el.dataset.id,el));
+}
+function scanCard(id,el){
+ if(!state.unlocked.cards){speak("Complete story first.");return}
+ const c=cards.find(x=>x.id===id);if(!state.scanned[id]){state.scanned[id]=true;state.score+=8;$("cardRows").innerHTML+=`<tr><td>${c.name}</td><td>${c.feature}</td><td>${c.group}</td></tr>`}
+ document.querySelectorAll(".microbeCard").forEach(x=>x.classList.remove("active"));el.classList.add("active","done");$("cardCount").textContent=Object.keys(state.scanned).length+" / 6";$("selectedCard").textContent=c.name;
+ $("cardExplain").innerHTML=`<h4>${c.name}</h4><div>${c.ex}</div><div class="explainGrid"><div class="explainItem"><b>Feature</b><br>${c.feature}</div><div class="explainItem"><b>Group</b><br>${c.group}</div></div>`;
+ speak(c.name+". "+c.ex);checkUnlocks();
+}
+function renderFeature(){
+ const f=featureSet[state.featureIndex];$("featureClue").textContent=f.clue;
+ $("featureChoices").innerHTML=["Algae","Protozoa","Bacteria","Fungi"].map(g=>`<button class="choice" data-answer="${g}">${g}</button>`).join("");
+ document.querySelectorAll("#featureChoices .choice").forEach(b=>b.onclick=()=>answerFeature(b.dataset.answer,b));
+}
+function answerFeature(ans,btn){
+ if(!state.unlocked.features){speak("Scan all cards first.");return}
+ const f=featureSet[state.featureIndex];document.querySelectorAll("#featureChoices .choice").forEach(x=>x.classList.remove("correct","wrong"));
+ if(ans===f.answer){btn.classList.add("correct");if(!state.featuresDone[state.featureIndex]){state.featuresDone[state.featureIndex]=true;state.score+=12}$("featureExplain").innerHTML=`<h4>Correct Feature Match</h4><div>${f.ex}</div>`;speak("Correct. "+f.ex)}
+ else{btn.classList.add("wrong");$("featureExplain").innerHTML=`<h4>Try Again</h4><div>Read the clue carefully and match it with the strongest feature.</div>`;speak("Try again.");}
+ $("featureCount").textContent=Object.keys(state.featuresDone).length+" / 4";checkUnlocks();
+}
+function nextFeature(){state.featureIndex=(state.featureIndex+1)%featureSet.length;renderFeature();}
+function selectSortGroup(g,btn){state.selectedGroup=g;$("selectedGroup").textContent=g;document.querySelectorAll(".sortChoices .choice").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");}
+function sortBucket(bucket,btn){
+ if(!state.unlocked.sort){speak("Complete feature detector first.");return}
+ if(!state.selectedGroup){$("sortExplain").innerHTML="<h4>Select a group first</h4><div>Choose one microbe group before selecting a bucket.</div>";return}
+ const correct={Algae:"Photo",Protozoa:"Move",Bacteria:"Tiny",Fungi:"Decomp"}[state.selectedGroup];
+ document.querySelectorAll(".bucket").forEach(x=>x.classList.remove("correct","wrong"));
+ if(bucket===correct){
+  btn.classList.add("correct");
+  if(!state.sorted[state.selectedGroup]){state.sorted[state.selectedGroup]=true;state.score+=15;const span=document.createElement("span");span.className="badgeItem";span.textContent=state.selectedGroup;$("b"+bucket).appendChild(span)}
+  $("sortExplain").innerHTML=`<h4>Correct Sorting</h4><div>${state.selectedGroup} is placed in the correct bucket.</div>`;speak("Correct sorting.");
+ }else{btn.classList.add("wrong");$("sortExplain").innerHTML=`<h4>Not Correct</h4><div>Think about the main feature of ${state.selectedGroup}.</div>`;speak("Not correct. Think about the main feature.");}
+ $("sortCount").textContent=Object.keys(state.sorted).length+" / 4";checkUnlocks();
+}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{if(!b.disabled)showSection(b.dataset.go)});
+$("startBtn").onclick=()=>{showSection("theory");speak("Welcome to Lab 5, Microbe Classification Arena. First complete the story briefing.")};
+$("voiceBtn").onclick=()=>{state.voice=!state.voice;$("voiceBtn").textContent=state.voice?"🔊 Voice ON":"🔇 Voice OFF";if(state.voice)speak("Voice is on.")};
+$("stopVoiceBtn").onclick=stopVoice;$("voiceStyle").onchange=e=>{state.style=e.target.value;speak(state.style==="indian"?"Indian English voice selected. Let us begin.":"Standard English voice selected. Let us begin.")};
+$("nextStory").onclick=()=>{state.storyIndex=Math.min(stories.length-1,state.storyIndex+1);renderStory()};$("prevStory").onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1);renderStory()};$("markTheory").onclick=markTheory;
+$("nextFeature").onclick=nextFeature;
+document.querySelectorAll(".sortChoices .choice").forEach(b=>b.onclick=()=>selectSortGroup(b.dataset.group,b));
+document.querySelectorAll(".bucket").forEach(b=>b.onclick=()=>sortBucket(b.dataset.bucket,b));
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{
+ if(!state.unlocked.quiz){speak("Complete sorting first.");return}
+ const q=o.dataset.q;if(state.quizCorrect[q])return;
+ const group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)];group.forEach(x=>x.classList.remove("correct","wrong"));
+ if(o.dataset.correct){o.classList.add("correct");state.quizCorrect[q]=true;state.score+=25;speak("Correct. Excellent classification reasoning.")}
+ else{o.classList.add("wrong");group.forEach(x=>{if(x.dataset.correct)x.classList.add("correct")});speak("Not correct. Think about features and classification.")}
+ checkUnlocks();
+});
+renderStory();renderCards();renderFeature();updateStatus();
+})();
+</script>
+</body>
+</html>

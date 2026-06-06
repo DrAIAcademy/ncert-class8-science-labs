@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Lab 3: Cheek Cell Investigator | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#06101d;--bg2:#0c2141;--panel:rgba(9,23,43,.92);--line:rgba(112,232,255,.22);
+  --cyan:#70e8ff;--gold:#ffd56b;--green:#86ffb0;--red:#ff7c7c;--violet:#b99cff;
+  --text:#eef8ff;--muted:#a8c3da;--shadow:0 18px 50px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%,rgba(112,232,255,.14),transparent 28%),
+    radial-gradient(circle at 82% 16%,rgba(185,156,255,.14),transparent 30%),
+    radial-gradient(circle at 40% 90%,rgba(255,213,107,.07),transparent 28%),
+    linear-gradient(135deg,var(--bg),var(--bg2));
+  color:var(--text);min-height:100%;overflow-x:hidden;user-select:none
+}
+body:before{
+  content:"";position:fixed;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.024) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.024) 1px,transparent 1px);
+  background-size:30px 30px;pointer-events:none
+}
+.wm-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.045);font-size:42px;font-weight:900;letter-spacing:2px;white-space:nowrap;transform:rotate(-26deg)}
+.wrap{max-width:1500px;margin:auto;padding:16px;position:relative;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.hero{padding:22px;position:relative;overflow:hidden}
+.logo{position:absolute;right:18px;top:18px;padding:10px 14px;border-radius:14px;background:rgba(5,16,30,.76);border:1px solid rgba(112,232,255,.24);text-align:right}
+.logo b{display:block;color:#fff}.logo span{font-size:.78rem;color:var(--cyan);font-weight:800}
+.badge{display:inline-block;padding:9px 14px;border-radius:999px;background:rgba(112,232,255,.10);border:1px solid rgba(112,232,255,.22);color:var(--cyan);font-weight:900;font-size:.8rem;letter-spacing:.5px}
+h1{font-size:clamp(2rem,4.2vw,4.4rem);line-height:1.03;margin:14px 0 10px;max-width:1050px}
+.sub{max-width:1080px;color:var(--muted);line-height:1.6}
+button,select,input{font:inherit}
+.btn{border:0;border-radius:14px;padding:11px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;box-shadow:0 10px 22px rgba(112,232,255,.14)}
+.btn.secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.12);box-shadow:none}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.topGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.box{padding:18px}
+.rules,.levels{display:grid;gap:10px}
+.rule,.level{
+  display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px
+}
+.rule .n,.level .n{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(112,232,255,.12);color:var(--cyan);font-weight:1000}
+.level.active{border-color:rgba(255,213,107,.44);background:rgba(255,213,107,.08)}
+.level.done{border-color:rgba(134,255,176,.44);background:rgba(134,255,176,.09)}
+.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.07);font-size:.78rem;font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.stat{padding:12px;text-align:center;border-radius:15px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.stat b{display:block;font-size:1.32rem;color:var(--cyan)} .stat span{font-size:.8rem;color:var(--muted)}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.nav button.active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.section{display:none}
+.section.active{display:block}
+.theoryGrid,.prepGrid,.observeGrid,.compareGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.storyPanel,.bridgePanel,.simPanel,.quizPanel,.certPanel{padding:18px}
+.storyBox{min-height:320px;padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(112,232,255,.09),rgba(255,255,255,.035));border:1px solid rgba(112,232,255,.16);line-height:1.7}
+.storyBox h2{margin:0 0 8px}
+.storyBox ul{margin:8px 0 0 20px;padding:0}
+.storyBox li{margin:7px 0;color:#d8edff}
+.storyBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-top:12px}
+.bridgeRows{display:grid;gap:10px}
+.bridgeRow{display:grid;grid-template-columns:145px 1fr;gap:10px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.bridgeRow b{color:var(--gold)}
+.labScene{position:relative;min-height:390px;border-radius:22px;overflow:hidden;background:
+radial-gradient(circle at 18% 16%,rgba(112,232,255,.12),transparent 28%),
+radial-gradient(circle at 82% 18%,rgba(255,213,107,.12),transparent 24%),
+linear-gradient(180deg,#102440,#0a1528 64%,#09101e);border:1px solid rgba(255,255,255,.08)}
+.aiChar{position:absolute;left:24px;bottom:28px;width:126px;height:200px}
+.head{position:absolute;left:32px;top:0;width:62px;height:62px;border-radius:50%;background:linear-gradient(#dff9ff,#70e8ff)}
+.face{position:absolute;left:44px;top:24px;color:#062033;font-weight:1000}
+.body{position:absolute;left:10px;top:64px;width:108px;height:120px;border-radius:24px;background:linear-gradient(#faffff,#ccecff)}
+.arm{position:absolute;top:106px;width:78px;height:14px;border-radius:14px;background:#b8f3ff}.arm.a{left:-4px;transform:rotate(20deg)}.arm.b{left:62px;transform:rotate(-23deg)}
+.labTable{position:absolute;bottom:0;left:0;right:0;height:72px;background:linear-gradient(#6d4320,#3e2414)}
+.screen{position:absolute;right:16px;top:16px;width:62%;min-height:248px;border-radius:18px;background:rgba(4,13,24,.78);border:1px solid rgba(112,232,255,.18);padding:14px}
+.screen h3{margin:0 0 8px}
+.screenLine{margin:8px 0;padding:9px;border-radius:12px;background:rgba(255,255,255,.05)}
+.swab{position:absolute;left:49%;bottom:144px;transform:translateX(-50%) rotate(-25deg);width:220px;height:20px;border-radius:20px;background:#dbeafe;box-shadow:0 5px 18px rgba(0,0,0,.25)}
+.swab:before,.swab:after{content:"";position:absolute;top:-11px;width:42px;height:42px;border-radius:50%;background:#f8fafc;border:2px solid rgba(255,255,255,.55)}
+.swab:before{left:-18px}.swab:after{right:-18px}
+.slide{position:absolute;left:50%;bottom:95px;transform:translateX(-50%);width:260px;height:98px;border-radius:12px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.55);box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.smear{position:absolute;left:50%;bottom:126px;transform:translateX(-50%);width:175px;height:38px;border-radius:50%;background:rgba(191,219,254,.45);border:1px solid rgba(255,255,255,.34);opacity:.4}
+.drop{position:absolute;left:50%;top:160px;transform:translateX(-50%);width:34px;height:46px;border-radius:50% 50% 60% 60%;background:rgba(147,197,253,.7);opacity:0;animation:drop 1.1s ease-in-out infinite}
+@keyframes drop{0%{top:120px;opacity:0}30%{opacity:1}100%{top:205px;opacity:0}}
+.coverSlip{position:absolute;left:50%;bottom:155px;transform:translateX(-50%) rotate(-10deg);width:160px;height:58px;background:rgba(255,255,255,.20);border:2px solid rgba(255,255,255,.55);border-radius:8px;opacity:.9}
+.microscope{position:absolute;left:53%;bottom:72px;transform:translateX(-50%);width:260px;height:240px}
+.scopeArm{position:absolute;left:112px;top:35px;width:72px;height:165px;border-radius:44px;background:linear-gradient(#dbeafe,#7dd3fc);transform:rotate(20deg)}
+.scopeTube{position:absolute;left:80px;top:18px;width:138px;height:42px;border-radius:22px;background:#e0f2fe;transform:rotate(20deg)}
+.scopeStage{position:absolute;left:38px;bottom:58px;width:190px;height:22px;border-radius:10px;background:#cbd5e1}
+.scopeBase{position:absolute;left:36px;bottom:12px;width:210px;height:42px;border-radius:50% 50% 12px 12px;background:#94a3b8}
+.scopeLens{position:absolute;left:84px;top:64px;width:34px;height:60px;border-radius:14px;background:#e2e8f0;transform:rotate(20deg)}
+.controlCard{padding:16px;border-radius:18px;background:linear-gradient(180deg,rgba(112,232,255,.08),rgba(255,255,255,.03));border:1px solid rgba(112,232,255,.16)}
+.toolGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.toolBtn{padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;text-align:left;line-height:1.4}
+.toolBtn.done{border-color:rgba(134,255,176,.5);background:rgba(134,255,176,.1)}
+.toolBtn b{color:var(--gold)}
+.controlRow{display:grid;grid-template-columns:1fr 100px;gap:10px;align-items:center;margin:12px 0}
+.controlRow output{padding:8px 10px;border-radius:999px;background:rgba(112,232,255,.10);border:1px solid rgba(112,232,255,.18);color:var(--cyan);text-align:center;font-weight:800}
+input[type=range]{width:100%}
+.explainBox{margin-top:12px;border-radius:18px;padding:16px;background:linear-gradient(180deg,rgba(112,232,255,.10),rgba(255,255,255,.035));border:1px solid rgba(112,232,255,.18);line-height:1.65}
+.explainBox h4{margin:0 0 8px}
+.explainGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.explainItem{background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:11px}
+.explainItem b{color:var(--gold)}
+.microView{position:relative;margin-top:12px;height:380px;border-radius:22px;background:radial-gradient(circle at 45% 40%,rgba(255,255,255,.2),rgba(112,232,255,.08) 45%,rgba(0,0,0,.25));border:1px solid rgba(255,255,255,.08);overflow:hidden;display:grid;place-items:center}
+.viewCircle{position:relative;width:min(330px,86vw);height:min(330px,86vw);border-radius:50%;border:8px solid rgba(255,255,255,.92);background:#eef6ff;overflow:hidden;box-shadow:inset 0 0 40px rgba(0,0,0,.18)}
+.cheekCells{position:absolute;inset:-40px;transform:scale(var(--zoom,1));transform-origin:center;opacity:var(--focus,.55);filter:blur(var(--blur,2px));transition:.2s}
+.cheekCell{position:absolute;width:92px;height:66px;border:2px solid #2563eb;background:rgba(191,219,254,.55);border-radius:48% 58% 45% 55%;transform:rotate(var(--rot,0deg))}
+.cheekCell:after{content:"";position:absolute;width:17px;height:17px;border-radius:50%;background:#7e22ce;left:42%;top:42%;box-shadow:0 0 0 4px rgba(126,34,206,.1)}
+.c1{left:42px;top:42px;--rot:12deg}.c2{left:150px;top:70px;--rot:-8deg}.c3{left:95px;top:150px;--rot:22deg}.c4{left:205px;top:175px;--rot:-18deg}.c5{left:20px;top:230px;--rot:-12deg}.c6{left:185px;top:270px;--rot:8deg}
+.labelMarker{position:absolute;padding:6px 10px;border-radius:999px;background:rgba(255,213,107,.95);color:#2a1700;font-size:.8rem;font-weight:900;box-shadow:0 6px 14px rgba(0,0,0,.18);cursor:pointer}
+.marker-membrane{left:32%;top:32%}.marker-nucleus{left:52%;top:50%}.marker-cytoplasm{left:28%;top:58%}
+.labelMarker.selected{background:var(--green)}
+.labelInfo{display:grid;gap:10px;margin-top:12px}
+.labelChoice{padding:12px 13px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);cursor:pointer;line-height:1.48}
+.labelChoice.correct{border-color:rgba(134,255,176,.62);background:rgba(134,255,176,.12)}
+.labelChoice.wrong{border-color:rgba(255,124,124,.62);background:rgba(255,124,124,.12)}
+.compareCard{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);line-height:1.6}
+.compareCard h3{margin-top:0;color:var(--gold)}
+.compareTable{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.compareItem{padding:12px;border-radius:14px;background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.08)}
+.quizGrid{display:grid;gap:14px}
+.q{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);border-radius:16px;padding:14px}
+.opt{padding:11px 13px;margin-top:8px;border-radius:13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);cursor:pointer}
+.opt.correct{border-color:rgba(134,255,176,.6);background:rgba(134,255,176,.12)}
+.opt.wrong{border-color:rgba(255,124,124,.6);background:rgba(255,124,124,.1)}
+.certCard{background:linear-gradient(135deg,rgba(112,232,255,.15),rgba(255,213,107,.12));border:2px solid rgba(255,213,107,.45);border-radius:22px;padding:24px;text-align:center}
+.certCard h2{font-size:2rem;margin:8px 0}
+.certCard .seal{font-size:56px}
+.certCard input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:#fff;text-align:center;margin:10px 0}
+.noPrint{display:block}
+footer{margin:20px 0 6px;border:1px solid var(--line);border-radius:20px;padding:16px 20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}
+footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:1100px){.topGrid,.theoryGrid,.prepGrid,.observeGrid,.compareGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 12px auto}}
+@media(max-width:760px){
+  .wrap{padding:10px}.hero{padding:16px}
+  .rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2/3;width:max-content}.stats{grid-template-columns:1fr 1fr}
+  .bridgeRow,.compareTable{grid-template-columns:1fr}.explainGrid,.toolGrid{grid-template-columns:1fr}
+  .screen{position:relative;right:auto;top:auto;width:auto;margin:14px}
+  .labScene{min-height:530px}
+  .aiChar{left:50%;transform:translateX(-50%);bottom:24px}
+}
+@media(max-width:480px){h1{font-size:1.8rem}.badge{font-size:11px}.btn{font-size:.9rem;padding:10px 12px}.wm{font-size:32px}}
+@media print{
+  body{background:white;color:#111}
+  .hero,.nav,.section:not(#certificate),footer,.wm-layer,.noPrint{display:none!important}
+  #certificate{display:block!important}
+  .certCard{color:#111;background:white;border:4px solid #111}
+  .certCard input{border:0;color:#111}
+}
+</style>
+</head>
+<body>
+<div class="wm-layer">
+  <div class="wm" style="top:6%;left:-4%">Dr AI Academy</div>
+  <div class="wm" style="top:21%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:39%;left:61%">Dr AI Academy</div>
+  <div class="wm" style="top:55%;left:8%">Dr AI Academy</div>
+  <div class="wm" style="top:72%;left:38%">Dr AI Academy</div>
+  <div class="wm" style="top:86%;left:66%">Dr AI Academy</div>
+</div>
+
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Invisible World Lab Series</span></div>
+  <div class="badge">LAB 3 • CHAPTER 2 • THE INVISIBLE LIVING WORLD • CHEEK CELL ACTIVITY</div>
+  <h1>CHEEK CELL INVESTIGATOR:<br>THE ANIMAL CELL PORTAL</h1>
+  <p class="sub">A story-based microscope game in simple English for Indian students. Dr AI guides students to prepare a cheek cell slide, focus the microscope, observe irregular animal cells, label cell membrane, cytoplasm and nucleus, and compare animal cells with onion plant cells for NEET / Olympiad foundation.</p>
+
+  <div class="actions">
+    <button class="btn gold" id="startBtn">🎮 Start Lab 3</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle">
+      <option value="standard">Standard English</option>
+      <option value="indian">Indian English</option>
+    </select>
+  </div>
+
+  <div class="topGrid">
+    <div class="panel box">
+      <h3>Game Rules</h3>
+      <div class="rules">
+        <div class="rule"><div class="n">1</div><div><b>Learn animal cell theory</b><br>Understand cell membrane, cytoplasm, nucleus, and lack of cell wall.</div><div class="tag">Level 1</div></div>
+        <div class="rule"><div class="n">2</div><div><b>Prepare cheek cell slide</b><br>Follow safe slide steps: swab, smear, stain, cover slip.</div><div class="tag">Level 2</div></div>
+        <div class="rule"><div class="n">3</div><div><b>Focus microscope</b><br>Adjust power and focus to observe cheek cells clearly.</div><div class="tag">Level 3</div></div>
+        <div class="rule"><div class="n">4</div><div><b>Label animal cell parts</b><br>Identify membrane, nucleus and cytoplasm.</div><div class="tag">Level 4</div></div>
+        <div class="rule"><div class="n">5</div><div><b>Compare + Quiz</b><br>Compare onion and cheek cells, then unlock certificate.</div><div class="tag">Final</div></div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Level Transition Map</h3>
+      <div class="levels">
+        <div class="level active" id="lvl1"><div class="n">1</div><div><b>Theory Briefing</b><br><small>Complete 4 theory cards.</small></div><div class="tag" id="tag1">Active</div></div>
+        <div class="level" id="lvl2"><div class="n">2</div><div><b>Slide Preparation</b><br><small>Complete 4 correct steps.</small></div><div class="tag" id="tag2">Locked</div></div>
+        <div class="level" id="lvl3"><div class="n">3</div><div><b>Microscope Focus</b><br><small>Reach clear view score 75+.</small></div><div class="tag" id="tag3">Locked</div></div>
+        <div class="level" id="lvl4"><div class="n">4</div><div><b>Cell Labelling</b><br><small>Label 3 animal-cell structures.</small></div><div class="tag" id="tag4">Locked</div></div>
+        <div class="level" id="lvl5"><div class="n">5</div><div><b>Compare + Quiz</b><br><small>Read comparison and answer 3 questions.</small></div><div class="tag" id="tag5">Locked</div></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="theoryCount">0/4</b><span>Theory</span></div>
+        <div class="stat"><b id="simCount">0/3</b><span>Levels</span></div>
+        <div class="stat"><b id="quizCount">0/3</b><span>Quiz</span></div>
+        <div class="stat"><b id="score">0</b><span>Score</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="btn gold active" data-go="theory">Level 1: Theory</button>
+  <button class="btn secondary" data-go="prepare" id="navPrepare" disabled>Level 2: Slide Prep</button>
+  <button class="btn secondary" data-go="observe" id="navObserve" disabled>Level 3: Microscope</button>
+  <button class="btn secondary" data-go="label" id="navLabel" disabled>Level 4: Label Cell</button>
+  <button class="btn secondary" data-go="compare" id="navCompare" disabled>Compare</button>
+  <button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Level 5: Quiz</button>
+  <button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button>
+</div>
+
+<section class="section active" id="theory">
+  <div class="theoryGrid">
+    <div class="panel storyPanel">
+      <h3>Dr AI Theory Briefing</h3>
+      <div class="storyBox" id="storyBox"></div>
+      <div class="storyBtns">
+        <button class="btn secondary" id="prevStory">← Previous</button>
+        <button class="btn" id="nextStory">Next Theory →</button>
+        <button class="btn gold" id="markTheory">Mark Theory Complete</button>
+      </div>
+    </div>
+    <div class="panel bridgePanel">
+      <h3>What Student Learns + Exam Link</h3>
+      <div class="bridgeRows">
+        <div class="bridgeRow"><b>NCERT Link</b><span>Students observe cheek cells under microscope and compare them with onion peel cells.</span></div>
+        <div class="bridgeRow"><b>Core Concept</b><span>Animal cells have cell membrane, cytoplasm and nucleus, but no cell wall.</span></div>
+        <div class="bridgeRow"><b>Biology Seed</b><span>Plant and animal cells are both living units but differ in shape and outer boundary.</span></div>
+        <div class="bridgeRow"><b>Olympiad Link</b><span>Microscope observation, comparison, structure-function reasoning, and classification.</span></div>
+        <div class="bridgeRow"><b>NEET Foundation</b><span>Animal cell structure, cell membrane, nucleus, cytoplasm and plant-vs-animal comparison.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="prepare">
+  <div class="prepGrid">
+    <div class="panel simPanel">
+      <h3>Level 2: Cheek Cell Slide Preparation</h3>
+      <p style="color:var(--muted);line-height:1.55">Follow the correct safe steps to prepare a temporary cheek cell slide.</p>
+      <div class="labScene">
+        <div class="aiChar"><div class="head"></div><div class="face">AI</div><div class="body"></div><div class="arm a"></div><div class="arm b"></div></div>
+        <div class="screen">
+          <h3>Dr AI Slide Prep Scanner</h3>
+          <div class="screenLine">Step Progress: <b id="prepProgress">0 / 4</b></div>
+          <div class="screenLine">Current Goal: <b id="prepGoal">Collect cheek cells using clean swab.</b></div>
+          <div class="screenLine">Safety Note: Use clean tools and do not scrape harshly.</div>
+        </div>
+        <div class="swab" id="swabVisual"></div>
+        <div class="slide" id="slideVisual"></div>
+        <div class="smear" id="smearVisual"></div>
+        <div class="drop" id="dropVisual"></div>
+        <div class="coverSlip" id="coverVisual" style="display:none"></div>
+        <div class="labTable"></div>
+      </div>
+    </div>
+    <div class="panel simPanel">
+      <div class="controlCard">
+        <h3>Slide Tools</h3>
+        <div class="toolGrid">
+          <button class="toolBtn" data-step="swab"><b>1. Clean Swab</b><br>Collect cells gently from inside cheek.</button>
+          <button class="toolBtn" data-step="smear"><b>2. Smear on Slide</b><br>Spread cells gently on the slide.</button>
+          <button class="toolBtn" data-step="stain"><b>3. Add Stain</b><br>Make nucleus and cell boundary clearer.</button>
+          <button class="toolBtn" data-step="cover"><b>4. Cover Slip</b><br>Place cover slip carefully.</button>
+          <button class="toolBtn" data-step="hard"><b>Wrong: Scrape Hard</b><br>Unsafe and not needed.</button>
+          <button class="toolBtn" data-step="dirty"><b>Wrong: Dirty Slide</b><br>Creates unclear observation.</button>
+        </div>
+      </div>
+
+      <div class="explainBox" id="prepExplain">
+        <h4>Preparation Feedback</h4>
+        <div>Select safe slide preparation steps in correct order. Dr AI will explain why each step matters.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="observe">
+  <div class="observeGrid">
+    <div class="panel simPanel">
+      <h3>Level 3: Microscope Focus Mission</h3>
+      <p style="color:var(--muted);line-height:1.55">Adjust microscope power and focus. Get a clear view score of 75 or more to observe cheek cells properly.</p>
+      <div class="labScene">
+        <div class="aiChar"><div class="head"></div><div class="face">AI</div><div class="body"></div><div class="arm a"></div><div class="arm b"></div></div>
+        <div class="screen">
+          <h3>Microscope Console</h3>
+          <div class="screenLine">Magnification: <b id="powerText">90x</b></div>
+          <div class="screenLine">Focus: <b id="focusText">45</b></div>
+          <div class="screenLine">Clear View Score: <b id="clearScore">0</b></div>
+          <div class="screenLine">Target: <b>75+</b></div>
+        </div>
+        <div class="microscope">
+          <div class="scopeArm"></div><div class="scopeTube"></div><div class="scopeLens"></div><div class="scopeStage"></div><div class="scopeBase"></div>
+        </div>
+        <div class="labTable"></div>
+      </div>
+    </div>
+    <div class="panel simPanel">
+      <div class="controlCard">
+        <h3>Microscope Controls</h3>
+        <div class="controlRow">
+          <input type="range" id="powerSlider" min="40" max="220" value="90" />
+          <output id="powerOut">90x</output>
+        </div>
+        <div class="controlRow">
+          <input type="range" id="focusSlider" min="0" max="100" value="45" />
+          <output id="focusOut">45</output>
+        </div>
+        <button class="btn green" id="checkFocusBtn">🔬 Check Focus</button>
+      </div>
+      <div class="microView">
+        <div class="viewCircle">
+          <div class="cheekCells" id="cheekCells">
+            <div class="cheekCell c1"></div><div class="cheekCell c2"></div><div class="cheekCell c3"></div>
+            <div class="cheekCell c4"></div><div class="cheekCell c5"></div><div class="cheekCell c6"></div>
+          </div>
+        </div>
+      </div>
+      <div class="explainBox" id="focusExplain">
+        <h4>Focus Feedback</h4>
+        <div>Adjust magnification and focus. Cheek cells become clear only when focus and power are balanced.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="label">
+  <div class="observeGrid">
+    <div class="panel simPanel">
+      <h3>Level 4: Label the Cheek Cell</h3>
+      <p style="color:var(--muted);line-height:1.55">Click marker A, B or C, then choose the correct animal cell structure.</p>
+      <div class="microView" style="height:420px">
+        <div class="viewCircle">
+          <div class="cheekCells" style="--zoom:1.24;--focus:1;--blur:0px">
+            <div class="cheekCell c1"></div><div class="cheekCell c2"></div><div class="cheekCell c3"></div>
+            <div class="cheekCell c4"></div><div class="cheekCell c5"></div><div class="cheekCell c6"></div>
+          </div>
+          <div class="labelMarker marker-membrane" data-marker="membrane">A</div>
+          <div class="labelMarker marker-nucleus" data-marker="nucleus">B</div>
+          <div class="labelMarker marker-cytoplasm" data-marker="cytoplasm">C</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel simPanel">
+      <h3>Choose Structure Name</h3>
+      <div class="screenLine">Selected Marker: <b id="selectedMarkerText">None</b></div>
+      <div class="screenLine">Labels Done: <b id="labelCount">0 / 3</b></div>
+      <div class="labelInfo">
+        <div class="labelChoice" data-answer="membrane">Cell Membrane</div>
+        <div class="labelChoice" data-answer="nucleus">Nucleus</div>
+        <div class="labelChoice" data-answer="cytoplasm">Cytoplasm</div>
+        <div class="labelChoice" data-answer="cellWall">Cell Wall</div>
+      </div>
+      <div class="explainBox" id="labelExplain">
+        <h4>Label Feedback</h4>
+        <div>Select marker A, B, or C. Then choose the correct part name.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="compare">
+  <div class="compareGrid">
+    <div class="panel simPanel">
+      <h3>Plant Cell vs Animal Cell</h3>
+      <div class="compareCard">
+        <h3>Onion Peel Cell</h3>
+        <div class="compareTable">
+          <div class="compareItem"><b>Shape</b><br>Brick-like or rectangular</div>
+          <div class="compareItem"><b>Outer Boundary</b><br>Cell wall present</div>
+          <div class="compareItem"><b>Nucleus</b><br>Present</div>
+          <div class="compareItem"><b>Cytoplasm</b><br>Present</div>
+        </div>
+      </div>
+      <div class="compareCard" style="margin-top:12px">
+        <h3>Cheek Cell</h3>
+        <div class="compareTable">
+          <div class="compareItem"><b>Shape</b><br>Irregular / rounded</div>
+          <div class="compareItem"><b>Outer Boundary</b><br>Cell membrane only, no cell wall</div>
+          <div class="compareItem"><b>Nucleus</b><br>Present</div>
+          <div class="compareItem"><b>Cytoplasm</b><br>Present</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel simPanel">
+      <h3>Dr AI Concept Explanation</h3>
+      <div class="explainBox">
+        <h4>What is the big concept?</h4>
+        <div>
+          Onion peel cells and cheek cells are both living cells, but they do not look the same. 
+          Onion cells are plant cells, so they have a rigid cell wall and a more fixed shape. 
+          Cheek cells are animal cells, so they do not have a cell wall and their shape is more irregular.
+        </div>
+        <div class="explainGrid">
+          <div class="explainItem"><b>Common Features</b><br>Both have cell membrane, cytoplasm and nucleus.</div>
+          <div class="explainItem"><b>Main Difference</b><br>Plant cell has cell wall; animal cell does not.</div>
+          <div class="explainItem"><b>NEET Link</b><br>Plant vs animal cell comparison is a core biology foundation.</div>
+          <div class="explainItem"><b>Olympiad Link</b><br>Structure-function reasoning and microscopic observation.</div>
+        </div>
+      </div>
+      <button class="btn green" id="completeCompareBtn">✅ I Understood the Comparison</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel quizPanel">
+    <h3>Level 5: Cheek Cell Concept Quiz</h3>
+    <p style="color:var(--muted);line-height:1.55">Answer all three questions to unlock the certificate.</p>
+    <div class="quizGrid">
+      <div class="q">
+        <b>Q1. Which structure is present in onion cell but absent in cheek cell?</b>
+        <div class="opt" data-q="q1" data-correct="1">Cell wall</div>
+        <div class="opt" data-q="q1">Nucleus</div>
+        <div class="opt" data-q="q1">Cytoplasm</div>
+      </div>
+      <div class="q">
+        <b>Q2. Why do cheek cells usually appear irregular in shape?</b>
+        <div class="opt" data-q="q2" data-correct="1">They do not have a rigid cell wall.</div>
+        <div class="opt" data-q="q2">They are made of stone.</div>
+        <div class="opt" data-q="q2">They have no cell membrane.</div>
+      </div>
+      <div class="q">
+        <b>Q3. What is the function of the nucleus?</b>
+        <div class="opt" data-q="q3" data-correct="1">It controls cell activities.</div>
+        <div class="opt" data-q="q3">It is only a stain drop.</div>
+        <div class="opt" data-q="q3">It is the outer cell wall.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="certificate">
+  <div class="panel certPanel">
+    <div class="certCard">
+      <div class="seal">🧬🔬🏅</div>
+      <h2>Certificate of Animal Cell Observation</h2>
+      <p>This certifies that</p>
+      <input id="studentName" placeholder="Enter Student Name" />
+      <p>has successfully completed <b>Lab 3: Cheek Cell Investigator</b></p>
+      <p>Skills: Slide Preparation • Microscope Focus • Animal Cell Structure • Cell Membrane • Nucleus • Plant vs Animal Cell Comparison</p>
+      <p><b>Developed by Dr AI Academy</b></p>
+      <div class="noPrint" style="margin-top:14px">
+        <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div>
+  <div><a href="https://courses.draiacademy.com" target="_blank" rel="noopener">AI Courses @ Dr AI Academy</a></div>
+</footer>
+</div>
+
+<script>
+(()=>{
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{if((e.ctrlKey&&["u","s","c","x"].includes(e.key.toLowerCase()))||e.key==="F12")e.preventDefault()});
+const $=id=>document.getElementById(id);
+
+const state={
+  voice:true,style:"standard",storyIndex:0,theoryDone:0,score:0,
+  unlocked:{prepare:false,observe:false,label:false,compare:false,quiz:false,certificate:false},
+  prepDone:false,observeDone:false,labelDone:false,compareDone:false,
+  prepStep:0, selectedMarker:null,
+  labels:{membrane:false,nucleus:false,cytoplasm:false},
+  quizCorrect:{}
+};
+
+const stories=[
+  {title:"Theory 1: Cheek Cells are Animal Cells",body:"The inner lining of our cheek has cells that can be observed under a microscope. These are animal cells. They are usually irregular in shape and do not have a cell wall.",points:["Cheek cells are animal cells.","They are observed using a microscope.","They do not have a cell wall."]},
+  {title:"Theory 2: Animal Cell Boundary is Cell Membrane",body:"Animal cells have a thin cell membrane around them. It controls what enters and leaves the cell. Unlike plant cells, animal cells do not have a rigid cell wall.",points:["Cell membrane is the outer boundary.","No rigid cell wall in animal cells.","This gives animal cells more flexible shapes."]},
+  {title:"Theory 3: Nucleus and Cytoplasm",body:"The nucleus is a rounded structure that controls cell activities. Cytoplasm is the jelly-like material inside the cell where many life processes happen.",points:["Nucleus controls cell activities.","Cytoplasm fills the cell interior.","Staining helps us see these parts more clearly."]},
+  {title:"Theory 4: Plant vs Animal Cell Comparison",body:"Onion cells are plant cells and usually look brick-like because of their cell wall. Cheek cells are animal cells and usually look irregular because they do not have a cell wall.",points:["Plant cell has cell wall.","Animal cell has no cell wall.","Both have nucleus and cytoplasm."]}
+];
+
+const prepOrder=["swab","smear","stain","cover"];
+const prepText={
+  swab:"Correct. A clean swab gently collects cheek cells. Safety and hygiene are important.",
+  smear:"Correct. Smearing spreads cells thinly so light can pass through the sample.",
+  stain:"Correct. Stain makes nucleus and cell boundary more visible.",
+  cover:"Correct. Cover slip protects the sample and gives a flat observation surface."
+};
+
+const labelData={
+  membrane:{name:"Cell Membrane",explain:"Cell membrane is the thin outer boundary of an animal cell. It controls entry and exit of materials."},
+  nucleus:{name:"Nucleus",explain:"Nucleus is the rounded structure that controls cell activities."},
+  cytoplasm:{name:"Cytoplasm",explain:"Cytoplasm is the jelly-like material inside the cell where many activities happen."}
+};
+
+function speak(txt){
+  if(!state.voice||!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang="en-IN";u.rate=state.style==="indian"?0.88:0.98;u.pitch=state.style==="indian"?1.05:1;
+  const voices=speechSynthesis.getVoices();
+  const v=state.style==="indian"
+    ? voices.find(x=>/india|en-IN/i.test((x.lang||"")+" "+x.name))
+    : voices.find(x=>/en-US|en-GB|english|google|zira|samantha/i.test((x.lang||"")+" "+x.name));
+  if(v)u.voice=v;
+  speechSynthesis.speak(u);
+}
+function stopVoice(){if("speechSynthesis" in window) speechSynthesis.cancel();}
+function showSection(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  $(id).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+  $(id).scrollIntoView({behavior:"smooth",block:"start"});
+}
+function updateStatus(){
+  $("theoryCount").textContent=Math.min(state.theoryDone,4)+"/4";
+  let simDone=(state.prepDone?1:0)+(state.observeDone?1:0)+(state.labelDone?1:0);
+  $("simCount").textContent=simDone+"/3";
+  $("quizCount").textContent=Object.keys(state.quizCorrect).length+"/3";
+  $("score").textContent=state.score;
+
+  const map=[
+    ["lvl1","tag1",state.theoryDone>=4,true],
+    ["lvl2","tag2",state.prepDone,state.unlocked.prepare],
+    ["lvl3","tag3",state.observeDone,state.unlocked.observe],
+    ["lvl4","tag4",state.labelDone,state.unlocked.label],
+    ["lvl5","tag5",state.unlocked.certificate,state.unlocked.quiz||state.unlocked.certificate]
+  ];
+  map.forEach(([id,tag,done,active])=>{
+    $(id).classList.toggle("done",done);
+    $(id).classList.toggle("active",active&&!done);
+    $(tag).textContent=done?"Done":active?"Active":"Locked";
+  });
+
+  $("navPrepare").disabled=!state.unlocked.prepare;
+  $("navObserve").disabled=!state.unlocked.observe;
+  $("navLabel").disabled=!state.unlocked.label;
+  $("navCompare").disabled=!state.unlocked.compare;
+  $("navQuiz").disabled=!state.unlocked.quiz;
+  $("navCert").disabled=!state.unlocked.certificate;
+}
+function checkUnlocks(){
+  if(state.theoryDone>=4 && !state.unlocked.prepare){
+    state.unlocked.prepare=true;
+    speak("Theory complete. Cheek cell slide preparation is now unlocked.");
+    showSection("prepare");
+  }
+  if(state.prepDone && !state.unlocked.observe){
+    state.unlocked.observe=true;
+    speak("Slide prepared. Microscope Focus Mission is now unlocked.");
+    showSection("observe");
+  }
+  if(state.observeDone && !state.unlocked.label){
+    state.unlocked.label=true;
+    speak("Clear cheek cell view achieved. Cell Labelling level is now unlocked.");
+    showSection("label");
+  }
+  if(state.labelDone && !state.unlocked.compare){
+    state.unlocked.compare=true;
+    speak("Cell labelling complete. Compare plant and animal cells.");
+    showSection("compare");
+  }
+  if(state.compareDone && !state.unlocked.quiz){
+    state.unlocked.quiz=true;
+    speak("Comparison complete. Concept quiz is now unlocked.");
+    showSection("quiz");
+  }
+  if(Object.keys(state.quizCorrect).length>=3 && !state.unlocked.certificate){
+    state.unlocked.certificate=true;
+    speak("Mission complete. Certificate unlocked.");
+    showSection("certificate");
+  }
+  updateStatus();
+}
+function renderStory(){
+  const s=stories[state.storyIndex];
+  $("storyBox").innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  speak(s.title+". "+s.body);
+}
+function markTheory(){
+  if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1;state.score+=15;}
+  if(state.storyIndex<stories.length-1){state.storyIndex++;renderStory();}
+  else{ speak("All theory cards are complete. Now prepare the cheek cell slide."); }
+  checkUnlocks();
+}
+function handlePrep(step,btn){
+  if(!state.unlocked.prepare){speak("Complete theory first.");return;}
+  const expected=prepOrder[state.prepStep];
+  if(step===expected){
+    btn.classList.add("done");
+    state.prepStep++;
+    state.score+=10;
+    $("prepProgress").textContent=state.prepStep+" / 4";
+    $("prepExplain").innerHTML=`<h4>Correct Step</h4><div>${prepText[step]}</div>`;
+    speak(prepText[step]);
+    if(step==="smear") $("smearVisual").style.opacity=.95;
+    if(step==="stain") $("dropVisual").style.opacity=.8;
+    if(step==="cover") $("coverVisual").style.display="block";
+    $("prepGoal").textContent=state.prepStep<4 ? `Next: ${["Collect cheek cells","Smear on slide","Add stain","Place cover slip"][state.prepStep]}` : "Slide ready for microscope.";
+    if(state.prepStep>=4 && !state.prepDone){
+      state.prepDone=true;
+      state.score+=20;
+      $("prepExplain").innerHTML+=`<div class="explainGrid"><div class="explainItem"><b>Level Cleared</b><br>The cheek cell slide is ready.</div><div class="explainItem"><b>Why it matters</b><br>A thin smear and stain give a clear animal-cell view.</div></div>`;
+      speak("Slide preparation complete.");
+    }
+  }else{
+    $("prepExplain").innerHTML=`<h4>Wrong Step</h4><div>This step is not correct now. Follow the safe order: clean swab, smear, stain, cover slip.</div>`;
+    speak("Wrong step. Follow the safe slide preparation order.");
+  }
+  checkUnlocks();
+}
+function updateFocus(){
+  const p=+$("powerSlider").value,f=+$("focusSlider").value;
+  $("powerOut").textContent=p+"x";$("powerText").textContent=p+"x";
+  $("focusOut").textContent=f;$("focusText").textContent=f;
+  const focusScore=Math.max(0,100-Math.abs(f-68)*2);
+  const powerScore=p>=90&&p<=170?92:Math.max(45,100-Math.abs(p-130)*.52);
+  const score=Math.round((focusScore*.58)+(powerScore*.42));
+  $("clearScore").textContent=score;
+  const zoom=.75+p/135, blur=Math.max(0,5-score/20), opacity=.35+score/160;
+  $("cheekCells").style.setProperty("--zoom",zoom);
+  $("cheekCells").style.setProperty("--blur",blur+"px");
+  $("cheekCells").style.setProperty("--focus",opacity);
+}
+function checkFocus(){
+  if(!state.unlocked.observe){speak("Complete slide preparation first.");return;}
+  const score=+$("clearScore").textContent;
+  if(score>=75){
+    if(!state.observeDone){state.observeDone=true;state.score+=35;}
+    $("focusExplain").innerHTML=`<h4>Clear Cheek Cell View Achieved</h4>
+      <div>You focused the microscope properly. Cheek cells now appear as irregular animal cells with visible nucleus.</div>
+      <div class="explainGrid">
+        <div class="explainItem"><b>What happened?</b><br>Irregular cell boundaries and nucleus became clearer.</div>
+        <div class="explainItem"><b>Why?</b><br>Correct focus and staining make animal cell structures visible.</div>
+        <div class="explainItem"><b>Biology concept</b><br>Animal cells have cell membrane but no cell wall.</div>
+        <div class="explainItem"><b>NEET/Olympiad link</b><br>Animal cell structure and plant-animal comparison.</div>
+      </div>`;
+    speak("Clear cheek cell view achieved. Animal cells are visible.");
+  }else{
+    $("focusExplain").innerHTML=`<h4>View Still Blurry</h4><div>Adjust focus closer to 68 and magnification near the middle range. Very low or very high power can make observation difficult.</div>`;
+    speak("The view is still blurry. Adjust focus and magnification.");
+  }
+  checkUnlocks();
+}
+function selectMarker(marker){
+  state.selectedMarker=marker;
+  $("selectedMarkerText").textContent=marker==="membrane"?"A":marker==="nucleus"?"B":"C";
+  document.querySelectorAll(".labelMarker").forEach(m=>m.classList.toggle("selected",m.dataset.marker===marker));
+}
+function chooseLabel(answer,el){
+  if(!state.unlocked.label){speak("Complete microscope focus first.");return;}
+  if(!state.selectedMarker){
+    $("labelExplain").innerHTML=`<h4>Select Marker First</h4><div>Click marker A, B or C first, then choose a structure name.</div>`;
+    speak("Select a marker first.");
+    return;
+  }
+  document.querySelectorAll(".labelChoice").forEach(x=>x.classList.remove("correct","wrong"));
+  const correct=answer===state.selectedMarker;
+  if(correct){
+    el.classList.add("correct");
+    if(!state.labels[answer]){
+      state.labels[answer]=true;state.score+=15;
+    }
+    const info=labelData[answer];
+    $("labelExplain").innerHTML=`<h4>Correct Label</h4><div><b>${info.name}:</b> ${info.explain}</div>`;
+    speak("Correct. "+info.name+". "+info.explain);
+  }else{
+    el.classList.add("wrong");
+    $("labelExplain").innerHTML=`<h4>Not Correct</h4><div>Cell membrane is the outer boundary, nucleus is the dark round body, and cytoplasm is the inner jelly-like region. Animal cells do not have a cell wall.</div>`;
+    speak("Not correct. Look carefully at the animal cell structure.");
+  }
+  const count=Object.values(state.labels).filter(Boolean).length;
+  $("labelCount").textContent=count+" / 3";
+  if(count>=3 && !state.labelDone){
+    state.labelDone=true;
+    state.score+=20;
+    $("labelExplain").innerHTML+=`<div class="explainGrid"><div class="explainItem"><b>Level Cleared</b><br>You identified all key animal cell structures.</div><div class="explainItem"><b>Exam Link</b><br>Animal cell labelling and comparison are core biology skills.</div></div>`;
+    speak("Animal cell labelling complete.");
+  }
+  checkUnlocks();
+}
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{if(!b.disabled)showSection(b.dataset.go);});
+$("startBtn").onclick=()=>{showSection("theory");speak("Welcome to Lab 3, Cheek Cell Investigator. First complete the theory briefing.");};
+$("voiceBtn").onclick=()=>{state.voice=!state.voice;$("voiceBtn").textContent=state.voice?"🔊 Voice ON":"🔇 Voice OFF";if(state.voice)speak("Voice is on.");};
+$("stopVoiceBtn").onclick=stopVoice;
+$("voiceStyle").onchange=e=>{state.style=e.target.value;speak(state.style==="indian"?"Indian English voice selected. Let us begin.":"Standard English voice selected. Let us begin.");};
+$("nextStory").onclick=()=>{state.storyIndex=Math.min(stories.length-1,state.storyIndex+1);renderStory();};
+$("prevStory").onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1);renderStory();};
+$("markTheory").onclick=markTheory;
+
+document.querySelectorAll(".toolBtn").forEach(btn=>btn.onclick=()=>handlePrep(btn.dataset.step,btn));
+$("powerSlider").oninput=updateFocus;
+$("focusSlider").oninput=updateFocus;
+$("checkFocusBtn").onclick=checkFocus;
+document.querySelectorAll(".labelMarker").forEach(m=>m.onclick=()=>selectMarker(m.dataset.marker));
+document.querySelectorAll(".labelChoice").forEach(c=>c.onclick=()=>chooseLabel(c.dataset.answer,c));
+$("completeCompareBtn").onclick=()=>{
+  if(!state.compareDone){state.compareDone=true;state.score+=20;}
+  speak("Comparison complete. You understood the main difference: plant cells have cell wall, cheek cells do not.");
+  checkUnlocks();
+};
+
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{
+  if(!state.unlocked.quiz){speak("Complete plant and animal cell comparison first.");return;}
+  const q=o.dataset.q;if(state.quizCorrect[q])return;
+  const group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)];
+  group.forEach(x=>x.classList.remove("correct","wrong"));
+  if(o.dataset.correct){
+    o.classList.add("correct");
+    state.quizCorrect[q]=true;
+    state.score+=25;
+    speak("Correct. Excellent animal cell understanding.");
+  }else{
+    o.classList.add("wrong");
+    group.forEach(x=>{if(x.dataset.correct)x.classList.add("correct")});
+    speak("Not correct. Think about cheek cell and plant cell comparison.");
+  }
+  checkUnlocks();
+});
+
+renderStory();
+updateFocus();
+updateStatus();
+})();
+</script>
+</body>
+</html>

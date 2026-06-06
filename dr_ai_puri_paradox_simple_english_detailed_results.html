@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Puri Paradox Mission Lab | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#06111f;--bg2:#0b1c34;--panel:rgba(10,24,44,.88);--panel2:rgba(14,32,58,.92);
+  --line:rgba(119,208,255,.23);--cyan:#70e8ff;--gold:#ffd56b;--green:#86ffb0;--red:#ff7c7c;--violet:#b99cff;
+  --text:#eef8ff;--muted:#a9c3da;--shadow:0 18px 55px rgba(0,0,0,.38);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:
+radial-gradient(circle at 12% 10%,rgba(112,232,255,.14),transparent 28%),
+radial-gradient(circle at 85% 15%,rgba(185,156,255,.14),transparent 30%),
+linear-gradient(135deg,var(--bg),var(--bg2));color:var(--text);min-height:100%;overflow-x:hidden;user-select:none}
+body:before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:30px 30px;pointer-events:none}
+.wm-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}.wm{position:absolute;color:rgba(255,255,255,.045);font-size:44px;font-weight:900;letter-spacing:2px;white-space:nowrap;transform:rotate(-26deg)}
+.wrap{max-width:1480px;margin:auto;padding:18px;position:relative;z-index:1}.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.hero{position:relative;overflow:hidden;border-radius:28px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(14,34,65,.8),rgba(8,17,33,.9));box-shadow:var(--shadow);padding:22px}
+.logo{position:absolute;right:18px;top:18px;text-align:right;background:rgba(5,16,30,.76);border:1px solid rgba(112,232,255,.22);border-radius:14px;padding:10px 14px;z-index:3}.logo b{display:block;color:#fff}.logo span{font-size:.78rem;color:var(--cyan);font-weight:800}
+.badge{display:inline-block;padding:9px 14px;border-radius:999px;background:rgba(112,232,255,.1);border:1px solid rgba(112,232,255,.22);color:var(--cyan);font-size:.82rem;font-weight:900;letter-spacing:.6px}
+h1{font-size:clamp(2rem,4.6vw,4.6rem);line-height:1;margin:14px 0 10px;max-width:980px}.sub{max-width:980px;color:var(--muted);font-size:1.04rem;line-height:1.62}
+button,select,input{font:inherit}.btn{border:0;border-radius:14px;padding:12px 16px;font-weight:900;cursor:pointer;color:#031521;background:linear-gradient(135deg,var(--cyan),#b5f6ff);box-shadow:0 10px 24px rgba(112,232,255,.15)}.btn.secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.12);box-shadow:none}.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#271500}.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}.btn:disabled{opacity:.45;cursor:not-allowed}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px;align-items:center}.voiceSelect{max-width:210px}
+.onboarding{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;margin-top:16px}.box{padding:18px}
+.box h3{margin:0 0 10px}.rules{display:grid;gap:10px}.rule{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:12px}.rule b{display:grid;place-items:center;border-radius:50%;width:34px;height:34px;background:rgba(112,232,255,.12);color:var(--cyan)}
+.levelPath{display:grid;gap:10px}.levelCard{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);border-radius:16px;padding:12px}.levelCard .num{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(112,232,255,.12);color:var(--cyan);font-weight:1000}.levelCard.active{border-color:rgba(255,213,107,.45);background:rgba(255,213,107,.08)}.levelCard.done{border-color:rgba(134,255,176,.38);background:rgba(134,255,176,.08)}.levelCard.locked{opacity:.62}.tag{font-size:.78rem;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.stat{text-align:center;border-radius:15px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);padding:12px}.stat b{display:block;color:var(--cyan);font-size:1.35rem}.stat span{font-size:.78rem;color:var(--muted)}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.nav button.active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#271500}
+.section{display:none}.section.active{display:block}.theoryGrid{display:grid;grid-template-columns:.95fr 1.05fr;gap:16px}.storyPanel{padding:18px}.storyBox{border-radius:18px;padding:18px;background:linear-gradient(180deg,rgba(112,232,255,.09),rgba(255,255,255,.035));border:1px solid rgba(112,232,255,.16);line-height:1.7;min-height:320px}.storyBox h2{margin:0 0 8px}.storyBox ul{margin:8px 0 0 20px;padding:0}.storyBox li{margin:7px 0;color:#d8edff}.storyBtns{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px}
+.bridge{padding:18px}.bridgeTable{display:grid;gap:10px}.bridgeRow{display:grid;grid-template-columns:145px 1fr;gap:10px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:12px}.bridgeRow b{color:var(--gold)}
+.mainLab{display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px}.side{padding:16px;align-self:start;position:sticky;top:10px}.label{display:block;margin:12px 0 6px;color:#dff7ff;font-weight:800;font-size:.9rem}.control{display:grid;grid-template-columns:1fr 82px;gap:10px;align-items:center;padding:9px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}input[type=range]{width:100%}output{padding:7px 8px;border-radius:999px;background:rgba(112,232,255,.1);border:1px solid rgba(112,232,255,.17);color:var(--cyan);font-weight:900;text-align:center;font-size:.85rem}select{width:100%;padding:11px;border-radius:13px;background:#061421;color:var(--text);border:1px solid rgba(255,255,255,.13)}
+.lab{padding:16px}.labTop{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.taskBox{padding:12px;border-radius:15px;background:rgba(255,213,107,.09);border:1px solid rgba(255,213,107,.18);line-height:1.55}
+.scene{position:relative;min-height:400px;border-radius:24px;overflow:hidden;background:radial-gradient(circle at 50% -5%,rgba(112,232,255,.18),transparent 32%),linear-gradient(180deg,#0d213e,#0a1528 64%,#09101e);border:1px solid rgba(255,255,255,.08);margin-top:12px}
+.labname{position:absolute;left:14px;top:14px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);font-weight:900}.screen{position:absolute;right:14px;top:14px;width:235px;padding:13px;border-radius:16px;background:rgba(5,14,25,.74);border:1px solid rgba(112,232,255,.14)}.meter{height:11px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}.meter span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));transition:.3s}
+.char{position:absolute;left:38px;bottom:55px;width:150px;height:230px}.head{position:absolute;left:35px;top:0;width:70px;height:70px;border-radius:50%;background:linear-gradient(#ffd8b5,#f6ad78)}.hair{position:absolute;left:28px;top:-3px;width:84px;height:45px;border-radius:40px 40px 18px 18px;background:#172339}.coat{position:absolute;left:0;top:90px;width:145px;height:135px;border-radius:24px 24px 13px 13px;background:linear-gradient(#faffff,#dbeeff)}.body{position:absolute;left:20px;top:66px;width:105px;height:72px;border-radius:18px;background:#cde9ff}.arm{position:absolute;top:120px;width:88px;height:18px;border-radius:18px;background:#eda06b}.arm.a{left:-4px;transform:rotate(18deg)}.arm.b{left:76px;transform:rotate(-20deg)}.leg{position:absolute;bottom:0;width:23px;height:72px;background:#1d2d46;border-radius:18px}.l1{left:42px}.l2{left:82px}
+.table{position:absolute;bottom:0;left:0;right:0;height:82px;background:linear-gradient(#69401d,#3b2212)}.kadai{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);width:280px;height:118px;border:6px solid #9db3c8;border-top-width:10px;border-radius:0 0 160px 160px/0 0 100px 100px;background:linear-gradient(rgba(53,78,105,.35),rgba(20,29,43,.6));box-shadow:0 24px 25px rgba(0,0,0,.35)}.oil{position:absolute;left:50%;bottom:110px;transform:translateX(-50%);width:238px;height:54px;border-radius:50%;background:radial-gradient(circle,#fff199,#efb920 72%,#c58715);box-shadow:0 0 30px rgba(255,193,7,.22)}.puri{position:absolute;left:50%;bottom:130px;transform:translateX(-50%) scale(1);width:94px;height:94px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff3bf,#ffd46a 20%,#d99124 72%,#945a0c);box-shadow:0 10px 22px rgba(0,0,0,.28);transition:.9s}.puri.puff{transform:translateX(-50%) scale(1.35)}.puri.fail{filter:grayscale(.25) brightness(.8)}.thin{position:absolute;left:58%;bottom:160px;width:40px;height:16px;border-radius:50%;background:rgba(255,255,255,.3);opacity:0;transition:.4s;transform:rotate(-18deg)}.thin.show{opacity:1}.steam{position:absolute;left:50%;bottom:197px;transform:translateX(-50%);width:140px;height:100px}.steam i{position:absolute;bottom:0;width:16px;height:52px;border-radius:16px;opacity:0;background:linear-gradient(rgba(255,255,255,.58),rgba(255,255,255,0));animation:steam 2s infinite}.steam i:nth-child(1){left:14px}.steam i:nth-child(2){left:48px;animation-delay:.5s}.steam i:nth-child(3){left:84px;animation-delay:1s}.steam i:nth-child(4){left:112px;animation-delay:1.4s}@keyframes steam{0%{transform:translateY(16px);opacity:0}25%{opacity:.8}100%{transform:translateY(-55px);opacity:0}}
+.mobile-console{display:none;margin-top:12px;border:1px solid rgba(112,232,255,.16);background:linear-gradient(180deg,rgba(10,25,44,.95),rgba(8,18,32,.95));border-radius:18px;padding:12px}.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mc-field{border-radius:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:9px}.mc-field label{display:flex;justify-content:space-between;color:#e2f6ff;font-weight:800;font-size:.82rem;margin-bottom:6px}.mc-field span{color:var(--cyan)}.mc-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.dialog,.learn{margin-top:12px;border-radius:16px;padding:15px 16px;line-height:1.6}.dialog{background:linear-gradient(180deg,rgba(185,156,255,.12),rgba(255,255,255,.04));border:1px solid rgba(185,156,255,.18)}.learn{background:linear-gradient(180deg,rgba(255,213,107,.1),rgba(255,255,255,.035));border:1px solid rgba(255,213,107,.18);color:#fff5d5}
+.results{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.chip{border-radius:15px;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}.chip small{display:block;color:var(--muted);margin-bottom:5px}.chip b{font-size:1.05rem}
+.table-wrap{margin-top:14px;overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.08)}table{width:100%;border-collapse:collapse;background:rgba(7,14,24,.72)}th,td{padding:10px;font-size:.9rem;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}th{background:rgba(112,232,255,.08);color:var(--cyan);position:sticky;top:0}
+.quizPanel{padding:18px}.quizGrid{display:grid;gap:14px}.q{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);border-radius:16px;padding:14px}.opt{padding:11px 13px;margin-top:8px;border-radius:13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);cursor:pointer}.opt.correct{border-color:rgba(134,255,176,.6);background:rgba(134,255,176,.12)}.opt.wrong{border-color:rgba(255,124,124,.6);background:rgba(255,124,124,.1)}
+.certPanel{padding:18px}.cert-card{background:linear-gradient(135deg,rgba(112,232,255,.15),rgba(255,213,107,.12));border:2px solid rgba(255,213,107,.45);border-radius:22px;padding:24px;text-align:center}.cert-card h2{font-size:2rem;margin:8px 0;color:#fff}.cert-card .seal{font-size:56px}.cert-card input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:#fff;text-align:center;margin:10px 0}
+footer{margin:20px 0 6px;border:1px solid var(--line);border-radius:20px;padding:16px 20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:1100px){.onboarding,.theoryGrid,.mainLab{grid-template-columns:1fr}.side{position:relative}.logo{position:static;width:max-content;margin:0 0 12px auto}}
+@media(max-width:760px){.wrap{padding:10px}.hero{padding:16px}.side{display:none}.mobile-console{display:block}.scene{min-height:340px}.screen{right:10px;top:10px;width:160px;padding:10px;font-size:.84rem}.char{left:8px;bottom:45px;transform:scale(.72);transform-origin:left bottom}.kadai{width:220px;height:100px;bottom:60px}.oil{width:184px;height:44px;bottom:92px}.puri{width:72px;height:72px;bottom:104px}.thin{bottom:126px;width:30px;height:12px}.steam{bottom:160px;width:110px}.table{height:66px}.results,.stats{grid-template-columns:1fr 1fr}.levelCard{grid-template-columns:44px 1fr}.levelCard .tag{grid-column:1/-1}.bridgeRow{grid-template-columns:1fr}.wm{font-size:32px}}
+@media(max-width:480px){h1{font-size:1.8rem}.badge{font-size:11px}.mc-grid,.mc-actions{grid-template-columns:1fr 1fr}.btn{font-size:.9rem;padding:10px 12px}.chip{padding:10px}th,td{font-size:.82rem}}
+@media print{body{background:white;color:#111}.wrap>section:not(.section),.hero,.nav,.side,.scene,.mobile-console,.dialog,.results,.learn,.table-wrap,.quizPanel,footer,.wm-layer{display:none!important}.certPanel{display:block!important}.cert-card{color:#111;background:white;border:4px solid #111}.cert-card input{border:0;color:#111}}
+
+.explainBox{
+  margin-top:12px;
+  border-radius:18px;
+  padding:16px;
+  background:linear-gradient(180deg,rgba(112,232,255,.10),rgba(255,255,255,.035));
+  border:1px solid rgba(112,232,255,.18);
+  line-height:1.65;
+}
+.explainBox h4{margin:0 0 8px;color:#fff}
+.explainGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:10px;
+}
+.explainItem{
+  background:rgba(0,0,0,.14);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  padding:11px;
+}
+.explainItem b{color:var(--gold)}
+.simpleHint{
+  margin-top:8px;
+  color:#d9f3ff;
+  font-size:.95rem;
+}
+@media(max-width:760px){.explainGrid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="wm-layer">
+  <div class="wm" style="top:6%;left:-4%">Dr AI Academy</div><div class="wm" style="top:21%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:39%;left:61%">Dr AI Academy</div><div class="wm" style="top:55%;left:8%">Dr AI Academy</div>
+  <div class="wm" style="top:72%;left:38%">Dr AI Academy</div><div class="wm" style="top:86%;left:66%">Dr AI Academy</div>
+</div>
+
+<div class="wrap">
+<section class="hero">
+  <div class="logo"><b>Dr AI Academy</b><span>Science GameLab</span></div>
+  <div class="badge">CLASS 8 NCERT SCIENCE • CHAPTER 1 • JEE / NEET / OLYMPIAD FOUNDATION</div>
+  <h1>THE PURI PARADOX:<br>MISSION LAB</h1>
+  <p class="sub">This game uses simple English for Indian students. First learn the science story, then run the experiment, understand the result in detail, solve reasoning questions, and unlock a certificate.</p>
+  <div class="hero-actions">
+    <button class="btn gold" id="startBtn">🎮 Start Game</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle" class="voiceSelect"><option value="standard">Standard English</option><option value="indian">Indian English</option></select>
+  </div>
+
+  <div class="onboarding">
+    <div class="panel box">
+      <h3>Game Rules: What Student Must Do</h3>
+      <div class="rules">
+        <div class="rule"><b>1</b><div><strong>Read Story Theory</strong><br><span class="muted">Understand curiosity, hypothesis, variables and evidence.</span></div></div>
+        <div class="rule"><b>2</b><div><strong>Complete 3 Controlled Trials</strong><br>Change only one variable at a time and observe puff result, time, and safety.</div></div>
+        <div class="rule"><b>3</b><div><strong>Answer 3 Reasoning Questions</strong><br>Questions connect the lab with JEE/NEET/Olympiad foundation concepts.</div></div>
+        <div class="rule"><b>4</b><div><strong>Unlock Certificate</strong><br>Certificate opens after theory + 3 trials + 3 correct quiz answers.</div></div>
+      </div>
+    </div>
+    <div class="panel box">
+      <h3>Level Transition Map</h3>
+      <div class="levelPath">
+        <div class="levelCard active" id="lc1"><div class="num">1</div><div><b>Theory Story</b><br><small>Transition after all theory cards are completed.</small></div><span class="tag" id="l1tag">Active</span></div>
+        <div class="levelCard locked" id="lc2"><div class="num">2</div><div><b>Experiment Lab</b><br><small>Transition after 3 trials are completed.</small></div><span class="tag" id="l2tag">Locked</span></div>
+        <div class="levelCard locked" id="lc3"><div class="num">3</div><div><b>Olympiad Challenge</b><br><small>Transition after 3 correct answers.</small></div><span class="tag" id="l3tag">Locked</span></div>
+        <div class="levelCard locked" id="lc4"><div class="num">4</div><div><b>Certificate</b><br><small>Unlocked after full mission completion.</small></div><span class="tag" id="l4tag">Locked</span></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="theoryCount">0/5</b><span>Theory</span></div><div class="stat"><b id="trialCount">0/3</b><span>Trials</span></div>
+        <div class="stat"><b id="quizCount">0/3</b><span>Quiz</span></div><div class="stat"><b id="score">0</b><span>Score</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="btn gold active" data-go="theory">Level 1: Theory</button>
+  <button class="btn secondary" data-go="lab" id="navLab" disabled>Level 2: Lab</button>
+  <button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Level 3: Quiz</button>
+  <button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button>
+</div>
+
+<section class="section active" id="theory">
+  <div class="theoryGrid">
+    <div class="panel storyPanel">
+      <h3>Dr AI Story Theory</h3>
+      <div class="storyBox" id="storyBox"></div>
+      <div class="storyBtns">
+        <button class="btn secondary" id="prevStory">← Previous</button>
+        <button class="btn" id="nextStory">Next Theory →</button>
+        <button class="btn green" id="markTheory">Mark This Theory Complete</button>
+      </div>
+    </div>
+    <div class="panel bridge">
+      <h3>What Student Learns + Competitive Link</h3>
+      <div class="bridgeTable">
+        <div class="bridgeRow"><b>NCERT Skill</b><span>Ask focused questions, observe carefully, design experiments, record evidence.</span></div>
+        <div class="bridgeRow"><b>Physics Bridge</b><span>Heat transfer, phase change, gas expansion, pressure difference, and time measurement.</span></div>
+        <div class="bridgeRow"><b>Chemistry Bridge</b><span>Change of state: liquid water inside dough turns into steam due to heating.</span></div>
+        <div class="bridgeRow"><b>Olympiad Bridge</b><span>Controlled variable thinking, invalid conclusion detection, data interpretation.</span></div>
+        <div class="bridgeRow"><b>NEET/JEE Seed</b><span>Early foundation for thermodynamics, kinetic theory, pressure, and experimental error.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="lab">
+  <div class="mainLab">
+    <aside class="panel side">
+      <h3>Experiment Controls</h3>
+      <label class="label">Dough Thickness</label><div class="control"><input type="range" id="thickness" min="1" max="8" value="3"><output id="thicknessOut">3 mm</output></div>
+      <label class="label">Dough Diameter</label><div class="control"><input type="range" id="diameter" min="8" max="20" value="14"><output id="diameterOut">14 cm</output></div>
+      <label class="label">Oil Temperature</label><div class="control"><input type="range" id="temperature" min="120" max="230" value="185"><output id="temperatureOut">185°C</output></div>
+      <label class="label">Moisture Level</label><div class="control"><input type="range" id="moisture" min="10" max="60" value="34"><output id="moistureOut">34%</output></div>
+      <label class="label">Flour Type</label><select id="flour"><option value="atta">Atta</option><option value="maida">Maida</option><option value="mixed">Mixed Flour</option></select>
+      <label class="label">Surface Condition</label><select id="surface"><option value="sealed">No Hole / Sealed Layer</option><option value="pin">Tiny Prick Hole</option></select>
+      <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:15px"><button class="btn" id="runBtn">⚗ Run Trial</button><button class="btn secondary" id="speakBtn">🗣 Explain</button><button class="btn secondary" id="resetBtn">↺ Reset Game</button></div>
+    </aside>
+
+    <main class="panel lab">
+      <div class="labTop">
+        <h3>Level 2: Controlled Experiment</h3>
+        <div class="taskBox"><b>Goal:</b> Complete 3 trials. Try one ideal trial, one tiny-hole trial, and one low/high temperature trial.</div>
+      </div>
+      <div class="scene">
+        <div class="labname">Puri Physics Reactor</div>
+        <div class="screen"><b>Live Analysis</b><div>Puff probability:</div><div class="meter"><span id="probBar"></span></div><div id="probText" style="margin-top:8px;color:var(--muted)">Adjust variables.</div></div>
+        <div class="char"><div class="hair"></div><div class="head"></div><div class="body"></div><div class="coat"></div><div class="arm a"></div><div class="arm b"></div><div class="leg l1"></div><div class="leg l2"></div></div>
+        <div class="steam"><i></i><i></i><i></i><i></i></div><div class="thin" id="thin"></div><div class="puri" id="puri"></div><div class="oil"></div><div class="kadai"></div><div class="table"></div>
+      </div>
+
+      <div class="mobile-console">
+        <b>Mobile Lab Console</b>
+        <div class="mc-grid">
+          <div class="mc-field"><label>Thickness <span id="mThicknessOut">3 mm</span></label><input type="range" id="mThickness" min="1" max="8" value="3"></div>
+          <div class="mc-field"><label>Oil Temp <span id="mTemperatureOut">185°C</span></label><input type="range" id="mTemperature" min="120" max="230" value="185"></div>
+          <div class="mc-field"><label>Diameter <span id="mDiameterOut">14 cm</span></label><input type="range" id="mDiameter" min="8" max="20" value="14"></div>
+          <div class="mc-field"><label>Moisture <span id="mMoistureOut">34%</span></label><input type="range" id="mMoisture" min="10" max="60" value="34"></div>
+          <div class="mc-field"><label>Flour</label><select id="mFlour"><option value="atta">Atta</option><option value="maida">Maida</option><option value="mixed">Mixed Flour</option></select></div>
+          <div class="mc-field"><label>Surface</label><select id="mSurface"><option value="sealed">No Hole</option><option value="pin">Tiny Hole</option></select></div>
+        </div>
+        <div class="mc-actions"><button class="btn" id="mRunBtn">⚗ Run</button><button class="btn secondary" id="mSpeakBtn">🗣 Explain</button><button class="btn secondary" id="mResetBtn">↺ Reset</button></div>
+      </div>
+
+      <div class="dialog" id="dialog"><b>Dr AI:</b> Run a trial. Watch the result and read why it happened.</div>
+      <div class="results">
+        <div class="chip"><small>Puff Result</small><b id="resPuff">—</b></div><div class="chip"><small>Puff Time</small><b id="resTime">—</b></div>
+        <div class="chip"><small>Thin Side</small><b id="resThin">—</b></div><div class="chip"><small>Lab Quality</small><b id="resSafe">—</b></div>
+      </div>
+      <div class="learn" id="learningStrip"><b>Concept:</b> Heat converts moisture into steam. Steam expands and builds pressure inside sealed dough layers.</div>
+      <div class="explainBox" id="detailedExplain">
+        <h4>Result Explanation</h4>
+        <div id="explainText">Run a trial to see a simple step-by-step explanation of what happened and why.</div>
+      </div>
+
+      <div class="table-wrap"><table><thead><tr><th>#</th><th>Thickness</th><th>Temp</th><th>Surface</th><th>Result</th><th>Learning</th></tr></thead><tbody id="trialRows"></tbody></table></div>
+    </main>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel quizPanel">
+    <h3>Level 3: JEE / NEET / Olympiad Reasoning</h3>
+    <p style="color:var(--muted);line-height:1.55">Answer these to prove that you understood the concept, not just the game.</p>
+    <div class="quizGrid">
+      <div class="q"><b>Q1. Controlled variable question:</b> Which design correctly tests oil temperature?
+        <div class="opt" data-q="q1" data-correct="1">Keep dough size, thickness, flour and surface same; change only oil temperature.</div>
+        <div class="opt" data-q="q1">Change flour, thickness and temperature together.</div>
+        <div class="opt" data-q="q1">Do only one trial and guess.</div>
+      </div>
+      <div class="q"><b>Q2. Pressure question:</b> A tiny hole reduces puffing mainly because:
+        <div class="opt" data-q="q2" data-correct="1">Steam escapes, so internal pressure cannot build properly.</div>
+        <div class="opt" data-q="q2">The puri becomes heavier.</div>
+        <div class="opt" data-q="q2">Oil becomes colder permanently.</div>
+      </div>
+      <div class="q"><b>Q3. Competitive bridge:</b> This lab is closest to which higher-level concept group?
+        <div class="opt" data-q="q3" data-correct="1">Heat transfer, phase change, gas expansion, pressure difference and experimental design.</div>
+        <div class="opt" data-q="q3">Only food taste testing.</div>
+        <div class="opt" data-q="q3">Magnetic effect of current.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="certificate">
+  <div class="panel certPanel">
+    <div class="cert-card">
+      <div class="seal">🏅</div>
+      <h2>Certificate of Scientific Investigation</h2>
+      <p>This certifies that</p>
+      <input id="studentName" placeholder="Enter Student Name" />
+      <p>has completed <b>The Puri Paradox Mission Lab</b></p>
+      <p>Skills: Scientific Method • Controlled Variables • Heat & Pressure • Olympiad Reasoning</p>
+      <p><b>Developed by Dr AI Academy</b></p>
+      <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+    </div>
+  </div>
+</section>
+
+<footer><div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div><div><a href="https://courses.draiacademy.com" target="_blank" rel="noopener">AI Courses @ Dr AI Academy</a></div></footer>
+</div>
+
+<script>
+(()=>{
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{if((e.ctrlKey&&["u","s","c","x"].includes(e.key.toLowerCase()))||e.key==="F12")e.preventDefault()});
+const $=id=>document.getElementById(id);
+const state={voice:true,style:"standard",score:0,theoryDone:0,storyIndex:0,trials:0,quizCorrect:{},unlocked:{theory:true,lab:false,quiz:false,certificate:false}};
+const stories=[
+{t:"Theory 1: Curiosity",b:"A scientist begins with a question. In this mission, the question is: why does a puri puff up, and why does one side become thinner? This is not cooking class; this is investigation training.",p:["NCERT: observe everyday events carefully.","Olympiad: convert curiosity into a testable question.","JEE/NEET seed: link heat, steam, pressure and material behavior."]},
+{t:"Theory 2: Hypothesis",b:"A hypothesis is a testable scientific explanation. Dr AI suggests: maybe water inside dough becomes steam, steam expands, and sealed layers inflate like a balloon.",p:["Hypothesis A: steam forms inside dough.","Hypothesis B: sealed layers trap pressure.","Hypothesis C: a tiny hole releases steam and reduces puffing."]},
+{t:"Theory 3: Variables",b:"A strong experiment changes only one variable at a time. If temperature, thickness, flour and surface all change together, the conclusion becomes weak.",p:["Independent variable: what you change.","Dependent variable: what you measure.","Controlled variables: everything kept the same."]},
+{t:"Theory 4: Evidence",b:"Evidence means recorded observations. Did the puri puff? How long did it take? Was the oil too hot? Did one side stretch? Data beats guessing.",p:["Record every trial.","Compare results.","Use evidence to improve your explanation."]},
+{t:"Theory 5: Competitive Bridge",b:"This simple lab builds foundations for thermodynamics, kinetic theory, pressure, experimental error and data interpretation.",p:["Physics: pressure, heat and expansion.","Chemistry: phase change.","Olympiad: experiment design and reasoning."]}
+];
+function speak(txt){
+ if(!state.voice||!("speechSynthesis"in window))return;
+ speechSynthesis.cancel();
+ let u=new SpeechSynthesisUtterance(txt);
+ u.lang="en-IN"; u.rate=state.style==="indian"?.88:.98; u.pitch=state.style==="indian"?1.05:1.0;
+ let voices=speechSynthesis.getVoices();
+ let v=state.style==="indian"?voices.find(x=>/india|en-IN/i.test((x.lang||"")+" "+x.name)):voices.find(x=>/en-US|en-GB|english|google|zira|samantha/i.test((x.lang||"")+" "+x.name));
+ if(v)u.voice=v;
+ speechSynthesis.speak(u);
+}
+function stop(){if("speechSynthesis"in window)speechSynthesis.cancel()}
+function showSection(id){
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active")); $(id).classList.add("active");
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+ $(id).scrollIntoView({behavior:"smooth",block:"start"});
+}
+function updateLevelCards(){
+ const levels=[["lc1","l1tag",state.theoryDone>=5],["lc2","l2tag",state.unlocked.lab&&state.trials>=3],["lc3","l3tag",state.unlocked.quiz&&Object.keys(state.quizCorrect).length>=3],["lc4","l4tag",state.unlocked.certificate]];
+ levels.forEach(([card,tag,done],i)=>{$(card).classList.toggle("done",done);$(card).classList.toggle("locked",!state.unlocked[["theory","lab","quiz","certificate"][i]]);$(card).classList.toggle("active",state.unlocked[["theory","lab","quiz","certificate"][i]]&&!done);$(tag).textContent=done?"Done":state.unlocked[["theory","lab","quiz","certificate"][i]]?"Active":"Locked"});
+ $("navLab").disabled=!state.unlocked.lab; $("navQuiz").disabled=!state.unlocked.quiz; $("navCert").disabled=!state.unlocked.certificate;
+ $("theoryCount").textContent=Math.min(state.theoryDone,5)+"/5"; $("trialCount").textContent=Math.min(state.trials,3)+"/3"; $("quizCount").textContent=Math.min(Object.keys(state.quizCorrect).length,3)+"/3"; $("score").textContent=state.score;
+}
+function unlockCheck(){
+ if(state.theoryDone>=5&&!state.unlocked.lab){state.unlocked.lab=true;speak("Level one complete. Level two, Experiment Lab, is now unlocked.");showSection("lab")}
+ if(state.trials>=3&&!state.unlocked.quiz){state.unlocked.quiz=true;speak("Level two complete. Level three, Olympiad Challenge, is now unlocked.");showSection("quiz")}
+ if(Object.keys(state.quizCorrect).length>=3&&!state.unlocked.certificate){state.unlocked.certificate=true;speak("Mission complete. Certificate unlocked.");showSection("certificate")}
+ updateLevelCards();
+}
+function renderStory(){
+ const s=stories[state.storyIndex];
+ $("storyBox").innerHTML=`<h2>${s.t}</h2><p>${s.b}</p><ul>${s.p.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+ speak(s.t+". "+s.b);
+}
+function markTheory(){
+ if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1;state.score+=15}
+ if(state.storyIndex<stories.length-1){state.storyIndex++;renderStory()}else{speak("All theory cards are complete. You are ready for the lab.");}
+ unlockCheck();
+}
+function sync(a,b){if($(a)&&$(b))$(b).value=$(a).value}
+function out(){
+ $("thicknessOut").textContent=$("thickness").value+" mm"; $("diameterOut").textContent=$("diameter").value+" cm"; $("temperatureOut").textContent=$("temperature").value+"°C"; $("moistureOut").textContent=$("moisture").value+"%";
+ $("mThicknessOut").textContent=$("mThickness").value+" mm"; $("mDiameterOut").textContent=$("mDiameter").value+" cm"; $("mTemperatureOut").textContent=$("mTemperature").value+"°C"; $("mMoistureOut").textContent=$("mMoisture").value+"%"; prob();
+}
+function data(){return{t:+$("thickness").value,d:+$("diameter").value,temp:+$("temperature").value,m:+$("moisture").value,fl:$("flour").value,surf:$("surface").value}}
+function calc(x){
+ let p=.35;if(x.temp>=175&&x.temp<=195)p+=.34;else if(x.temp>=165&&x.temp<=205)p+=.22;else if(x.temp<145)p-=.18;else if(x.temp>215)p-=.1;
+ if(x.t>=2&&x.t<=4)p+=.22;else if(x.t>6)p-=.15;if(x.m>=28&&x.m<=40)p+=.16;else if(x.m<18||x.m>52)p-=.12;if(x.surf==="pin")p-=.28;p=Math.max(.03,Math.min(.98,p));
+ let result=p>.83?"Excellent Puff":p>.67?"Good Puff":p>.55?"Partial Puff":"Poor Puff";let time=Math.max(1,Math.round((240-x.temp)/14+x.t*.7+(x.surf==="pin"?2:0)));
+ let insight="Steam pressure inflated the sealed dough layers.";if(x.surf==="pin")insight="The hole allowed steam to escape, so pressure did not build well.";else if(x.temp<155)insight="Low oil temperature made steam formation slow.";else if(x.t>5)insight="Thick dough reduced fast puffing because heat reached the inside slowly.";
+ return{p,result,time,thin:p>.55?"Visible":"Not clear",safe:x.temp>215?"Risky":x.temp<145?"Too cool":"Safe",insight}
+}
+function prob(){let r=calc(data()),pct=Math.round(r.p*100);$("probBar").style.width=pct+"%";$("probText").textContent=pct>=75?"High chance":pct>=55?"Moderate chance":"Low chance"}
+
+function simpleResultExplanation(x,r){
+ let chance=Math.round(r.p*100);
+ let main="";
+ let why="";
+ let improve="";
+ let exam="";
+ if(x.surf==="pin"){
+   main="The puri did not puff well because there was a tiny hole.";
+   why="Steam is needed to build pressure inside the puri. When there is a hole, steam escapes outside. So the inside pressure becomes weak.";
+   improve="Next time, keep the dough layer sealed and compare it with the hole trial. This is a controlled experiment.";
+   exam="Olympiad link: This teaches cause and effect. JEE/NEET foundation: pressure difference and gas expansion.";
+ } else if(x.temp<155){
+   main="The oil was too cool, so puffing was slow or weak.";
+   why="When oil is not hot enough, water inside the dough changes into steam slowly. Slow steam formation means weak pressure.";
+   improve="Increase oil temperature near the safe middle range and keep other variables same.";
+   exam="Physics link: heat transfer and rate of evaporation. Olympiad link: one-variable testing.";
+ } else if(x.temp>215){
+   main="The oil was too hot, so the outside may cook too fast.";
+   why="Very hot oil can harden or brown the outer layer quickly. Then the puri may not expand smoothly.";
+   improve="Reduce oil temperature and test again with the same thickness and flour.";
+   exam="JEE/NEET seed: heat transfer rate, surface heating and experimental safety.";
+ } else if(x.t>5){
+   main="The dough was too thick, so heat reached the inside slowly.";
+   why="Thick dough needs more time for heat to reach the moisture inside. Less steam forms quickly, so puffing becomes weaker.";
+   improve="Try 2 to 4 mm thickness and keep temperature same.";
+   exam="Physics link: heat conduction. Olympiad link: compare thickness vs puffing time.";
+ } else if(r.p>.83){
+   main="Excellent! Your conditions were good for strong puffing.";
+   why="The dough was sealed, oil temperature was suitable, and moisture could turn into steam. Steam expanded and pushed the layers apart.";
+   improve="Now change only one variable, like temperature or thickness, and compare the new result.";
+   exam="JEE/NEET seed: phase change, gas expansion and pressure. Olympiad link: controlled experiment and data comparison.";
+ } else if(r.p>.55){
+   main="The puri puffed, but not perfectly.";
+   why="Steam pressure was formed, but one condition may not be ideal. It could be thickness, moisture, or temperature.";
+   improve="Repeat the trial and change only one variable. This will help you find the real reason.";
+   exam="Olympiad link: finding the limiting factor. NEET/JEE foundation: pressure and heat transfer.";
+ } else {
+   main="The puri did not puff properly.";
+   why="For puffing, steam must form inside and stay trapped. In this trial, pressure was not strong enough.";
+   improve="Use sealed dough, medium thickness, and safe hot oil. Then compare the result.";
+   exam="Science skill: observe, change one variable, measure result, then conclude.";
+ }
+ return `
+   <h4>Result Explanation</h4>
+   <div><b>What happened?</b> ${main}</div>
+   <div class="simpleHint"><b>Why did it happen?</b> ${why}</div>
+   <div class="explainGrid">
+     <div class="explainItem"><b>Your Trial</b><br>Thickness: ${x.t||x.thickness} mm<br>Oil Temperature: ${x.temp||x.temperature}°C<br>Surface: ${x.surf||x.surface}<br>Puff Chance: ${chance}%</div>
+     <div class="explainItem"><b>How to Improve</b><br>${improve}</div>
+     <div class="explainItem"><b>Concept Learned</b><br>Heat changes water into steam. Steam expands and creates pressure inside the puri.</div>
+     <div class="explainItem"><b>Exam Connection</b><br>${exam}</div>
+   </div>
+ `;
+}
+
+function run(){
+ if(!state.unlocked.lab){speak("First complete level one theory.");showSection("theory");return}
+ let x=data(),r=calc(x);state.trials++;state.score+=r.p>.67?28:r.p>.55?20:10;if(r.safe==="Safe")state.score+=8;
+ let puri=$("puri"),thin=$("thin");puri.classList.remove("puff","fail");thin.classList.remove("show");setTimeout(()=>{if(r.p>.55)puri.classList.add("puff");else puri.classList.add("fail");if(r.thin==="Visible")thin.classList.add("show")},150);
+ $("resPuff").textContent=r.result;$("resTime").textContent=r.time+" s";$("resThin").textContent=r.thin;$("resSafe").textContent=r.safe;$("learningStrip").innerHTML="<b>Concept:</b> "+r.insight; if($("detailedExplain")) $("detailedExplain").innerHTML=simpleResultExplanation((typeof x!=="undefined"?x:data), (typeof r!=="undefined"?r:res));
+ $("dialog").innerHTML="<b>Dr AI:</b> Trial "+state.trials+" complete. "+r.insight+" This trial links to heat transfer, steam expansion, pressure and experimental design.";
+ speak("Trial "+state.trials+" complete. "+r.insight+" This links to heat transfer, steam expansion, pressure and experimental design.");
+ $("trialRows").prepend(Object.assign(document.createElement("tr"),{innerHTML:`<td>${state.trials}</td><td>${x.t} mm</td><td>${x.temp}°C</td><td>${x.surf}</td><td>${r.result}</td><td>${r.insight}</td>`}));
+ unlockCheck();
+}
+function explain(){let r=calc(data());$("dialog").innerHTML="<b>Dr AI:</b> "+r.insight+" Simple explanation: heat makes steam, steam expands, and pressure builds inside the puri. JEE/NEET/Olympiad link: heat transfer, phase change, pressure difference and controlled variables.";speak(r.insight+" In simple words, heat makes steam, steam expands, and expansion creates pressure. This is why the puri can puff. This same thinking helps in JEE, NEET and Olympiad questions on heat, pressure and experiments.")}
+function reset(){
+ state.score=0;state.theoryDone=0;state.storyIndex=0;state.trials=0;state.quizCorrect={};state.unlocked={theory:true,lab:false,quiz:false,certificate:false};$("trialRows").innerHTML="";document.querySelectorAll(".opt").forEach(o=>o.classList.remove("correct","wrong"));renderStory();updateLevelCards();showSection("theory");
+}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{if(!b.disabled)showSection(b.dataset.go)});
+$("startBtn").onclick=()=>{showSection("theory");speak("Welcome to Puri Paradox Mission Lab. First, complete the theory story, then unlock the experiment lab.")};
+$("voiceBtn").onclick=()=>{state.voice=!state.voice;$("voiceBtn").textContent=state.voice?"🔊 Voice ON":"🔇 Voice OFF"};$("stopVoiceBtn").onclick=stop;$("voiceStyle").onchange=e=>{state.style=e.target.value;speak(state.style==="indian"?"Indian English voice selected. Namaste scientists, let us begin.":"Standard English voice selected. Let us begin.")};
+$("nextStory").onclick=()=>{state.storyIndex=Math.min(stories.length-1,state.storyIndex+1);renderStory()};$("prevStory").onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1);renderStory()};$("markTheory").onclick=markTheory;
+[["thickness","mThickness"],["diameter","mDiameter"],["temperature","mTemperature"],["moisture","mMoisture"],["flour","mFlour"],["surface","mSurface"]].forEach(([a,b])=>{[a,b].forEach(id=>$(id).addEventListener("input",()=>{id===a?sync(a,b):sync(b,a);out()}));[a,b].forEach(id=>$(id).addEventListener("change",()=>{id===a?sync(a,b):sync(b,a);out()}))});
+["runBtn","mRunBtn"].forEach(id=>$(id).onclick=run);["speakBtn","mSpeakBtn"].forEach(id=>$(id).onclick=explain);["resetBtn","mResetBtn"].forEach(id=>$(id).onclick=reset);
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{if(!state.unlocked.quiz){speak("Complete the experiment level first.");return}let q=o.dataset.q;if(state.quizCorrect[q])return;let group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)];group.forEach(x=>x.classList.remove("correct","wrong"));if(o.dataset.correct){o.classList.add("correct");state.quizCorrect[q]=true;state.score+=25;speak("Correct. Excellent reasoning.")}else{o.classList.add("wrong");group.forEach(x=>{if(x.dataset.correct)x.classList.add("correct")});speak("Not quite. Look for controlled variables, steam and pressure.")}unlockCheck()});
+renderStory();out();updateLevelCards();
+})();
+</script>
+</body>
+</html>

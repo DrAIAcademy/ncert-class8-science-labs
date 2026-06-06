@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Lab 5: Hypothesis Builder | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#06111f;--bg2:#0b1c34;--panel:rgba(10,24,44,.9);--line:rgba(119,208,255,.22);
+  --cyan:#70e8ff;--gold:#ffd56b;--green:#86ffb0;--red:#ff7c7c;--violet:#b99cff;
+  --text:#eef8ff;--muted:#a9c3da;--shadow:0 18px 50px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 12% 10%,rgba(112,232,255,.14),transparent 28%),
+    radial-gradient(circle at 85% 15%,rgba(185,156,255,.13),transparent 30%),
+    linear-gradient(135deg,var(--bg),var(--bg2));
+  color:var(--text);min-height:100%;overflow-x:hidden;user-select:none
+}
+body:before{
+  content:"";position:fixed;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.024) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.024) 1px,transparent 1px);
+  background-size:30px 30px;pointer-events:none
+}
+.wm-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.045);font-size:42px;font-weight:900;letter-spacing:2px;white-space:nowrap;transform:rotate(-26deg)}
+.wrap{max-width:1480px;margin:auto;padding:16px;position:relative;z-index:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.hero{padding:22px;position:relative;overflow:hidden}
+.logo{position:absolute;right:18px;top:18px;padding:10px 14px;border-radius:14px;background:rgba(5,16,30,.76);border:1px solid rgba(112,232,255,.24);text-align:right}
+.logo b{display:block;color:#fff}.logo span{font-size:.78rem;color:var(--cyan);font-weight:800}
+.badge{display:inline-block;padding:9px 14px;border-radius:999px;background:rgba(112,232,255,.10);border:1px solid rgba(112,232,255,.22);color:var(--cyan);font-weight:900;font-size:.8rem;letter-spacing:.5px}
+h1{font-size:clamp(2rem,4.2vw,4.3rem);line-height:1.03;margin:14px 0 10px;max-width:1000px}
+.sub{max-width:1000px;color:var(--muted);line-height:1.6}
+button,select,input{font:inherit}
+.btn{border:0;border-radius:14px;padding:11px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;box-shadow:0 10px 22px rgba(112,232,255,.14)}
+.btn.secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.12);box-shadow:none}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}
+.btn:disabled{opacity:.52;cursor:not-allowed}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.topGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.box{padding:18px}
+.rules,.levels{display:grid;gap:10px}
+.rule,.level{
+  display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px
+}
+.rule .n,.level .n{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(112,232,255,.12);color:var(--cyan);font-weight:1000}
+.level.active{border-color:rgba(255,213,107,.44);background:rgba(255,213,107,.08)}
+.level.done{border-color:rgba(134,255,176,.44);background:rgba(134,255,176,.09)}
+.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.07);font-size:.78rem;font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.stat{padding:12px;text-align:center;border-radius:15px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.stat b{display:block;font-size:1.32rem;color:var(--cyan)} .stat span{font-size:.8rem;color:var(--muted)}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.nav button.active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.section{display:none}
+.section.active{display:block}
+.theoryGrid{display:grid;grid-template-columns:.9fr 1.1fr;gap:16px}
+.storyPanel,.bridgePanel,.missionPanel,.quizPanel,.certPanel{padding:18px}
+.storyBox{min-height:310px;padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(112,232,255,.09),rgba(255,255,255,.035));border:1px solid rgba(112,232,255,.16);line-height:1.7}
+.storyBox h2{margin:0 0 8px}
+.storyBox ul{margin:8px 0 0 20px;padding:0}
+.storyBox li{margin:7px 0;color:#d8edff}
+.storyBtns{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-top:12px}
+.bridgeRows{display:grid;gap:10px}
+.bridgeRow{display:grid;grid-template-columns:145px 1fr;gap:10px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.bridgeRow b{color:var(--gold)}
+.missionGrid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+.mysteryGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.mysteryCard{padding:15px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:.2s}
+.mysteryCard:hover{transform:translateY(-2px);border-color:rgba(112,232,255,.35)}
+.mysteryCard.active{border-color:rgba(255,213,107,.5);background:rgba(255,213,107,.09)}
+.mysteryCard b{display:block;margin-bottom:6px;color:#fff}
+.stepBox{margin-top:14px;padding:16px;border-radius:18px;background:linear-gradient(180deg,rgba(112,232,255,.08),rgba(255,255,255,.03));border:1px solid rgba(112,232,255,.16)}
+.stepTitle{font-size:1.05rem;font-weight:900;color:#fff;margin-bottom:8px}
+.choiceGroup{display:grid;gap:10px;margin-top:8px}
+.choice{padding:12px 13px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);cursor:pointer;line-height:1.48}
+.choice.selected{border-color:rgba(112,232,255,.55);background:rgba(112,232,255,.12)}
+.choice.correct{border-color:rgba(134,255,176,.62);background:rgba(134,255,176,.12)}
+.choice.wrong{border-color:rgba(255,124,124,.62);background:rgba(255,124,124,.12)}
+.consoleScene{position:relative;min-height:320px;border-radius:22px;overflow:hidden;background:
+radial-gradient(circle at 22% 20%,rgba(112,232,255,.12),transparent 28%),
+radial-gradient(circle at 82% 18%,rgba(255,213,107,.11),transparent 24%),
+linear-gradient(180deg,#0d213e,#0a1528 64%,#09101e);
+border:1px solid rgba(255,255,255,.08)}
+.aiChar{position:absolute;left:28px;bottom:42px;width:130px;height:200px}
+.head{position:absolute;left:30px;top:0;width:64px;height:64px;border-radius:50%;background:linear-gradient(#dff9ff,#70e8ff)}
+.face{position:absolute;left:42px;top:24px;color:#062033;font-weight:1000}
+.body{position:absolute;left:10px;top:66px;width:110px;height:118px;border-radius:24px;background:linear-gradient(#faffff,#ccecff)}
+.arm{position:absolute;top:106px;width:80px;height:14px;border-radius:14px;background:#b8f3ff}.arm.a{left:-4px;transform:rotate(20deg)}.arm.b{left:64px;transform:rotate(-23deg)}
+.board{position:absolute;right:18px;top:18px;width:58%;min-height:235px;border-radius:18px;background:rgba(3,12,24,.74);border:1px solid rgba(112,232,255,.18);padding:15px}
+.board h3{margin:0 0 8px}
+.boardLine{margin:8px 0;padding:9px;border-radius:12px;background:rgba(255,255,255,.05)}
+.progressBar{height:12px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:8px}
+.progressBar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));transition:.3s}
+.explainBox{margin-top:12px;border-radius:18px;padding:16px;background:linear-gradient(180deg,rgba(112,232,255,.10),rgba(255,255,255,.035));border:1px solid rgba(112,232,255,.18);line-height:1.65}
+.explainBox h4{margin:0 0 8px}
+.explainGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.explainItem{background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:11px}
+.explainItem b{color:var(--gold)}
+.quizGrid{display:grid;gap:14px}
+.q{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);border-radius:16px;padding:14px}
+.opt{padding:11px 13px;margin-top:8px;border-radius:13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);cursor:pointer}
+.opt.correct{border-color:rgba(134,255,176,.6);background:rgba(134,255,176,.12)}
+.opt.wrong{border-color:rgba(255,124,124,.6);background:rgba(255,124,124,.1)}
+.certCard{background:linear-gradient(135deg,rgba(112,232,255,.15),rgba(255,213,107,.12));border:2px solid rgba(255,213,107,.45);border-radius:22px;padding:24px;text-align:center}
+.certCard h2{font-size:2rem;margin:8px 0}
+.certCard .seal{font-size:56px}
+.certCard input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:#fff;text-align:center;margin:10px 0}
+footer{margin:20px 0 6px;border:1px solid var(--line);border-radius:20px;padding:16px 20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}
+footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:1100px){.topGrid,.theoryGrid,.missionGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 12px auto}}
+@media(max-width:760px){
+  .wrap{padding:10px}.hero{padding:16px}.rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2/3;width:max-content}.stats{grid-template-columns:1fr 1fr}
+  .bridgeRow{grid-template-columns:1fr}.mysteryGrid,.explainGrid{grid-template-columns:1fr}.board{position:relative;right:auto;top:auto;width:auto;margin:14px}.consoleScene{min-height:470px}.aiChar{left:50%;transform:translateX(-50%);bottom:26px}
+}
+@media(max-width:480px){h1{font-size:1.8rem}.badge{font-size:11px}.btn{font-size:.9rem;padding:10px 12px}.wm{font-size:32px}}
+@media print{
+  body{background:white;color:#111}.hero,.nav,.section:not(#certificate),footer,.wm-layer{display:none!important}
+  #certificate{display:block!important}.certCard{color:#111;background:white;border:4px solid #111}.certCard input{border:0;color:#111}
+}
+</style>
+</head>
+<body>
+<div class="wm-layer">
+  <div class="wm" style="top:6%;left:-4%">Dr AI Academy</div>
+  <div class="wm" style="top:21%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:39%;left:61%">Dr AI Academy</div>
+  <div class="wm" style="top:55%;left:8%">Dr AI Academy</div>
+  <div class="wm" style="top:72%;left:38%">Dr AI Academy</div>
+  <div class="wm" style="top:86%;left:66%">Dr AI Academy</div>
+</div>
+
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Science GameLab</span></div>
+  <div class="badge">LAB 5 • CLASS 8 NCERT SCIENCE CHAPTER 1 • HYPOTHESIS + SCIENTIFIC THINKING</div>
+  <h1>HYPOTHESIS BUILDER:<br>THE SCIENCE MYSTERY ENGINE</h1>
+  <p class="sub">A simple English investigation game for Indian students. Students learn how to move from a science question to a testable hypothesis, then plan a fair experiment, predict the result, and think like a real scientist. This builds strong JEE, NEET, and Olympiad reasoning.</p>
+  <div class="actions">
+    <button class="btn gold" id="startBtn">🎮 Start Lab 5</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select>
+  </div>
+
+  <div class="topGrid">
+    <div class="panel box">
+      <h3>Game Rules</h3>
+      <div class="rules">
+        <div class="rule"><div class="n">1</div><div><b>Learn Theory</b><br>Understand question, hypothesis, variable, prediction, and conclusion.</div><div class="tag">Level 1</div></div>
+        <div class="rule"><div class="n">2</div><div><b>Select a Science Mystery</b><br>Choose one real-life mystery given by Dr AI.</div><div class="tag">Level 2</div></div>
+        <div class="rule"><div class="n">3</div><div><b>Build the Hypothesis Plan</b><br>Choose the best question, hypothesis, variable, control, and prediction.</div><div class="tag">Level 3-4</div></div>
+        <div class="rule"><div class="n">4</div><div><b>Solve Quiz + Unlock Certificate</b><br>Complete reasoning questions to finish the mission.</div><div class="tag">Final</div></div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Level Transition Map</h3>
+      <div class="levels">
+        <div class="level active" id="lvl1"><div class="n">1</div><div><b>Theory Briefing</b><br><small>Complete 4 theory cards.</small></div><div class="tag" id="tag1">Active</div></div>
+        <div class="level" id="lvl2"><div class="n">2</div><div><b>Mystery Selection</b><br><small>Choose one science mystery.</small></div><div class="tag" id="tag2">Locked</div></div>
+        <div class="level" id="lvl3"><div class="n">3</div><div><b>Hypothesis Builder</b><br><small>Build one correct investigation plan.</small></div><div class="tag" id="tag3">Locked</div></div>
+        <div class="level" id="lvl4"><div class="n">4</div><div><b>Olympiad Quiz</b><br><small>Answer 3 reasoning questions.</small></div><div class="tag" id="tag4">Locked</div></div>
+        <div class="level" id="lvl5"><div class="n">5</div><div><b>Certificate</b><br><small>Unlock after full mission.</small></div><div class="tag" id="tag5">Locked</div></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="theoryCount">0/4</b><span>Theory</span></div>
+        <div class="stat"><b id="missionCount">0/1</b><span>Mission</span></div>
+        <div class="stat"><b id="quizCount">0/3</b><span>Quiz</span></div>
+        <div class="stat"><b id="score">0</b><span>Score</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="btn gold active" data-go="theory">Level 1: Theory</button>
+  <button class="btn secondary" data-go="mission" id="navMission" disabled>Level 2-3: Mission</button>
+  <button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Level 4: Quiz</button>
+  <button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button>
+</div>
+
+<section class="section active" id="theory">
+  <div class="theoryGrid">
+    <div class="panel storyPanel">
+      <h3>Dr AI Theory Briefing</h3>
+      <div class="storyBox" id="storyBox"></div>
+      <div class="storyBtns">
+        <button class="btn secondary" id="prevStory">← Previous</button>
+        <button class="btn" id="nextStory">Next Theory →</button>
+        <button class="btn gold" id="markTheory">Mark Theory Complete</button>
+      </div>
+    </div>
+
+    <div class="panel bridgePanel">
+      <h3>What Student Learns + Exam Link</h3>
+      <div class="bridgeRows">
+        <div class="bridgeRow"><b>NCERT Skill</b><span>Ask a good science question, make a testable hypothesis, and plan a fair experiment.</span></div>
+        <div class="bridgeRow"><b>Physics Link</b><span>Cause-effect reasoning in heat, pressure, motion, light, electricity and forces.</span></div>
+        <div class="bridgeRow"><b>Chemistry Link</b><span>Testing ideas about rusting, evaporation, food spoilage, and reaction conditions.</span></div>
+        <div class="bridgeRow"><b>Olympiad Link</b><span>Testable explanation, invalid hypothesis detection, and experiment planning.</span></div>
+        <div class="bridgeRow"><b>JEE / NEET Seed</b><span>Scientific thinking, prediction, assertion-reason logic, and evidence-based conclusion.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mission">
+  <div class="missionGrid">
+    <div class="panel missionPanel">
+      <h3>Level 2-3: Mystery Mission</h3>
+      <p style="color:var(--muted);line-height:1.55">First select one mystery. Then complete all steps to build a correct scientific investigation.</p>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 1: Choose Your Science Mystery</div>
+        <div class="mysteryGrid" id="mysteryGrid"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 2: Choose the Best Scientific Question</div>
+        <div class="choiceGroup" id="questionChoices"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 3: Choose the Best Testable Hypothesis</div>
+        <div class="choiceGroup" id="hypothesisChoices"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 4: Choose the Variable to Change</div>
+        <div class="choiceGroup" id="variableChoices"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 5: Choose the Best Control Setup</div>
+        <div class="choiceGroup" id="controlChoices"></div>
+      </div>
+
+      <div class="stepBox">
+        <div class="stepTitle">Step 6: Choose the Best Prediction</div>
+        <div class="choiceGroup" id="predictionChoices"></div>
+      </div>
+
+      <div class="storyBtns">
+        <button class="btn green" id="submitPlan">✅ Submit Plan</button>
+        <button class="btn secondary" id="resetMission">↺ Reset Mission</button>
+      </div>
+
+      <div class="explainBox" id="feedbackBox">
+        <h4>Mission Feedback</h4>
+        <div>Select a mystery and make your choices. Dr AI will explain the result in simple language.</div>
+      </div>
+    </div>
+
+    <div class="panel missionPanel">
+      <h3>Dr AI Mission Console</h3>
+      <div class="consoleScene">
+        <div class="aiChar"><div class="head"></div><div class="face">AI</div><div class="body"></div><div class="arm a"></div><div class="arm b"></div></div>
+        <div class="board">
+          <h3>Investigation Scanner</h3>
+          <div class="boardLine">Selected Mystery: <b id="selectedMystery">None</b></div>
+          <div class="boardLine">Current Step: <b id="currentStep">Choose a mystery</b></div>
+          <div class="boardLine">Mission Goal: <span id="missionGoal">Build a full science plan from question to prediction.</span></div>
+          <div class="boardLine">Exam Bridge: <span id="examBridge">This mission builds scientific reasoning for JEE / NEET / Olympiad.</span></div>
+          <div class="progressBar"><span id="progressFill"></span></div>
+        </div>
+      </div>
+
+      <div class="explainBox">
+        <h4>Simple Rule</h4>
+        <div>
+          A <b>question</b> asks what you want to know.  
+          A <b>hypothesis</b> gives a testable explanation.  
+          A <b>variable</b> is what you change.  
+          A <b>control</b> means other conditions stay same.  
+          A <b>prediction</b> tells what you expect to happen if your hypothesis is correct.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel quizPanel">
+    <h3>Level 4: Olympiad Reasoning Quiz</h3>
+    <p style="color:var(--muted);line-height:1.55">Now show that you understand hypothesis building, not just option selection.</p>
+    <div class="quizGrid">
+      <div class="q">
+        <b>Q1. Which statement is the best scientific hypothesis?</b>
+        <div class="opt" data-q="q1" data-correct="1">If oil temperature is too low, then puri puffing will become weak because steam forms more slowly.</div>
+        <div class="opt" data-q="q1">Puri is nice and interesting.</div>
+        <div class="opt" data-q="q1">Maybe something happens somehow.</div>
+      </div>
+      <div class="q">
+        <b>Q2. Why must a hypothesis be testable?</b>
+        <div class="opt" data-q="q2" data-correct="1">Because we should be able to check it by observation or experiment.</div>
+        <div class="opt" data-q="q2">Because it should sound difficult.</div>
+        <div class="opt" data-q="q2">Because it should be impossible to test.</div>
+      </div>
+      <div class="q">
+        <b>Q3. Which skill is most useful for JEE / NEET / Olympiad science investigations?</b>
+        <div class="opt" data-q="q3" data-correct="1">Asking a good question, testing one variable, and using evidence to conclude.</div>
+        <div class="opt" data-q="q3">Guessing quickly without checking.</div>
+        <div class="opt" data-q="q3">Changing many things together and hoping for the best.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="certificate">
+  <div class="panel certPanel">
+    <div class="certCard">
+      <div class="seal">🧠🏅</div>
+      <h2>Certificate of Hypothesis Building</h2>
+      <p>This certifies that</p>
+      <input id="studentName" placeholder="Enter Student Name" />
+      <p>has completed <b>Lab 5: Hypothesis Builder</b></p>
+      <p>Skills: Scientific Question • Testable Hypothesis • Variable Control • Prediction • Evidence Reasoning</p>
+      <p><b>Developed by Dr AI Academy</b></p>
+      <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div>
+  <div><a href="https://courses.draiacademy.com" target="_blank" rel="noopener">AI Courses @ Dr AI Academy</a></div>
+</footer>
+</div>
+
+<script>
+(()=>{
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{if((e.ctrlKey&&["u","s","c","x"].includes(e.key.toLowerCase()))||e.key==="F12")e.preventDefault()});
+const $=id=>document.getElementById(id);
+
+const state={
+  voice:true,style:"standard",storyIndex:0,theoryDone:0,missionSolved:false,quizCorrect:{},
+  selectedMystery:null,
+  answers:{question:null,hypothesis:null,variable:null,control:null,prediction:null},
+  score:0,
+  unlocked:{theory:true,mission:false,quiz:false,certificate:false}
+};
+
+const stories=[
+ {title:"Theory 1: A Good Science Investigation Starts with a Question",body:"Science begins with curiosity. A good scientific question is clear and focused. It should ask about something we can observe or test.",points:["Bad question: Why is science nice?","Better question: Does oil temperature affect puri puffing?","Good questions are specific and testable."]},
+ {title:"Theory 2: What is a Hypothesis?",body:"A hypothesis is a testable explanation. It does not only guess what happens; it also suggests why it may happen.",points:["A hypothesis is not random.","It can be tested by experiment.","It often uses 'If..., then..., because...'."]},
+ {title:"Theory 3: Variable, Control and Prediction",body:"To test a hypothesis, we change one variable, keep other conditions the same, and make a prediction. Then we compare the result with the prediction.",points:["Variable: what you change.","Control: what you keep same.","Prediction: what you expect if your hypothesis is correct."]},
+ {title:"Theory 4: Why This Matters for JEE, NEET and Olympiad",body:"Higher-level science is not only about formulas. It also needs logic, prediction, experiment planning, assertion-reason thinking, and evidence-based conclusion.",points:["Olympiad: testable reasoning.","JEE/NEET foundation: cause-effect thinking.","Scientific method builds strong concepts."]}
+];
+
+const mysteries=[
+ {
+   id:"puri",
+   title:"The Puri Puff Mystery",
+   blurb:"Why does a puri puff while frying?",
+   question:{
+     prompt:"Which is the best scientific question?",
+     options:[
+       "Why is puri tasty?",
+       "Does oil temperature affect puri puffing?",
+       "Who invented puri?"
+     ],
+     correct:1
+   },
+   hypothesis:{
+     prompt:"Which is the best hypothesis?",
+     options:[
+       "If oil temperature is low, then puri puffing will be weak because steam forms slowly.",
+       "Puri is always magical.",
+       "Hot oil looks bright."
+     ],
+     correct:0
+   },
+   variable:{
+     prompt:"Which variable should be changed?",
+     options:["Oil temperature","Puri colour","Plate design"],
+     correct:0
+   },
+   control:{
+     prompt:"Which is the best control setup?",
+     options:[
+       "Keep thickness, flour, moisture, and size same.",
+       "Change temperature, flour, and thickness together.",
+       "Do not keep anything same."
+     ],
+     correct:0
+   },
+   prediction:{
+     prompt:"Which is the best prediction?",
+     options:[
+       "If oil is too cool, the puri will puff more.",
+       "If oil is too cool, puffing will become slower and weaker.",
+       "Oil temperature will not matter at all."
+     ],
+     correct:1
+   },
+   explanation:"This mission teaches heat, steam, pressure, and controlled testing. It builds a strong base for thermodynamics and experiment logic."
+ },
+ {
+   id:"cloth",
+   title:"The Drying Cloth Mystery",
+   blurb:"Why do wet clothes dry faster in sunlight?",
+   question:{
+     prompt:"Which is the best scientific question?",
+     options:[
+       "Does sunlight affect drying speed of wet cloth?",
+       "Why do people wear clothes?",
+       "Which cloth colour looks best?"
+     ],
+     correct:0
+   },
+   hypothesis:{
+     prompt:"Which is the best hypothesis?",
+     options:[
+       "If cloth is kept in sunlight, then it will dry faster because water evaporates more quickly.",
+       "Clothes dry because they are happy.",
+       "Sunlight always changes cloth colour."
+     ],
+     correct:0
+   },
+   variable:{
+     prompt:"Which variable should be changed?",
+     options:["Sunlight exposure","Brand name of cloth","Room wall colour"],
+     correct:0
+   },
+   control:{
+     prompt:"Which is the best control setup?",
+     options:[
+       "Keep cloth size, amount of water, and cloth type same.",
+       "Use different cloth sizes and different water amounts.",
+       "Keep changing everything."
+     ],
+     correct:0
+   },
+   prediction:{
+     prompt:"Which is the best prediction?",
+     options:[
+       "Cloth in sunlight will dry more slowly.",
+       "Cloth in sunlight will dry faster than cloth in shade.",
+       "Sunlight will turn water into ice."
+     ],
+     correct:1
+   },
+   explanation:"This mission teaches evaporation, heat transfer, and fair testing. It builds chemistry and physics thinking together."
+ },
+ {
+   id:"food",
+   title:"The Summer Food Mystery",
+   blurb:"Why does food spoil faster in summer?",
+   question:{
+     prompt:"Which is the best scientific question?",
+     options:[
+       "Does higher temperature increase food spoilage speed?",
+       "Why do we eat food?",
+       "Is summer better than winter?"
+     ],
+     correct:0
+   },
+   hypothesis:{
+     prompt:"Which is the best hypothesis?",
+     options:[
+       "If temperature is higher, food will spoil faster because microorganisms grow faster.",
+       "Food spoils because the plate becomes angry.",
+       "Food always spoils at the same rate."
+     ],
+     correct:0
+   },
+   variable:{
+     prompt:"Which variable should be changed?",
+     options:["Temperature","Food colour preference","Table height"],
+     correct:0
+   },
+   control:{
+     prompt:"Which is the best control setup?",
+     options:[
+       "Keep food type, amount, and container same.",
+       "Use different foods in different containers and places.",
+       "Add many changes together."
+     ],
+     correct:0
+   },
+   prediction:{
+     prompt:"Which is the best prediction?",
+     options:[
+       "Food at higher temperature will spoil faster.",
+       "Food at higher temperature will never spoil.",
+       "Temperature does not affect spoilage."
+     ],
+     correct:0
+   },
+   explanation:"This mission connects biology, chemistry, and scientific testing. It helps students understand environmental effects and microbial growth."
+ },
+ {
+   id:"moon",
+   title:"The Moon Shape Mystery",
+   blurb:"Why does the Moon seem to change shape?",
+   question:{
+     prompt:"Which is the best scientific question?",
+     options:[
+       "Does the relative position of Sun, Earth, and Moon affect the visible Moon phase?",
+       "Why is the Moon beautiful?",
+       "Who painted the Moon?"
+     ],
+     correct:0
+   },
+   hypothesis:{
+     prompt:"Which is the best hypothesis?",
+     options:[
+       "If the Moon moves around Earth, we will see different lit parts because its position changes relative to Sun and Earth.",
+       "The Moon changes shape because it grows and shrinks physically every week.",
+       "Clouds create all Moon phases."
+     ],
+     correct:0
+   },
+   variable:{
+     prompt:"Which variable should be considered as changing?",
+     options:["Relative position of Moon in orbit","Name of the night","Observer mood"],
+     correct:0
+   },
+   control:{
+     prompt:"Which is the best control idea?",
+     options:[
+       "Observe the same Moon over different days and record the phase pattern.",
+       "Observe random objects and compare them.",
+       "Skip recording and only guess."
+     ],
+     correct:0
+   },
+   prediction:{
+     prompt:"Which is the best prediction?",
+     options:[
+       "Moon phases will repeat in a cycle over time.",
+       "Moon phase will be completely random every night.",
+       "The Moon will disappear forever after one week."
+     ],
+     correct:0
+   },
+   explanation:"This mission teaches observation, cyclic pattern, light reflection, and model-based explanation."
+ }
+];
+
+function speak(txt){
+ if(!state.voice||!("speechSynthesis" in window)) return;
+ speechSynthesis.cancel();
+ const u = new SpeechSynthesisUtterance(txt);
+ u.lang="en-IN"; u.rate=state.style==="indian"?0.88:0.98; u.pitch=state.style==="indian"?1.05:1;
+ const voices=speechSynthesis.getVoices();
+ const v=state.style==="indian"
+   ? voices.find(x=>/india|en-IN/i.test((x.lang||"")+" "+x.name))
+   : voices.find(x=>/en-US|en-GB|english|google|zira|samantha/i.test((x.lang||"")+" "+x.name));
+ if(v)u.voice=v;
+ speechSynthesis.speak(u);
+}
+function stop(){ if("speechSynthesis" in window) speechSynthesis.cancel(); }
+
+function showSection(id){
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+ $(id).classList.add("active");
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+ $(id).scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function updateStatus(){
+ $("theoryCount").textContent=Math.min(state.theoryDone,4)+"/4";
+ $("missionCount").textContent=(state.missionSolved?1:0)+"/1";
+ $("quizCount").textContent=Object.keys(state.quizCorrect).length+"/3";
+ $("score").textContent=state.score;
+
+ const map=[
+   ["lvl1","tag1",state.theoryDone>=4,state.unlocked.theory],
+   ["lvl2","tag2",!!state.selectedMystery,state.unlocked.mission],
+   ["lvl3","tag3",state.missionSolved,state.unlocked.mission],
+   ["lvl4","tag4",Object.keys(state.quizCorrect).length>=3,state.unlocked.quiz],
+   ["lvl5","tag5",state.unlocked.certificate,state.unlocked.certificate]
+ ];
+ map.forEach(([id,tag,done,active])=>{
+   $(id).classList.toggle("done",done);
+   $(id).classList.toggle("active",active&&!done);
+   $(tag).textContent=done?"Done":active?"Active":"Locked";
+ });
+
+ $("navMission").disabled=!state.unlocked.mission;
+ $("navQuiz").disabled=!state.unlocked.quiz;
+ $("navCert").disabled=!state.unlocked.certificate;
+ updateProgress();
+}
+
+function updateProgress(){
+ const steps = [
+   !!state.selectedMystery,
+   state.answers.question!==null,
+   state.answers.hypothesis!==null,
+   state.answers.variable!==null,
+   state.answers.control!==null,
+   state.answers.prediction!==null
+ ];
+ const done=steps.filter(Boolean).length;
+ $("progressFill").style.width=(done/6*100)+"%";
+ $("selectedMystery").textContent=state.selectedMystery ? getMystery().title : "None";
+ const labels=["Choose a mystery","Choose scientific question","Choose testable hypothesis","Choose variable","Choose control setup","Choose prediction","Ready to submit"];
+ $("currentStep").textContent=labels[done];
+}
+
+function checkUnlocks(){
+ if(state.theoryDone>=4 && !state.unlocked.mission){
+   state.unlocked.mission=true;
+   speak("Level one complete. Mystery mission is now unlocked.");
+   showSection("mission");
+ }
+ if(state.missionSolved && !state.unlocked.quiz){
+   state.unlocked.quiz=true;
+   speak("Excellent. Your hypothesis plan is correct. Olympiad quiz is now unlocked.");
+   showSection("quiz");
+ }
+ if(Object.keys(state.quizCorrect).length>=3 && !state.unlocked.certificate){
+   state.unlocked.certificate=true;
+   speak("Mission complete. Certificate unlocked.");
+   showSection("certificate");
+ }
+ updateStatus();
+}
+
+function renderStory(){
+ const s=stories[state.storyIndex];
+ $("storyBox").innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+ speak(s.title+". "+s.body);
+}
+
+function markTheory(){
+ if(state.theoryDone < state.storyIndex+1){
+   state.theoryDone = state.storyIndex+1;
+   state.score += 15;
+ }
+ if(state.storyIndex < stories.length-1){
+   state.storyIndex++;
+   renderStory();
+ }else{
+   speak("All theory cards are complete. Now start your science mystery mission.");
+ }
+ checkUnlocks();
+}
+
+function getMystery(){
+ return mysteries.find(m=>m.id===state.selectedMystery);
+}
+
+function renderMysteries(){
+ $("mysteryGrid").innerHTML = mysteries.map(m=>`
+   <div class="mysteryCard ${state.selectedMystery===m.id?"active":""}" data-mid="${m.id}">
+     <b>${m.title}</b>
+     <div>${m.blurb}</div>
+   </div>
+ `).join("");
+ document.querySelectorAll(".mysteryCard").forEach(card=>{
+   card.onclick=()=>{
+     state.selectedMystery=card.dataset.mid;
+     state.answers={question:null,hypothesis:null,variable:null,control:null,prediction:null};
+     state.missionSolved=false;
+     renderMysteries();
+     renderMission();
+     $("feedbackBox").innerHTML=`<h4>Mission Feedback</h4><div>Great! Now build the scientific plan for <b>${getMystery().title}</b>.</div>`;
+     speak("Mystery selected. Now build the scientific plan.");
+     updateStatus();
+   };
+ });
+}
+
+function renderChoices(containerId, key){
+ const container=$(containerId);
+ if(!state.selectedMystery){
+   container.innerHTML=`<div class="choice">Select a mystery first.</div>`;
+   return;
+ }
+ const m=getMystery();
+ const block=m[key];
+ container.innerHTML=block.options.map((opt,idx)=>`
+   <div class="choice ${state.answers[key]===idx?"selected":""}" data-key="${key}" data-idx="${idx}">
+     ${opt}
+   </div>
+ `).join("");
+ container.previousElementSibling && (container.previousElementSibling.textContent = block.prompt);
+ container.querySelectorAll(".choice").forEach(ch=>{
+   ch.onclick=()=>{
+     state.answers[key]=+ch.dataset.idx;
+     renderMission();
+     updateStatus();
+   };
+ });
+}
+
+function renderMission(){
+ renderChoices("questionChoices","question");
+ renderChoices("hypothesisChoices","hypothesis");
+ renderChoices("variableChoices","variable");
+ renderChoices("controlChoices","control");
+ renderChoices("predictionChoices","prediction");
+ if(state.selectedMystery){
+   $("missionGoal").textContent=getMystery().blurb;
+   $("examBridge").textContent=getMystery().explanation;
+ }else{
+   $("missionGoal").textContent="Build a full science plan from question to prediction.";
+   $("examBridge").textContent="This mission builds scientific reasoning for JEE / NEET / Olympiad.";
+ }
+ updateProgress();
+}
+
+function resetMission(){
+ state.selectedMystery=null;
+ state.answers={question:null,hypothesis:null,variable:null,control:null,prediction:null};
+ state.missionSolved=false;
+ renderMysteries();
+ renderMission();
+ $("feedbackBox").innerHTML=`<h4>Mission Feedback</h4><div>Mission reset. Choose a new mystery and build again.</div>`;
+ speak("Mission reset.");
+ updateStatus();
+}
+
+function clearMissionStyles(){
+ document.querySelectorAll(".choice").forEach(c=>c.classList.remove("correct","wrong"));
+}
+
+function markChoice(containerId,key,correctIndex){
+ const options=[...$(containerId).querySelectorAll(".choice")];
+ options.forEach((op,idx)=>{
+   op.classList.remove("correct","wrong");
+   if(state.answers[key]===idx && idx!==correctIndex) op.classList.add("wrong");
+   if(idx===correctIndex) op.classList.add("correct");
+ });
+}
+
+function submitPlan(){
+ if(!state.unlocked.mission){
+   speak("Complete theory first.");
+   showSection("theory");
+   return;
+ }
+ if(!state.selectedMystery){
+   $("feedbackBox").innerHTML=`<h4>Select a Mystery First</h4><div>Please choose one science mystery before submitting the plan.</div>`;
+   speak("Please choose a science mystery first.");
+   return;
+ }
+ const m=getMystery();
+ const keys=["question","hypothesis","variable","control","prediction"];
+ const allChosen=keys.every(k=>state.answers[k]!==null);
+ if(!allChosen){
+   $("feedbackBox").innerHTML=`<h4>Mission Incomplete</h4><div>Please complete all five steps: question, hypothesis, variable, control, and prediction.</div>`;
+   speak("Mission incomplete. Please complete all steps.");
+   return;
+ }
+
+ markChoice("questionChoices","question",m.question.correct);
+ markChoice("hypothesisChoices","hypothesis",m.hypothesis.correct);
+ markChoice("variableChoices","variable",m.variable.correct);
+ markChoice("controlChoices","control",m.control.correct);
+ markChoice("predictionChoices","prediction",m.prediction.correct);
+
+ const correctQuestion = state.answers.question===m.question.correct;
+ const correctHypothesis = state.answers.hypothesis===m.hypothesis.correct;
+ const correctVariable = state.answers.variable===m.variable.correct;
+ const correctControl = state.answers.control===m.control.correct;
+ const correctPrediction = state.answers.prediction===m.prediction.correct;
+ const total=[correctQuestion,correctHypothesis,correctVariable,correctControl,correctPrediction].filter(Boolean).length;
+
+ if(total===5){
+   if(!state.missionSolved){ state.missionSolved=true; state.score+=40; }
+   $("feedbackBox").innerHTML=`
+     <h4>Excellent! Mission Solved</h4>
+     <div>You built a strong scientific investigation for <b>${m.title}</b>.</div>
+     <div class="explainGrid">
+       <div class="explainItem"><b>Scientific Question</b><br>${m.question.options[m.question.correct]}</div>
+       <div class="explainItem"><b>Best Hypothesis</b><br>${m.hypothesis.options[m.hypothesis.correct]}</div>
+       <div class="explainItem"><b>Variable + Control</b><br>Change <b>${m.variable.options[m.variable.correct]}</b> and keep other important conditions the same.</div>
+       <div class="explainItem"><b>Prediction</b><br>${m.prediction.options[m.prediction.correct]}</div>
+       <div class="explainItem"><b>What You Learned</b><br>A good hypothesis must be testable, connected to a variable, and supported by a prediction.</div>
+       <div class="explainItem"><b>JEE / NEET / Olympiad Link</b><br>This is the base of scientific method, assertion-reason, and experiment design questions.</div>
+     </div>
+   `;
+   speak("Excellent. Your full hypothesis plan is correct. You are ready for the Olympiad quiz.");
+ }else{
+   $("feedbackBox").innerHTML=`
+     <h4>Good Try - Check the Corrected Plan</h4>
+     <div>You got <b>${total} out of 5</b> parts correct. Review the highlighted answers and try again.</div>
+     <div class="explainGrid">
+       <div class="explainItem"><b>Question</b><br>A good question should be clear and testable.</div>
+       <div class="explainItem"><b>Hypothesis</b><br>A strong hypothesis often says <b>If..., then..., because...</b></div>
+       <div class="explainItem"><b>Variable</b><br>Choose the factor you want to change and test.</div>
+       <div class="explainItem"><b>Control</b><br>Keep other conditions the same for a fair test.</div>
+       <div class="explainItem"><b>Prediction</b><br>Prediction should follow from the hypothesis.</div>
+       <div class="explainItem"><b>Why This Matters</b><br>In Olympiad and higher science, weak hypotheses and poor control setups lead to weak conclusions.</div>
+     </div>
+   `;
+   speak("Good try. Check the corrected plan and try again.");
+ }
+ checkUnlocks();
+}
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{ if(!b.disabled) showSection(b.dataset.go); });
+$("startBtn").onclick=()=>{ showSection("theory"); speak("Welcome to Lab 5, Hypothesis Builder. First complete the theory briefing."); };
+$("voiceBtn").onclick=()=>{ state.voice=!state.voice; $("voiceBtn").textContent=state.voice?"🔊 Voice ON":"🔇 Voice OFF"; if(state.voice) speak("Voice is on."); };
+$("stopVoiceBtn").onclick=stop;
+$("voiceStyle").onchange=e=>{ state.style=e.target.value; speak(state.style==="indian"?"Indian English voice selected. Let us begin.":"Standard English voice selected. Let us begin."); };
+$("nextStory").onclick=()=>{ state.storyIndex=Math.min(stories.length-1,state.storyIndex+1); renderStory(); };
+$("prevStory").onclick=()=>{ state.storyIndex=Math.max(0,state.storyIndex-1); renderStory(); };
+$("markTheory").onclick=markTheory;
+$("submitPlan").onclick=submitPlan;
+$("resetMission").onclick=resetMission;
+
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{
+ if(!state.unlocked.quiz){ speak("Complete the mystery mission first."); return; }
+ const q=o.dataset.q;
+ if(state.quizCorrect[q]) return;
+ const group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)];
+ group.forEach(x=>x.classList.remove("correct","wrong"));
+ if(o.dataset.correct){
+   o.classList.add("correct");
+   state.quizCorrect[q]=true;
+   state.score+=25;
+   speak("Correct. Excellent reasoning.");
+ }else{
+   o.classList.add("wrong");
+   group.forEach(x=>{ if(x.dataset.correct) x.classList.add("correct"); });
+   speak("Not correct. Think about testability, variables, and evidence.");
+ }
+ checkUnlocks();
+});
+
+renderStory();
+renderMysteries();
+renderMission();
+updateStatus();
+})();
+</script>
+</body>
+</html>
