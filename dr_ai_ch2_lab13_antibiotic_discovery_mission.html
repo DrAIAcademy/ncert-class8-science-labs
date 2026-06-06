@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 13: Antibiotic Discovery Mission | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#07122d;--bg2:#123b7a;--panel:rgba(12,30,62,.94);
+  --cyan:#63f4ff;--gold:#ffe066;--green:#8cffc1;--red:#ff8aa0;--violet:#d3a5ff;
+  --text:#eef8ff;--muted:#b5cbe4
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%,rgba(99,244,255,.20),transparent 26%),
+    radial-gradient(circle at 88% 12%,rgba(255,224,102,.18),transparent 27%),
+    radial-gradient(circle at 60% 90%,rgba(179,136,255,.12),transparent 24%),
+    linear-gradient(135deg,var(--bg),var(--bg2) 60%,#0a2248);
+  color:var(--text);overflow-x:hidden;-webkit-text-size-adjust:100%;
+}
+.watermark{position:fixed;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.082);font-size:clamp(28px,4.2vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap;letter-spacing:1px;text-shadow:0 0 9px rgba(0,0,0,.35)}
+.cornerMark{position:fixed;right:14px;bottom:14px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.72);background:rgba(4,13,24,.42);border:1px solid rgba(255,255,255,.20);padding:7px 12px;border-radius:999px;font-weight:1000;backdrop-filter:blur(6px)}
+.wrap{max-width:1480px;margin:auto;padding:16px;position:relative;z-index:10}
+.panel{background:var(--panel);border:1px solid rgba(99,244,255,.25);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.hero{padding:22px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(23,63,125,.9),rgba(9,25,57,.9))}
+.hero:after{content:"🧫 🍄 💊 🦠 🔬 ✨";position:absolute;right:22px;bottom:18px;font-size:34px;letter-spacing:9px;opacity:.28}
+.logo{position:absolute;right:18px;top:18px;background:rgba(0,0,0,.28);border:1px solid rgba(99,244,255,.3);border-radius:18px;padding:10px 14px;text-align:right}
+.logo b{display:block}.logo span{color:var(--cyan);font-size:.78rem;font-weight:900}
+.badge{display:inline-block;background:rgba(99,244,255,.12);border:1px solid rgba(99,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:1000;padding:9px 14px;font-size:.8rem}
+h1{font-size:clamp(2rem,4.5vw,4.2rem);line-height:1.02;margin:14px 0 10px;max-width:1100px;text-shadow:0 4px 0 rgba(0,0,0,.18)}
+.sub{color:var(--muted);max-width:1120px;line-height:1.6}
+.btn{border:0;border-radius:18px;padding:12px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;min-height:46px;touch-action:manipulation}
+.btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}
+.btn.violet{background:linear-gradient(135deg,var(--violet),#eadcff);color:#21083f}
+.btn:disabled{opacity:.5}
+.actions,.nav,.storyBtns{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.nav{position:sticky;top:0;z-index:60;background:rgba(7,18,45,.94);padding:8px;border-radius:18px;backdrop-filter:blur(10px)}
+.nav .active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.fun{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.fun div{background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.1);padding:10px;border-radius:16px;text-align:center;font-weight:900}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.labGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,460px);gap:16px;margin-top:16px;align-items:start}
+.box{padding:18px}
+.rule,.level{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px;margin-top:10px}
+.n{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(99,244,255,.16);color:var(--cyan);font-weight:1000}
+.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:.8rem;font-weight:900}
+.done{border-color:rgba(140,255,193,.55)!important;background:rgba(140,255,193,.1)!important}
+.activeLevel{border-color:rgba(255,224,102,.55)!important;background:rgba(255,224,102,.1)!important}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.stat{padding:12px;text-align:center;background:rgba(255,255,255,.055);border-radius:15px}
+.stat b{display:block;color:var(--cyan);font-size:1.3rem}
+.section{display:none}.section.active{display:block}
+.storyBox,.explain{padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(99,244,255,.11),rgba(255,255,255,.04));border:1px solid rgba(99,244,255,.22);line-height:1.65}
+.storyBox{min-height:300px}.storyBox h2:before,.explain h4:before{content:"💡 "}
+.scene{
+  position:relative;min-height:560px;border-radius:22px;overflow:hidden;
+  background:
+    radial-gradient(circle at 18% 12%,rgba(99,244,255,.16),transparent 28%),
+    radial-gradient(circle at 78% 14%,rgba(179,136,255,.18),transparent 18%),
+    linear-gradient(180deg,#123b7a,#0a2f68 44%,#112642 44%,#091526);
+  border:1px solid rgba(255,255,255,.08)
+}
+.screen{
+  position:absolute;right:16px;top:16px;width:min(42%,390px);min-height:205px;background:rgba(5,21,46,.78);
+  border:1px solid rgba(99,244,255,.22);border-radius:22px;padding:14px;pointer-events:none
+}
+.line{background:rgba(255,255,255,.065);padding:10px;border-radius:12px;margin:8px 0}
+.ai{position:absolute;left:26px;bottom:28px;font-size:86px;pointer-events:none}
+.ai:after{content:"Dr AI";display:block;font-size:14px;background:var(--gold);color:#2c1900;border-radius:999px;padding:6px 10px;font-weight:1000;text-align:center}
+.petri{
+  position:absolute;left:32%;bottom:90px;transform:translateX(-50%);
+  width:310px;height:310px;border-radius:50%;
+  background:radial-gradient(circle at 40% 38%,rgba(250,250,255,.9),rgba(186,230,253,.52),rgba(30,64,175,.28));
+  border:8px solid rgba(255,255,255,.72);box-shadow:0 22px 38px rgba(0,0,0,.28);overflow:hidden
+}
+.petri:before{content:"Bacteria Culture Plate";position:absolute;left:50%;top:18px;transform:translateX(-50%);font-size:.82rem;background:rgba(8,20,42,.72);padding:6px 12px;border-radius:999px;font-weight:1000;z-index:4}
+.bacteria{
+  position:absolute;font-size:27px;filter:drop-shadow(0 0 8px rgba(255,138,160,.35));animation:bacteriaWiggle 4.5s ease-in-out infinite
+}
+.ba1{left:65px;top:76px}.ba2{left:156px;top:70px;animation-delay:.6s}.ba3{left:222px;top:126px;animation-delay:1.2s}.ba4{left:84px;top:174px;animation-delay:1.8s}.ba5{left:178px;top:214px;animation-delay:2.4s}.ba6{left:42px;top:236px;animation-delay:3s}
+.antibioticDisc{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:70px;height:70px;border-radius:50%;
+  background:radial-gradient(circle,#fff,#dbeafe 70%,#93c5fd);
+  border:3px solid rgba(255,255,255,.95);display:grid;place-items:center;color:#172554;font-weight:1000;z-index:5;
+  box-shadow:0 0 18px rgba(99,244,255,.35);animation:discPulse 3s ease-in-out infinite
+}
+.clearZone{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:105px;height:105px;border-radius:50%;border:3px dashed rgba(140,255,193,.22);
+  background:radial-gradient(circle,rgba(140,255,193,.16),rgba(140,255,193,.04),transparent 72%);
+  animation:zonePulse 3.2s ease-in-out infinite;z-index:3
+}
+.medicineBeam{
+  position:absolute;left:32%;bottom:310px;transform:translateX(-50%);
+  width:6px;height:130px;border-radius:999px;background:linear-gradient(180deg,rgba(179,136,255,.95),rgba(179,136,255,0));
+  animation:beamPulse 2.8s ease-in-out infinite
+}
+.fungus{
+  position:absolute;right:82px;bottom:110px;font-size:62px;animation:fungusBounce 4s ease-in-out infinite
+}
+.molecule{
+  position:absolute;right:94px;bottom:230px;font-size:26px;color:#d8b4fe;font-weight:1000;animation:moleculeFly 5s linear infinite
+}
+.mo2{animation-delay:1.6s}.mo3{animation-delay:3.2s}
+.warning{
+  position:absolute;right:38px;bottom:48px;width:250px;padding:12px;border-radius:18px;
+  background:rgba(255,138,160,.10);border:1px solid rgba(255,138,160,.22);font-size:.86rem;color:#ffdbe2
+}
+.controlBox{padding:18px;border-radius:22px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}
+.cards{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+.choice,.opt,.mission{
+  padding:14px;border-radius:16px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.1);
+  color:white;cursor:pointer;text-align:left;min-height:52px;touch-action:manipulation
+}
+.choice b,.mission b{color:var(--gold)}
+.choice.good,.opt.correct,.mission.good{border-color:rgba(140,255,193,.65);background:rgba(140,255,193,.14)}
+.choice.bad,.opt.wrong,.mission.bad{border-color:rgba(255,138,160,.65);background:rgba(255,138,160,.14)}
+.choice.used,.mission.used{opacity:.82}
+.meter{padding:14px;background:rgba(255,255,255,.06);border-radius:16px;margin-top:10px}
+.meter label{display:flex;justify-content:space-between;color:var(--gold);font-weight:900}
+.bar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:8px}
+.bar span{height:100%;display:block;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.challengeCard{padding:14px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);margin-top:10px}
+.challengeCard h4{margin:0 0 8px}
+.cert{text-align:center;background:radial-gradient(circle at 20% 20%,rgba(99,244,255,.22),transparent 30%),linear-gradient(135deg,rgba(99,244,255,.18),rgba(255,224,102,.16));border:2px solid rgba(255,224,102,.45);border-radius:22px;padding:24px}
+.cert .seal{font-size:56px}.cert input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:white;text-align:center}
+footer{margin:20px 0 6px;padding:16px 20px;border:1px solid rgba(99,244,255,.25);border-radius:20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}
+footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@keyframes bacteriaWiggle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-10px) rotate(8deg)}}
+@keyframes discPulse{0%,100%{box-shadow:0 0 16px rgba(99,244,255,.28)}50%{box-shadow:0 0 36px rgba(99,244,255,.62)}}
+@keyframes zonePulse{0%,100%{width:105px;height:105px;border-color:rgba(140,255,193,.18)}50%{width:168px;height:168px;border-color:rgba(140,255,193,.68)}}
+@keyframes beamPulse{0%,100%{opacity:.28;transform:translateX(-50%) scaleY(.84)}50%{opacity:.9;transform:translateX(-50%) scaleY(1.12)}}
+@keyframes fungusBounce{0%,100%{transform:translateY(0) scale(.96)}50%{transform:translateY(-15px) scale(1.05)}}
+@keyframes moleculeFly{0%{transform:translate(0,0) scale(.8);opacity:0}20%{opacity:.9}100%{transform:translate(-260px,-70px) scale(1.15);opacity:0}}
+@media(max-width:1000px){
+  .grid2,.labGrid{grid-template-columns:1fr}
+  .logo{position:static;width:max-content;margin:0 0 12px auto}
+  .fun,.stats{grid-template-columns:1fr 1fr}
+  .screen{position:relative;width:auto;right:auto;top:auto;margin:12px}
+  .scene{min-height:760px}
+  .petri{left:50%;bottom:150px}
+  .medicineBeam{left:50%;bottom:380px}
+  .fungus{right:32px;bottom:80px}
+  .warning{right:18px;bottom:18px;width:220px}
+  .ai{left:18px;bottom:18px}
+  .nav{display:grid;grid-template-columns:1fr 1fr}
+  .actions{display:grid;grid-template-columns:1fr 1fr}
+  .actions .btn,.actions select{width:100%}
+  .hero:after{display:none}
+}
+@media(max-width:430px){
+  .fun,.stats,.nav,.actions{grid-template-columns:1fr}
+  .rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2}
+  .petri{width:265px;height:265px}
+  .fungus{font-size:48px}
+  .warning{position:relative;right:auto;bottom:auto;margin:16px;width:auto}
+  .ai{font-size:72px}
+}
+@media print{
+  .hero,.nav,.section:not(#certificate),footer,.watermark,.cornerMark{display:none!important}
+  .cert{color:#111;background:white;border:4px solid #111}.cert input{border:0;color:#111}
+}
+</style>
+</head>
+<body>
+<div class="watermark">
+  <div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:20%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:36%;left:-4%">Dr AI Academy</div><div class="wm" style="top:52%;left:45%">Dr AI Academy</div>
+  <div class="wm" style="top:68%;left:6%">Dr AI Academy</div><div class="wm" style="top:84%;left:44%">Dr AI Academy</div>
+</div>
+<div class="cornerMark">Dr AI Academy</div>
+
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Invisible World Lab Series</span></div>
+  <div class="badge">LAB 13 • CHAPTER 2 • ANTIBIOTICS + PENICILLIN</div>
+  <h1>ANTIBIOTIC DISCOVERY MISSION:<br>THE PENICILLIN ZONE ARENA</h1>
+  <p class="sub">A dynamic lab game where Dr AI guides students through the idea of antibiotics, bacterial growth, inhibition zones and responsible medicine use. Students build an antibiotic discovery plate, control dose and resistance risk, and solve real-world antibiotic reasoning challenges.</p>
+  <div class="actions">
+    <button class="btn gold" id="startBtn">🎮 Start Lab 13</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select>
+  </div>
+  <div class="fun">
+    <div>🧫 Inhibition Zone</div><div>🍄 Penicillium Idea</div><div>💊 Antibiotic Logic</div><div>🏅 Certificate Quest</div>
+  </div>
+  <div class="grid2">
+    <div class="panel box"><h3>Game Rules</h3>
+      <div class="rule"><div class="n">1</div><div><b>Learn antibiotic story</b><br>Understand useful fungi, antibiotics and bacteria.</div><div class="tag">Level 1</div></div>
+      <div class="rule"><div class="n">2</div><div><b>Build discovery plate</b><br>Add bacterial culture, antibiotic disc and observation time.</div><div class="tag">Level 2</div></div>
+      <div class="rule"><div class="n">3</div><div><b>Control inhibition zone</b><br>Balance dose, timing and resistance risk.</div><div class="tag">Level 3</div></div>
+      <div class="rule"><div class="n">4</div><div><b>Responsible use mission</b><br>Apply antibiotic logic correctly.</div><div class="tag">Level 4</div></div>
+    </div>
+    <div class="panel box"><h3>Level Map</h3>
+      <div class="level activeLevel" id="lvl1"><div class="n">1</div><div><b>Story Briefing</b><br><small>Complete 4 story cards.</small></div><div class="tag" id="tag1">Active</div></div>
+      <div class="level" id="lvl2"><div class="n">2</div><div><b>Plate Builder</b><br><small>Add 3 correct parts.</small></div><div class="tag" id="tag2">Locked</div></div>
+      <div class="level" id="lvl3"><div class="n">3</div><div><b>Zone Controller</b><br><small>Reach inhibition score 75+.</small></div><div class="tag" id="tag3">Locked</div></div>
+      <div class="level" id="lvl4"><div class="n">4</div><div><b>Mission + Quiz</b><br><small>Clear challenges and answer quiz.</small></div><div class="tag" id="tag4">Locked</div></div>
+      <div class="stats">
+        <div class="stat"><b id="theoryCount">0/4</b><span>Story</span></div>
+        <div class="stat"><b id="simCount">0/3</b><span>Levels</span></div>
+        <div class="stat"><b id="quizCount">0/3</b><span>Quiz</span></div>
+        <div class="stat"><b id="score">0</b><span>Score</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="btn gold active" data-go="theory">Story</button>
+  <button class="btn secondary" data-go="plate" id="navPlate" disabled>Plate</button>
+  <button class="btn secondary" data-go="zone" id="navZone" disabled>Zone</button>
+  <button class="btn secondary" data-go="mission" id="navMission" disabled>Mission</button>
+  <button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Quiz</button>
+  <button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button>
+</div>
+
+<section class="section active" id="theory">
+  <div class="grid2">
+    <div class="panel box">
+      <h3>Dr AI Story Briefing</h3>
+      <div class="storyBox" id="storyBox"></div>
+      <div class="storyBtns">
+        <button class="btn secondary" id="prevStory">← Previous</button>
+        <button class="btn" id="nextStory">Next Story →</button>
+        <button class="btn gold" id="markTheory">Mark Story Complete</button>
+      </div>
+    </div>
+    <div class="panel box">
+      <h3>What Students Learn</h3>
+      <div class="explain">
+        <b>NCERT Link:</b> Antibiotics are medicines that kill or stop the growth of disease-causing microorganisms. Penicillin was one of the first antibiotics discovered.<br><br>
+        <b>Olympiad Link:</b> Observation, inhibition zone reasoning, medicine safety and cause-effect logic.<br><br>
+        <b>NEET Foundation:</b> Antibiotics, antimicrobial action, resistance, drug use, microbes and biotechnology history.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="plate">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 2: Antibiotic Discovery Plate</h3>
+      <div class="scene">
+        <div class="screen">
+          <h3>Dr AI Plate Scanner</h3>
+          <div class="line">Correct Parts: <b id="plateCount">0 / 3</b></div>
+          <div class="line">Plate Status: <b id="plateStatus">Waiting</b></div>
+          <div class="line">Mission: Build a safe simulated antibiotic plate.</div>
+        </div>
+
+        <div class="medicineBeam"></div>
+        <div class="petri">
+          <div class="clearZone" id="clearZone"></div>
+          <div class="antibioticDisc">AB</div>
+          <div class="bacteria ba1">🦠</div><div class="bacteria ba2">🦠</div><div class="bacteria ba3">🧫</div>
+          <div class="bacteria ba4">🦠</div><div class="bacteria ba5">🧫</div><div class="bacteria ba6">🦠</div>
+        </div>
+        <div class="fungus">🍄</div>
+        <div class="molecule mo1">💊</div><div class="molecule mo2">💊</div><div class="molecule mo3">💊</div>
+        <div class="warning">Simulation only: antibiotics must be used only with proper medical guidance.</div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Controls: Build Discovery Setup</h3>
+      <div class="controlBox">
+        <div class="cards">
+          <button class="choice" data-item="Bacterial Culture" data-good="1"><b>🧫 Bacterial Culture</b><br>Simulated bacteria spread on a plate for observation.</button>
+          <button class="choice" data-item="Antibiotic Disc" data-good="1"><b>💊 Antibiotic Disc</b><br>Shows where bacterial growth may be stopped.</button>
+          <button class="choice" data-item="Observation Time" data-good="1"><b>⏱️ Observation Time</b><br>Time is needed to observe inhibition zone formation.</button>
+          <button class="choice" data-item="Random Sugar" data-good="0"><b>🍬 Random Sugar</b><br>Not the antibiotic testing factor.</button>
+          <button class="choice" data-item="Dirty Plate" data-good="0"><b>🧪 Dirty Plate</b><br>Uncontrolled contamination makes observation unreliable.</button>
+          <button class="choice" data-item="Guess Without Data" data-good="0"><b>🎲 Guessing</b><br>Science needs evidence and observation.</button>
+        </div>
+      </div>
+      <div class="explain" id="plateExplain"><h4>Plate Feedback</h4>Select a setup component. Dr AI will explain the role.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="zone">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 3: Inhibition Zone Environment</h3>
+      <div class="scene">
+        <div class="screen">
+          <h3>Zone Meter</h3>
+          <div class="line">Inhibition Score: <b id="zoneScore">0</b></div>
+          <div class="line">Growth Control: <b id="growthControl">Weak</b></div>
+          <div class="line">Target: <b>75+</b></div>
+        </div>
+        <div class="medicineBeam"></div>
+        <div class="petri">
+          <div class="clearZone"></div>
+          <div class="antibioticDisc">AB</div>
+          <div class="bacteria ba1" id="zb1">🦠</div><div class="bacteria ba2" id="zb2">🦠</div><div class="bacteria ba3" id="zb3">🧫</div>
+          <div class="bacteria ba4" id="zb4">🦠</div><div class="bacteria ba5" id="zb5">🧫</div><div class="bacteria ba6" id="zb6">🦠</div>
+        </div>
+        <div class="fungus">🍄</div>
+        <div class="molecule mo1">💊</div><div class="molecule mo2">💊</div><div class="molecule mo3">💊</div>
+        <div class="warning">Correct medicine use matters. Incomplete or wrong use can contribute to resistance.</div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Controls: Zone Controller</h3>
+      <div class="controlBox">
+        <div class="meter"><label>Antibiotic Effect <span id="effectOut">50</span></label><input type="range" min="0" max="100" value="50" id="effect"></div>
+        <div class="meter"><label>Correct Course Use <span id="courseOut">50</span></label><input type="range" min="0" max="100" value="50" id="course"></div>
+        <div class="meter"><label>Resistance Risk Control <span id="resistanceOut">50</span></label><input type="range" min="0" max="100" value="50" id="resistance"></div>
+        <button class="btn green" id="checkZone">🔬 Check Inhibition Zone</button>
+      </div>
+      <div class="explain" id="zoneExplain"><h4>Zone Feedback</h4>Balance antibiotic effect, correct course use and resistance risk control.</div>
+      <div class="meter"><label>Growth Control Power <span id="activityText">0%</span></label><div class="bar"><span id="activityBar"></span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mission">
+  <div class="grid2">
+    <div class="panel box">
+      <h3>Level 4: Responsible Antibiotic Mission</h3>
+
+      <div class="challengeCard">
+        <h4>Mission 1: Fever and cough decision</h4>
+        <div class="cards">
+          <button class="mission" data-mission="1" data-good="1"><b>Consult a doctor</b><br>Antibiotics should be taken only when medically advised.</button>
+          <button class="mission" data-mission="1" data-good="0"><b>Self-medicate randomly</b><br>Wrong antibiotic use is risky.</button>
+        </div>
+      </div>
+
+      <div class="challengeCard">
+        <h4>Mission 2: Antibiotic course</h4>
+        <div class="cards">
+          <button class="mission" data-mission="2" data-good="1"><b>Complete prescribed course</b><br>Following medical advice reduces misuse risk.</button>
+          <button class="mission" data-mission="2" data-good="0"><b>Stop randomly after one dose</b><br>Incomplete use can be harmful.</button>
+        </div>
+      </div>
+
+      <div class="challengeCard">
+        <h4>Mission 3: Viral illness confusion</h4>
+        <div class="cards">
+          <button class="mission" data-mission="3" data-good="1"><b>Antibiotics do not treat viral infections directly</b><br>They act mainly against bacteria, not viruses.</button>
+          <button class="mission" data-mission="3" data-good="0"><b>Use antibiotics for every cold</b><br>This is incorrect and unsafe.</button>
+        </div>
+      </div>
+
+      <div class="explain" id="missionExplain"><h4>Mission Feedback</h4>Clear all 3 missions to unlock the quiz.</div>
+    </div>
+
+    <div class="panel box">
+      <h3>Concept Panel</h3>
+      <div class="explain">
+        <b>Main Concept:</b> Antibiotics kill or stop the growth of bacteria.<br><br>
+        <b>Important Safety Logic:</b><br>
+        • Use only with medical guidance<br>
+        • Do not use antibiotics for every illness<br>
+        • Complete the prescribed course<br>
+        • Misuse can contribute to antibiotic resistance<br><br>
+        <b>Exam Link:</b> Antibiotic action, Penicillin history, and resistance are higher-level biology ideas.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel box">
+    <h3>Level 5: Antibiotic Boss Quiz</h3>
+    <div class="cards">
+      <div>
+        <b>Q1. What do antibiotics mainly act against?</b>
+        <div class="opt" data-q="q1" data-correct="1">Bacteria</div>
+        <div class="opt" data-q="q1">Plastic particles</div>
+        <div class="opt" data-q="q1">Only stones</div>
+      </div>
+      <div>
+        <b>Q2. What does an inhibition zone show in a simulated plate?</b>
+        <div class="opt" data-q="q2" data-correct="1">Area where bacterial growth is reduced or stopped</div>
+        <div class="opt" data-q="q2">Area where bacteria grow fastest always</div>
+        <div class="opt" data-q="q2">Area with no observation meaning</div>
+      </div>
+      <div>
+        <b>Q3. Why should antibiotics not be misused?</b>
+        <div class="opt" data-q="q3" data-correct="1">Misuse can contribute to antibiotic resistance</div>
+        <div class="opt" data-q="q3">Because they turn food into plastic</div>
+        <div class="opt" data-q="q3">Because they are needed for every viral cold</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="certificate">
+  <div class="panel box">
+    <div class="cert">
+      <div class="seal">🧫💊🏅</div>
+      <h2>Certificate of Antibiotic Science</h2>
+      <p>This certifies that</p>
+      <input id="studentName" placeholder="Enter Student Name">
+      <p>has successfully completed <b>Lab 13: Antibiotic Discovery Mission</b></p>
+      <p>Skills: Antibiotics • Penicillin • Bacterial Growth • Inhibition Zone • Resistance Awareness • Medicine Safety</p>
+      <p><b>Developed by Dr AI Academy</b></p>
+      <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div>
+  <div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div>
+</footer>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const state={
+  voice:true,style:"standard",storyIndex:0,theoryDone:0,score:0,
+  plateDone:false,zoneDone:false,missionDone:false,
+  parts:{},missions:{},quizCorrect:{},
+  unlocked:{plate:false,zone:false,mission:false,quiz:false,certificate:false}
+};
+
+const stories=[
+  {title:"Story 1: The Bacteria Problem",body:"Some bacteria can cause disease. Scientists found that certain substances can stop bacterial growth. These substances became important medicines called antibiotics.",points:["Some bacteria cause disease.","Stopping bacterial growth can help treatment.","Antibiotics are important medicines."]},
+  {title:"Story 2: Penicillin Discovery Idea",body:"Penicillin was discovered from a fungus called Penicillium. It showed that some microbes can produce substances that stop other microbes.",points:["Penicillium is a fungus.","Penicillin was an early antibiotic.","Useful microbes can help medicine."]},
+  {title:"Story 3: Inhibition Zone",body:"In a lab plate, an antibiotic may create a clear area where bacteria do not grow well. This area is called an inhibition zone.",points:["Bacteria grow on culture plate.","Antibiotic can stop growth nearby.","Clear area indicates inhibition."]},
+  {title:"Story 4: Responsible Use",body:"Antibiotics should not be used carelessly. Wrong or incomplete use can contribute to antibiotic resistance, where bacteria become harder to control.",points:["Use antibiotics only with guidance.","Complete prescribed course.","Misuse can cause resistance problems."]}
+];
+
+function speak(t){
+  if(!state.voice||!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);
+  u.lang="en-IN";
+  u.rate=state.style==="indian"?0.88:0.98;
+  speechSynthesis.speak(u);
+}
+function show(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  $(id).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+  $(id).scrollIntoView({behavior:"smooth",block:"start"});
+}
+function simDone(){return (state.plateDone?1:0)+(state.zoneDone?1:0)+(state.missionDone?1:0)}
+function status(){
+  $("theoryCount").textContent=Math.min(state.theoryDone,4)+"/4";
+  $("simCount").textContent=simDone()+"/3";
+  $("quizCount").textContent=Object.keys(state.quizCorrect).length+"/3";
+  $("score").textContent=state.score;
+  [["lvl1","tag1",state.theoryDone>=4,true],["lvl2","tag2",state.plateDone,state.unlocked.plate],["lvl3","tag3",state.zoneDone,state.unlocked.zone],["lvl4","tag4",state.missionDone,state.unlocked.mission]].forEach(([id,tag,done,active])=>{
+    $(id).classList.toggle("done",done);
+    $(id).classList.toggle("activeLevel",active&&!done);
+    $(tag).textContent=done?"Done":active?"Active":"Locked";
+  });
+  $("navPlate").disabled=!state.unlocked.plate;
+  $("navZone").disabled=!state.unlocked.zone;
+  $("navMission").disabled=!state.unlocked.mission;
+  $("navQuiz").disabled=!state.unlocked.quiz;
+  $("navCert").disabled=!state.unlocked.certificate;
+}
+function unlock(){
+  if(state.theoryDone>=4&&!state.unlocked.plate){state.unlocked.plate=true;speak("Discovery Plate unlocked.");show("plate")}
+  if(state.plateDone&&!state.unlocked.zone){state.unlocked.zone=true;speak("Inhibition Zone Controller unlocked.");show("zone")}
+  if(state.zoneDone&&!state.unlocked.mission){state.unlocked.mission=true;speak("Responsible Use Missions unlocked.");show("mission")}
+  if(state.missionDone&&!state.unlocked.quiz){state.unlocked.quiz=true;speak("Quiz unlocked.");show("quiz")}
+  if(Object.keys(state.quizCorrect).length>=3&&!state.unlocked.certificate){state.unlocked.certificate=true;speak("Certificate unlocked.");show("certificate")}
+  status();
+}
+function renderStory(){
+  const s=stories[state.storyIndex];
+  $("storyBox").innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  speak(s.title+". "+s.body);
+}
+function markTheory(){
+  if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1;state.score+=15}
+  if(state.storyIndex<3){state.storyIndex++;renderStory()}
+  unlock();
+}
+function addPart(btn){
+  if(!state.unlocked.plate)return;
+  const item=btn.dataset.item, good=btn.dataset.good==="1";
+  if(good){
+    if(!state.parts[item]){
+      state.parts[item]=true;
+      state.score+=10;
+      btn.classList.add("good","used");
+    }
+    const c=Object.keys(state.parts).length;
+    $("plateCount").textContent=c+" / 3";
+    $("plateStatus").textContent=c>=3?"Ready":"Building";
+    $("plateExplain").innerHTML=`<h4>Correct Setup</h4><b>${item}</b> is part of the simulated antibiotic observation setup.`;
+    if(c>=3&&!state.plateDone){state.plateDone=true;state.score+=20;$("clearZone").style.borderColor="rgba(140,255,193,.75)"}
+  }else{
+    btn.classList.add("bad");
+    $("plateExplain").innerHTML=`<h4>Not a Scientific Setup Choice</h4><b>${item}</b> does not help create reliable antibiotic evidence.`;
+  }
+  unlock();
+}
+function updateZone(){
+  const effect=+$("effect").value, course=+$("course").value, resistance=+$("resistance").value;
+  $("effectOut").textContent=effect;
+  $("courseOut").textContent=course;
+  $("resistanceOut").textContent=resistance;
+  const score=Math.round((100-Math.abs(effect-75)*1.0)*.37 + (100-Math.abs(course-80)*1.0)*.34 + (100-Math.abs(resistance-70)*1.05)*.29);
+  const finalScore=Math.max(0,Math.min(100,score));
+  $("zoneScore").textContent=finalScore;
+  $("activityText").textContent=finalScore+"%";
+  $("activityBar").style.width=finalScore+"%";
+  $("growthControl").textContent=finalScore>=75?"Strong":finalScore>=50?"Moderate":"Weak";
+  const op=finalScore>=75?.20:finalScore>=50?.48:.85;
+  ["zb1","zb2","zb3","zb4","zb5","zb6"].forEach(id=>$(id).style.opacity=op);
+  return finalScore;
+}
+function checkZone(){
+  const sc=updateZone();
+  if(sc>=75){
+    if(!state.zoneDone){state.zoneDone=true;state.score+=35}
+    $("zoneExplain").innerHTML="<h4>Strong Inhibition Zone!</h4>The simulated antibiotic effect and correct-use logic are strong. Bacterial growth near the antibiotic disc is reduced.";
+  }else{
+    $("zoneExplain").innerHTML="<h4>Zone Not Strong Enough</h4>Try antibiotic effect around 75, correct course use around 80 and resistance risk control around 70.";
+  }
+  unlock();
+}
+function doMission(btn){
+  if(!state.unlocked.mission)return;
+  const mission=btn.dataset.mission, good=btn.dataset.good==="1";
+  if(state.missions[mission]) return;
+  const group=[...document.querySelectorAll(`.mission[data-mission="${mission}"]`)];
+  if(good){
+    state.missions[mission]=true;
+    state.score+=18;
+    btn.classList.add("good","used");
+    $("missionExplain").innerHTML=`<h4>Mission ${mission} Cleared</h4>Correct! This follows responsible antibiotic-use logic.`;
+  }else{
+    btn.classList.add("bad");
+    group.forEach(x=>{if(x.dataset.good==="1") x.classList.add("good")});
+    $("missionExplain").innerHTML=`<h4>Unsafe Choice</h4>Think about medicine safety, bacteria vs viruses and resistance risk.`;
+  }
+  if(Object.keys(state.missions).length>=3&&!state.missionDone){state.missionDone=true;state.score+=25}
+  unlock();
+}
+function answerQuiz(opt){
+  if(!state.unlocked.quiz)return;
+  const q=opt.dataset.q;
+  if(state.quizCorrect[q]) return;
+  const group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)];
+  if(opt.dataset.correct){
+    state.quizCorrect[q]=true;
+    opt.classList.add("correct");
+    state.score+=20;
+  }else{
+    opt.classList.add("wrong");
+    group.forEach(x=>{if(x.dataset.correct) x.classList.add("correct")});
+  }
+  unlock();
+}
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{if(!b.disabled)show(b.dataset.go)});
+$("startBtn").onclick=()=>show("theory");
+$("voiceBtn").onclick=()=>{state.voice=!state.voice;$("voiceBtn").textContent=state.voice?"🔊 Voice ON":"🔇 Voice OFF"};
+$("stopVoiceBtn").onclick=()=>speechSynthesis.cancel();
+$("voiceStyle").onchange=e=>state.style=e.target.value;
+$("nextStory").onclick=()=>{state.storyIndex=Math.min(3,state.storyIndex+1);renderStory()};
+$("prevStory").onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1);renderStory()};
+$("markTheory").onclick=markTheory;
+document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>addPart(b));
+["effect","course","resistance"].forEach(id=>$(id).oninput=updateZone);
+$("checkZone").onclick=checkZone;
+document.querySelectorAll(".mission").forEach(b=>b.onclick=()=>doMission(b));
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>answerQuiz(o));
+
+renderStory(); updateZone(); status();
+})();
+</script>
+</body>
+</html>

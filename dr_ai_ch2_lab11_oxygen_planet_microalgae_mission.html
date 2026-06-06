@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 11: Oxygen Planet Microalgae Mission | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#07122d;--bg2:#123b7a;--panel:rgba(12,30,62,.94);
+  --cyan:#63f4ff;--gold:#ffe066;--green:#8cffc1;--red:#ff8aa0;--violet:#d3a5ff;
+  --text:#eef8ff;--muted:#b5cbe4
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%,rgba(99,244,255,.20),transparent 26%),
+    radial-gradient(circle at 88% 12%,rgba(255,224,102,.18),transparent 27%),
+    radial-gradient(circle at 60% 90%,rgba(140,255,193,.12),transparent 24%),
+    linear-gradient(135deg,var(--bg),var(--bg2) 60%,#0a2248);
+  color:var(--text);overflow-x:hidden;-webkit-text-size-adjust:100%;
+}
+
+/* visible professional watermark */
+.watermark{position:fixed;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.wm{
+  position:absolute;color:rgba(255,255,255,.082);font-size:clamp(28px,4.2vw,54px);
+  font-weight:1000;transform:rotate(-24deg);white-space:nowrap;letter-spacing:1px;
+  text-shadow:0 0 9px rgba(0,0,0,.35)
+}
+.cornerMark{
+  position:fixed;right:14px;bottom:14px;z-index:1000;pointer-events:none;
+  color:rgba(255,255,255,.72);background:rgba(4,13,24,.42);
+  border:1px solid rgba(255,255,255,.20);padding:7px 12px;border-radius:999px;
+  font-weight:1000;backdrop-filter:blur(6px)
+}
+
+.wrap{max-width:1480px;margin:auto;padding:16px;position:relative;z-index:10}
+.panel{background:var(--panel);border:1px solid rgba(99,244,255,.25);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.hero{padding:22px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(23,63,125,.9),rgba(9,25,57,.9))}
+.hero:after{content:"🌊 🟢 ☀️ O₂ 🌍 ✨";position:absolute;right:22px;bottom:18px;font-size:34px;letter-spacing:9px;opacity:.28}
+.logo{position:absolute;right:18px;top:18px;background:rgba(0,0,0,.28);border:1px solid rgba(99,244,255,.3);border-radius:18px;padding:10px 14px;text-align:right}
+.logo b{display:block}.logo span{color:var(--cyan);font-size:.78rem;font-weight:900}
+.badge{display:inline-block;background:rgba(99,244,255,.12);border:1px solid rgba(99,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:1000;padding:9px 14px;font-size:.8rem}
+h1{font-size:clamp(2rem,4.5vw,4.2rem);line-height:1.02;margin:14px 0 10px;max-width:1100px;text-shadow:0 4px 0 rgba(0,0,0,.18)}
+.sub{color:var(--muted);max-width:1120px;line-height:1.6}
+.btn{border:0;border-radius:18px;padding:12px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;min-height:46px;touch-action:manipulation}
+.btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}
+.btn.violet{background:linear-gradient(135deg,var(--violet),#eadcff);color:#21083f}
+.btn:disabled{opacity:.5}
+.actions,.nav,.storyBtns{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.nav{position:sticky;top:0;z-index:60;background:rgba(7,18,45,.94);padding:8px;border-radius:18px;backdrop-filter:blur(10px)}
+.nav .active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.fun{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.fun div{background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.1);padding:10px;border-radius:16px;text-align:center;font-weight:900}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.labGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,460px);gap:16px;margin-top:16px;align-items:start}
+.box{padding:18px}
+.rule,.level{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px;margin-top:10px}
+.n{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(99,244,255,.16);color:var(--cyan);font-weight:1000}
+.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:.8rem;font-weight:900}
+.done{border-color:rgba(140,255,193,.55)!important;background:rgba(140,255,193,.1)!important}
+.activeLevel{border-color:rgba(255,224,102,.55)!important;background:rgba(255,224,102,.1)!important}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.stat{padding:12px;text-align:center;background:rgba(255,255,255,.055);border-radius:15px}
+.stat b{display:block;color:var(--cyan);font-size:1.3rem}
+.section{display:none}.section.active{display:block}
+.storyBox,.explain{padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(99,244,255,.11),rgba(255,255,255,.04));border:1px solid rgba(99,244,255,.22);line-height:1.65}
+.storyBox{min-height:300px}.storyBox h2:before,.explain h4:before{content:"💡 "}
+.scene{
+  position:relative;min-height:560px;border-radius:22px;overflow:hidden;
+  background:
+    radial-gradient(circle at 18% 12%,rgba(99,244,255,.16),transparent 28%),
+    radial-gradient(circle at 78% 14%,rgba(255,224,102,.20),transparent 18%),
+    linear-gradient(180deg,#123b7a,#0a2f68 48%,#063d63 48%,#04243f);
+  border:1px solid rgba(255,255,255,.08)
+}
+.screen{
+  position:absolute;right:16px;top:16px;width:min(42%,390px);min-height:205px;background:rgba(5,21,46,.78);
+  border:1px solid rgba(99,244,255,.22);border-radius:22px;padding:14px;pointer-events:none
+}
+.line{background:rgba(255,255,255,.065);padding:10px;border-radius:12px;margin:8px 0}
+.ai{position:absolute;left:26px;bottom:28px;font-size:86px;pointer-events:none}
+.ai:after{content:"Dr AI";display:block;font-size:14px;background:var(--gold);color:#2c1900;border-radius:999px;padding:6px 10px;font-weight:1000;text-align:center}
+.pond{
+  position:absolute;left:32%;bottom:94px;transform:translateX(-50%);
+  width:300px;height:260px;border-radius:42% 42% 50% 50%;
+  background:radial-gradient(circle at 35% 30%,rgba(167,243,208,.9),rgba(56,189,248,.72) 38%,rgba(6,95,70,.65));
+  border:4px solid rgba(255,255,255,.42);box-shadow:0 22px 32px rgba(0,0,0,.28);
+  overflow:hidden
+}
+.pond:before{content:"Microalgae Pond";position:absolute;left:50%;top:16px;transform:translateX(-50%);font-size:.84rem;background:rgba(8,20,42,.72);padding:6px 12px;border-radius:999px;font-weight:1000;z-index:2}
+.algae{position:absolute;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,#dcfce7,#22c55e 65%,#15803d);box-shadow:0 0 18px rgba(34,197,94,.4);animation:algaeFloat 7s ease-in-out infinite}
+.g1{left:60px;top:80px}.g2{left:152px;top:82px;animation-delay:.8s}.g3{left:216px;top:122px;animation-delay:1.4s}.g4{left:86px;top:164px;animation-delay:2s}.g5{left:176px;top:190px;animation-delay:2.7s}
+.bubble{position:absolute;bottom:34px;color:#e0f2fe;font-weight:1000;font-size:22px;animation:bubbleUp 5s linear infinite;opacity:.8}
+.b1{left:74px}.b2{left:134px;animation-delay:1.2s}.b3{left:210px;animation-delay:2.2s}
+.sun{position:absolute;right:76px;top:76px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,#fff7ad,#facc15 65%,#f97316);box-shadow:0 0 36px rgba(250,204,21,.5);animation:sunPulse 3.2s ease-in-out infinite}
+.ray{position:absolute;width:4px;height:120px;border-radius:999px;background:linear-gradient(180deg,rgba(250,204,21,.95),rgba(250,204,21,0));transform-origin:top;opacity:.35;animation:rayPulse 3s ease-in-out infinite}
+.r1{right:104px;top:150px;transform:rotate(6deg)}.r2{right:144px;top:144px;transform:rotate(24deg);animation-delay:.5s}.r3{right:72px;top:144px;transform:rotate(-14deg);animation-delay:1s}
+.co2{
+  position:absolute;left:6%;top:120px;color:#d1fae5;font-size:24px;font-weight:1000;
+  animation:co2Flow 8s linear infinite;opacity:.75
+}
+.c2{top:168px;animation-delay:2s}.c3{top:216px;animation-delay:4s}
+.o2{
+  position:absolute;left:33%;bottom:270px;color:#dbeafe;font-size:26px;font-weight:1000;text-shadow:0 0 12px rgba(255,255,255,.3);
+  animation:o2Rise 5s linear infinite;opacity:.75
+}
+.o21{animation-delay:0s}.o22{animation-delay:1.6s}.o23{animation-delay:3.1s}
+.fish{position:absolute;left:56%;bottom:158px;font-size:44px;animation:fishSwim 6s ease-in-out infinite}
+.plantIcon{position:absolute;left:58%;bottom:84px;font-size:52px;animation:plantGrow 3s ease-in-out infinite}
+.energyRing{
+  position:absolute;left:32%;bottom:84px;transform:translateX(-50%);
+  width:326px;height:286px;border-radius:48%;
+  border:3px dashed rgba(140,255,193,.17);animation:ringPulse 3.2s ease-in-out infinite;pointer-events:none
+}
+.controlBox{padding:18px;border-radius:22px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}
+.cards{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+.choice,.opt,.predict,.mission{
+  padding:14px;border-radius:16px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.1);
+  color:white;cursor:pointer;text-align:left;min-height:52px;touch-action:manipulation
+}
+.choice b,.predict b,.mission b{color:var(--gold)}
+.choice.good,.predict.correct,.opt.correct,.mission.good{border-color:rgba(140,255,193,.65);background:rgba(140,255,193,.14)}
+.choice.bad,.predict.wrong,.opt.wrong,.mission.bad{border-color:rgba(255,138,160,.65);background:rgba(255,138,160,.14)}
+.choice.used,.mission.used{opacity:.82}
+.meter{padding:14px;background:rgba(255,255,255,.06);border-radius:16px;margin-top:10px}
+.meter label{display:flex;justify-content:space-between;color:var(--gold);font-weight:900}
+.bar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:8px}
+.bar span{height:100%;display:block;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.challengeCard{padding:14px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);margin-top:10px}
+.challengeCard h4{margin:0 0 8px}
+.cert{text-align:center;background:radial-gradient(circle at 20% 20%,rgba(99,244,255,.22),transparent 30%),linear-gradient(135deg,rgba(99,244,255,.18),rgba(255,224,102,.16));border:2px solid rgba(255,224,102,.45);border-radius:22px;padding:24px}
+.cert .seal{font-size:56px}.cert input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:white;text-align:center}
+footer{margin:20px 0 6px;padding:16px 20px;border:1px solid rgba(99,244,255,.25);border-radius:20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}
+footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@keyframes algaeFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-16px) scale(1.08)}}
+@keyframes bubbleUp{0%{transform:translateY(0) scale(.72);opacity:0}15%{opacity:.8}100%{transform:translateY(-205px) scale(1.1);opacity:0}}
+@keyframes sunPulse{0%,100%{transform:scale(.96);box-shadow:0 0 30px rgba(250,204,21,.42)}50%{transform:scale(1.06);box-shadow:0 0 52px rgba(250,204,21,.72)}}
+@keyframes rayPulse{0%,100%{opacity:.16}50%{opacity:.48}}
+@keyframes co2Flow{0%{transform:translateX(0);opacity:0}15%{opacity:.7}100%{transform:translateX(350px);opacity:0}}
+@keyframes o2Rise{0%{transform:translate(-50%,0) scale(.85);opacity:0}20%{opacity:.85}100%{transform:translate(-50%,-220px) scale(1.12);opacity:0}}
+@keyframes fishSwim{0%,100%{transform:translateX(0)}50%{transform:translateX(48px)}}
+@keyframes plantGrow{0%,100%{transform:scale(.96)}50%{transform:scale(1.08)}}
+@keyframes ringPulse{0%,100%{border-color:rgba(140,255,193,.12);box-shadow:0 0 0 rgba(140,255,193,0)}50%{border-color:rgba(140,255,193,.55);box-shadow:0 0 32px rgba(140,255,193,.2)}}
+@media(max-width:1000px){
+  .grid2,.labGrid{grid-template-columns:1fr}
+  .logo{position:static;width:max-content;margin:0 0 12px auto}
+  .fun,.stats{grid-template-columns:1fr 1fr}
+  .screen{position:relative;width:auto;right:auto;top:auto;margin:12px}
+  .scene{min-height:700px}
+  .pond,.energyRing{left:50%}
+  .ai{left:50%;transform:translateX(-50%);bottom:22px}
+  .sun{right:34px;top:108px}
+  .ray{right:66px;top:178px}
+  .fish{left:66%;bottom:150px}
+  .plantIcon{left:66%;bottom:84px}
+  .nav{display:grid;grid-template-columns:1fr 1fr}
+  .actions{display:grid;grid-template-columns:1fr 1fr}
+  .actions .btn,.actions select{width:100%}
+  .hero:after{display:none}
+}
+@media(max-width:430px){
+  .fun,.stats,.nav,.actions{grid-template-columns:1fr}
+  .rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2}
+  .pond{width:250px;height:230px}
+  .energyRing{width:270px;height:250px}
+}
+@media print{
+  .hero,.nav,.section:not(#certificate),footer,.watermark,.cornerMark{display:none!important}
+  .cert{color:#111;background:white;border:4px solid #111}.cert input{border:0;color:#111}
+}
+</style>
+</head>
+<body>
+<div class="watermark">
+  <div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:20%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:36%;left:-4%">Dr AI Academy</div><div class="wm" style="top:52%;left:45%">Dr AI Academy</div>
+  <div class="wm" style="top:68%;left:6%">Dr AI Academy</div><div class="wm" style="top:84%;left:44%">Dr AI Academy</div>
+</div>
+<div class="cornerMark">Dr AI Academy</div>
+
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Invisible World Lab Series</span></div>
+  <div class="badge">LAB 11 • CHAPTER 2 • MICROALGAE + OXYGEN PLANET</div>
+  <h1>OXYGEN PLANET:<br>THE MICROALGAE PHOTOSYNTHESIS MISSION</h1>
+  <p class="sub">A highly dynamic microalgae lab where Dr AI shows how tiny aquatic organisms use sunlight and carbon dioxide to make food and release oxygen. Students activate the pond ecosystem, balance light, CO₂ and nutrients, and connect microalgae to oxygen, food chains, biofuel and NEET/Olympiad level ecology.</p>
+  <div class="actions">
+    <button class="btn gold" id="startBtn">🎮 Start Lab 11</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select>
+  </div>
+  <div class="fun">
+    <div>🌊 Microalgae Pond</div><div>☀️ Photosynthesis</div><div>O₂ Oxygen Release</div><div>🏅 Certificate Quest</div>
+  </div>
+  <div class="grid2">
+    <div class="panel box"><h3>Game Rules</h3>
+      <div class="rule"><div class="n">1</div><div><b>Learn microalgae story</b><br>Understand photosynthesis, oxygen and aquatic life.</div><div class="tag">Level 1</div></div>
+      <div class="rule"><div class="n">2</div><div><b>Activate ecosystem</b><br>Add light, CO₂, nutrients and water.</div><div class="tag">Level 2</div></div>
+      <div class="rule"><div class="n">3</div><div><b>Balance oxygen factory</b><br>Adjust light, CO₂ and nutrients.</div><div class="tag">Level 3</div></div>
+      <div class="rule"><div class="n">4</div><div><b>Planet mission</b><br>Connect algae to oxygen, food chains and biofuel.</div><div class="tag">Level 4</div></div>
+    </div>
+    <div class="panel box"><h3>Level Map</h3>
+      <div class="level activeLevel" id="lvl1"><div class="n">1</div><div><b>Story Briefing</b><br><small>Complete 4 story cards.</small></div><div class="tag" id="tag1">Active</div></div>
+      <div class="level" id="lvl2"><div class="n">2</div><div><b>Pond Activation</b><br><small>Add 4 correct ecosystem factors.</small></div><div class="tag" id="tag2">Locked</div></div>
+      <div class="level" id="lvl3"><div class="n">3</div><div><b>Oxygen Factory</b><br><small>Reach oxygen score 75+.</small></div><div class="tag" id="tag3">Locked</div></div>
+      <div class="level" id="lvl4"><div class="n">4</div><div><b>Mission + Quiz</b><br><small>Clear mission and answer 3 quiz questions.</small></div><div class="tag" id="tag4">Locked</div></div>
+      <div class="stats">
+        <div class="stat"><b id="theoryCount">0/4</b><span>Story</span></div>
+        <div class="stat"><b id="simCount">0/3</b><span>Levels</span></div>
+        <div class="stat"><b id="quizCount">0/3</b><span>Quiz</span></div>
+        <div class="stat"><b id="score">0</b><span>Score</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="btn gold active" data-go="theory">Story</button>
+  <button class="btn secondary" data-go="activate" id="navActivate" disabled>Activate</button>
+  <button class="btn secondary" data-go="factory" id="navFactory" disabled>Factory</button>
+  <button class="btn secondary" data-go="mission" id="navMission" disabled>Mission</button>
+  <button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Quiz</button>
+  <button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button>
+</div>
+
+<section class="section active" id="theory">
+  <div class="grid2">
+    <div class="panel box">
+      <h3>Dr AI Story Briefing</h3>
+      <div class="storyBox" id="storyBox"></div>
+      <div class="storyBtns">
+        <button class="btn secondary" id="prevStory">← Previous</button>
+        <button class="btn" id="nextStory">Next Story →</button>
+        <button class="btn gold" id="markTheory">Mark Story Complete</button>
+      </div>
+    </div>
+    <div class="panel box">
+      <h3>What Students Learn</h3>
+      <div class="explain">
+        <b>NCERT Link:</b> Microalgae are tiny photosynthetic organisms and can be important for oxygen production and aquatic ecosystems.<br><br>
+        <b>Olympiad Link:</b> Photosynthesis variables, food chain logic, oxygen cycle and ecosystem reasoning.<br><br>
+        <b>NEET Foundation:</b> Producers, photosynthesis, carbon cycle, oxygen evolution, aquatic ecology and bioresource concepts.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="activate">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 2: Dynamic Microalgae Pond</h3>
+      <div class="scene">
+        <div class="screen">
+          <h3>Dr AI Pond Scanner</h3>
+          <div class="line">Correct Factors: <b id="factorCount">0 / 4</b></div>
+          <div class="line">Pond Status: <b id="pondStatus">Waiting</b></div>
+          <div class="line">Mission: Activate the algae ecosystem.</div>
+        </div>
+
+        <div class="sun"></div><div class="ray r1"></div><div class="ray r2"></div><div class="ray r3"></div>
+        <div class="co2 c1">CO₂</div><div class="co2 c2">CO₂</div><div class="co2 c3">CO₂</div>
+        <div class="o2 o21">O₂</div><div class="o2 o22">O₂</div><div class="o2 o23">O₂</div>
+        <div class="fish">🐟</div><div class="plantIcon">🌿</div>
+        <div class="energyRing" id="energyRing"></div>
+        <div class="pond">
+          <div class="algae g1"></div><div class="algae g2"></div><div class="algae g3"></div><div class="algae g4"></div><div class="algae g5"></div>
+          <div class="bubble b1">O₂</div><div class="bubble b2">O₂</div><div class="bubble b3">O₂</div>
+        </div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Controls: Activate Ecosystem</h3>
+      <div class="controlBox">
+        <div class="cards">
+          <button class="choice" data-item="Sunlight" data-good="1"><b>☀️ Sunlight</b><br>Energy source for photosynthesis.</button>
+          <button class="choice" data-item="Carbon Dioxide" data-good="1"><b>CO₂ Carbon Dioxide</b><br>Raw material used in photosynthesis.</button>
+          <button class="choice" data-item="Water" data-good="1"><b>💧 Water</b><br>Needed for photosynthesis and aquatic life.</button>
+          <button class="choice" data-item="Mineral Nutrients" data-good="1"><b>🧪 Mineral Nutrients</b><br>Support healthy algae growth.</button>
+          <button class="choice" data-item="Plastic Waste" data-good="0"><b>🧴 Plastic Waste</b><br>Pollutes water and harms ecosystems.</button>
+          <button class="choice" data-item="No Light" data-good="0"><b>🌑 No Light</b><br>Photosynthesis becomes very weak.</button>
+        </div>
+      </div>
+      <div class="explain" id="activateExplain"><h4>Activation Feedback</h4>Select an ecosystem factor to learn how it supports microalgae.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="factory">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 3: Oxygen Factory Environment</h3>
+      <div class="scene">
+        <div class="screen">
+          <h3>Oxygen Meter</h3>
+          <div class="line">Oxygen Score: <b id="oxygenScore">0</b></div>
+          <div class="line">Algae Mood: <b id="algaeMood">Sleeping</b></div>
+          <div class="line">Target: <b>75+</b></div>
+        </div>
+        <div class="sun"></div><div class="ray r1"></div><div class="ray r2"></div><div class="ray r3"></div>
+        <div class="co2 c1">CO₂</div><div class="co2 c2">CO₂</div><div class="co2 c3">CO₂</div>
+        <div class="o2 o21">O₂</div><div class="o2 o22">O₂</div><div class="o2 o23">O₂</div>
+        <div class="fish">🐟</div><div class="plantIcon">🌿</div>
+        <div class="energyRing"></div>
+        <div class="pond">
+          <div class="algae g1"></div><div class="algae g2"></div><div class="algae g3"></div><div class="algae g4"></div><div class="algae g5"></div>
+          <div class="bubble b1">O₂</div><div class="bubble b2">O₂</div><div class="bubble b3">O₂</div>
+        </div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Controls: Balance Photosynthesis</h3>
+      <div class="controlBox">
+        <div class="meter"><label>Light Intensity <span id="lightOut">50</span></label><input type="range" min="0" max="100" value="50" id="light"></div>
+        <div class="meter"><label>CO₂ Supply <span id="co2Out">50</span></label><input type="range" min="0" max="100" value="50" id="co2"></div>
+        <div class="meter"><label>Nutrient Level <span id="nutrientOut">50</span></label><input type="range" min="0" max="100" value="50" id="nutrient"></div>
+        <button class="btn green" id="checkFactory">O₂ Check Oxygen Factory</button>
+      </div>
+      <div class="explain" id="factoryExplain"><h4>Factory Feedback</h4>Adjust light, CO₂ and nutrients to increase photosynthesis.</div>
+      <div class="meter"><label>Photosynthesis Power <span id="activityText">0%</span></label><div class="bar"><span id="activityBar"></span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mission">
+  <div class="grid2">
+    <div class="panel box">
+      <h3>Level 4: Planet Mission Challenges</h3>
+
+      <div class="challengeCard">
+        <h4>Mission 1: Why are microalgae important?</h4>
+        <div class="cards">
+          <button class="mission" data-mission="1" data-good="1"><b>They act as producers</b><br>They make food using sunlight and support aquatic food chains.</button>
+          <button class="mission" data-mission="1" data-good="0"><b>They never interact with ecosystems</b><br>This ignores their role in aquatic food chains.</button>
+        </div>
+      </div>
+
+      <div class="challengeCard">
+        <h4>Mission 2: Which gas is released in photosynthesis?</h4>
+        <div class="cards">
+          <button class="mission" data-mission="2" data-good="1"><b>Oxygen</b><br>O₂ is released during photosynthesis.</button>
+          <button class="mission" data-mission="2" data-good="0"><b>Plastic gas</b><br>There is no such photosynthesis product.</button>
+        </div>
+      </div>
+
+      <div class="challengeCard">
+        <h4>Mission 3: Future science connection</h4>
+        <div class="cards">
+          <button class="mission" data-mission="3" data-good="1"><b>Biofuel / food security research</b><br>Some microalgae are studied for food, biofuel and environmental use.</button>
+          <button class="mission" data-mission="3" data-good="0"><b>They have no practical use</b><br>Microalgae have many research and ecological applications.</button>
+        </div>
+      </div>
+
+      <div class="explain" id="missionExplain"><h4>Mission Feedback</h4>Clear all 3 missions to unlock the quiz.</div>
+    </div>
+
+    <div class="panel box">
+      <h3>Concept Panel</h3>
+      <div class="explain">
+        <b>Main Concept:</b> Microalgae are tiny photosynthetic producers.<br><br>
+        <b>Photosynthesis Logic:</b><br>
+        Sunlight + CO₂ + water → food + oxygen<br><br>
+        <b>Why this matters:</b><br>
+        They support aquatic food chains, oxygen production, carbon cycling and future bioresource research.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel box">
+    <h3>Level 5: Microalgae Boss Quiz</h3>
+    <div class="cards">
+      <div>
+        <b>Q1. What type of organisms are microalgae in food chains?</b>
+        <div class="opt" data-q="q1" data-correct="1">Producers</div>
+        <div class="opt" data-q="q1">Only consumers</div>
+        <div class="opt" data-q="q1">Only plastic particles</div>
+      </div>
+      <div>
+        <b>Q2. What does photosynthesis release as a gas?</b>
+        <div class="opt" data-q="q2" data-correct="1">Oxygen</div>
+        <div class="opt" data-q="q2">Only smoke</div>
+        <div class="opt" data-q="q2">Metal vapour</div>
+      </div>
+      <div>
+        <b>Q3. Which conditions support microalgae photosynthesis?</b>
+        <div class="opt" data-q="q3" data-correct="1">Light, CO₂, water and nutrients</div>
+        <div class="opt" data-q="q3">No light and plastic waste</div>
+        <div class="opt" data-q="q3">Only dry air with no water</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="certificate">
+  <div class="panel box">
+    <div class="cert">
+      <div class="seal">🌊🟢🏅</div>
+      <h2>Certificate of Microalgae Photosynthesis Science</h2>
+      <p>This certifies that</p>
+      <input id="studentName" placeholder="Enter Student Name">
+      <p>has successfully completed <b>Lab 11: Oxygen Planet Microalgae Mission</b></p>
+      <p>Skills: Microalgae • Photosynthesis • Oxygen Release • Producers • Aquatic Ecology • Carbon Cycle</p>
+      <p><b>Developed by Dr AI Academy</b></p>
+      <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div>
+  <div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div>
+</footer>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const state={
+  voice:true,style:"standard",storyIndex:0,theoryDone:0,score:0,
+  activateDone:false,factoryDone:false,missionDone:false,
+  factors:{},missions:{},quizCorrect:{},
+  unlocked:{activate:false,factory:false,mission:false,quiz:false,certificate:false}
+};
+
+const stories=[
+  {title:"Story 1: Tiny Green Oxygen Makers",body:"Microalgae are tiny green organisms found in water. They can make their own food using sunlight, just like plants.",points:["Microalgae are tiny aquatic organisms.","They can perform photosynthesis.","They are important producers."]},
+  {title:"Story 2: Photosynthesis in Water",body:"Microalgae use sunlight, carbon dioxide and water to make food. Oxygen is released during this process.",points:["Sunlight gives energy.","CO₂ and water are raw materials.","Oxygen is released."]},
+  {title:"Story 3: Food Chain Heroes",body:"Small aquatic animals may depend on microalgae as food. This makes microalgae very important at the base of aquatic food chains.",points:["Microalgae support food chains.","They are producers.","Aquatic ecosystems depend on them."]},
+  {title:"Story 4: Future Science",body:"Some microalgae are studied for food, biofuel, oxygen production and environmental solutions. Tiny organisms can have planet-level importance.",points:["Microalgae can be useful resources.","They connect biology and environment.","This builds higher-level ecology thinking."]}
+];
+
+function speak(t){
+  if(!state.voice||!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);
+  u.lang="en-IN";
+  u.rate=state.style==="indian"?0.88:0.98;
+  speechSynthesis.speak(u);
+}
+function show(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  $(id).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+  $(id).scrollIntoView({behavior:"smooth",block:"start"});
+}
+function simDone(){return (state.activateDone?1:0)+(state.factoryDone?1:0)+(state.missionDone?1:0)}
+function status(){
+  $("theoryCount").textContent=Math.min(state.theoryDone,4)+"/4";
+  $("simCount").textContent=simDone()+"/3";
+  $("quizCount").textContent=Object.keys(state.quizCorrect).length+"/3";
+  $("score").textContent=state.score;
+  [["lvl1","tag1",state.theoryDone>=4,true],["lvl2","tag2",state.activateDone,state.unlocked.activate],["lvl3","tag3",state.factoryDone,state.unlocked.factory],["lvl4","tag4",state.missionDone,state.unlocked.mission]].forEach(([id,tag,done,active])=>{
+    $(id).classList.toggle("done",done);
+    $(id).classList.toggle("activeLevel",active&&!done);
+    $(tag).textContent=done?"Done":active?"Active":"Locked";
+  });
+  $("navActivate").disabled=!state.unlocked.activate;
+  $("navFactory").disabled=!state.unlocked.factory;
+  $("navMission").disabled=!state.unlocked.mission;
+  $("navQuiz").disabled=!state.unlocked.quiz;
+  $("navCert").disabled=!state.unlocked.certificate;
+}
+function unlock(){
+  if(state.theoryDone>=4&&!state.unlocked.activate){state.unlocked.activate=true;speak("Pond Activation unlocked.");show("activate")}
+  if(state.activateDone&&!state.unlocked.factory){state.unlocked.factory=true;speak("Oxygen Factory unlocked.");show("factory")}
+  if(state.factoryDone&&!state.unlocked.mission){state.unlocked.mission=true;speak("Planet Mission unlocked.");show("mission")}
+  if(state.missionDone&&!state.unlocked.quiz){state.unlocked.quiz=true;speak("Quiz unlocked.");show("quiz")}
+  if(Object.keys(state.quizCorrect).length>=3&&!state.unlocked.certificate){state.unlocked.certificate=true;speak("Certificate unlocked.");show("certificate")}
+  status();
+}
+function renderStory(){
+  const s=stories[state.storyIndex];
+  $("storyBox").innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  speak(s.title+". "+s.body);
+}
+function markTheory(){
+  if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1;state.score+=15}
+  if(state.storyIndex<3){state.storyIndex++;renderStory()}
+  unlock();
+}
+function activateFactor(btn){
+  if(!state.unlocked.activate)return;
+  const item=btn.dataset.item, good=btn.dataset.good==="1";
+  if(good){
+    if(!state.factors[item]){
+      state.factors[item]=true;
+      state.score+=10;
+      btn.classList.add("good","used");
+    }
+    const c=Object.keys(state.factors).length;
+    $("factorCount").textContent=c+" / 4";
+    $("pondStatus").textContent=c>=4?"Photosynthesis Ready":"Activating";
+    $("activateExplain").innerHTML=`<h4>Correct Factor</h4><b>${item}</b> supports microalgae photosynthesis and aquatic ecosystem health.`;
+    if(c>=4&&!state.activateDone){state.activateDone=true;state.score+=20;$("energyRing").style.borderColor="rgba(140,255,193,.75)"}
+  }else{
+    btn.classList.add("bad");
+    $("activateExplain").innerHTML=`<h4>Not Good for the Ecosystem</h4><b>${item}</b> does not support healthy microalgae photosynthesis.`;
+  }
+  unlock();
+}
+function updateFactory(){
+  const light=+$("light").value, co2=+$("co2").value, nutrient=+$("nutrient").value;
+  $("lightOut").textContent=light;
+  $("co2Out").textContent=co2;
+  $("nutrientOut").textContent=nutrient;
+  const score=Math.round((100-Math.abs(light-75)*1.0)*.38 + (100-Math.abs(co2-65)*1.05)*.33 + (100-Math.abs(nutrient-60)*1.0)*.29);
+  const finalScore=Math.max(0,Math.min(100,score));
+  $("oxygenScore").textContent=finalScore;
+  $("activityText").textContent=finalScore+"%";
+  $("activityBar").style.width=finalScore+"%";
+  $("algaeMood").textContent=finalScore>=75?"Super Active":finalScore>=50?"Working":"Sleeping";
+  return finalScore;
+}
+function checkFactory(){
+  const sc=updateFactory();
+  if(sc>=75){
+    if(!state.factoryDone){state.factoryDone=true;state.score+=35}
+    $("factoryExplain").innerHTML="<h4>Oxygen Factory Activated!</h4>Light, CO₂ and nutrients are balanced. Microalgae photosynthesis is strong and oxygen release increases.";
+  }else{
+    $("factoryExplain").innerHTML="<h4>Need Better Balance</h4>Try light around 75, CO₂ around 65 and nutrients around 60 to increase photosynthesis.";
+  }
+  unlock();
+}
+function doMission(btn){
+  if(!state.unlocked.mission)return;
+  const mission=btn.dataset.mission, good=btn.dataset.good==="1";
+  if(state.missions[mission]) return;
+  const group=[...document.querySelectorAll(`.mission[data-mission="${mission}"]`)];
+  if(good){
+    state.missions[mission]=true;
+    state.score+=18;
+    btn.classList.add("good","used");
+    $("missionExplain").innerHTML=`<h4>Mission ${mission} Cleared</h4>Correct! You used ecosystem evidence to understand microalgae.`;
+  }else{
+    btn.classList.add("bad");
+    group.forEach(x=>{if(x.dataset.good==="1") x.classList.add("good")});
+    $("missionExplain").innerHTML=`<h4>Try Again Conceptually</h4>Think about photosynthesis, producers and oxygen release.`;
+  }
+  if(Object.keys(state.missions).length>=3&&!state.missionDone){state.missionDone=true;state.score+=25}
+  unlock();
+}
+function answerQuiz(opt){
+  if(!state.unlocked.quiz)return;
+  const q=opt.dataset.q;
+  if(state.quizCorrect[q]) return;
+  const group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)];
+  if(opt.dataset.correct){
+    state.quizCorrect[q]=true;
+    opt.classList.add("correct");
+    state.score+=20;
+  }else{
+    opt.classList.add("wrong");
+    group.forEach(x=>{if(x.dataset.correct) x.classList.add("correct")});
+  }
+  unlock();
+}
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{if(!b.disabled)show(b.dataset.go)});
+$("startBtn").onclick=()=>show("theory");
+$("voiceBtn").onclick=()=>{state.voice=!state.voice;$("voiceBtn").textContent=state.voice?"🔊 Voice ON":"🔇 Voice OFF"};
+$("stopVoiceBtn").onclick=()=>speechSynthesis.cancel();
+$("voiceStyle").onchange=e=>state.style=e.target.value;
+$("nextStory").onclick=()=>{state.storyIndex=Math.min(3,state.storyIndex+1);renderStory()};
+$("prevStory").onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1);renderStory()};
+$("markTheory").onclick=markTheory;
+document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>activateFactor(b));
+["light","co2","nutrient"].forEach(id=>$(id).oninput=updateFactory);
+$("checkFactory").onclick=checkFactory;
+document.querySelectorAll(".mission").forEach(b=>b.onclick=()=>doMission(b));
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>answerQuiz(o));
+
+renderStory(); updateFactory(); status();
+})();
+</script>
+</body>
+</html>

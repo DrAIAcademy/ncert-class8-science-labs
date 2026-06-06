@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 12: Pathogen Defense Arena | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#07122d;--bg2:#123b7a;--panel:rgba(12,30,62,.94);
+  --cyan:#63f4ff;--gold:#ffe066;--green:#8cffc1;--red:#ff8aa0;--violet:#d3a5ff;
+  --text:#eef8ff;--muted:#b5cbe4
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%,rgba(99,244,255,.20),transparent 26%),
+    radial-gradient(circle at 88% 12%,rgba(255,224,102,.18),transparent 27%),
+    radial-gradient(circle at 60% 90%,rgba(255,138,160,.11),transparent 24%),
+    linear-gradient(135deg,var(--bg),var(--bg2) 60%,#0a2248);
+  color:var(--text);overflow-x:hidden;-webkit-text-size-adjust:100%;
+}
+.watermark{position:fixed;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.082);font-size:clamp(28px,4.2vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap;letter-spacing:1px;text-shadow:0 0 9px rgba(0,0,0,.35)}
+.cornerMark{position:fixed;right:14px;bottom:14px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.72);background:rgba(4,13,24,.42);border:1px solid rgba(255,255,255,.20);padding:7px 12px;border-radius:999px;font-weight:1000;backdrop-filter:blur(6px)}
+.wrap{max-width:1480px;margin:auto;padding:16px;position:relative;z-index:10}
+.panel{background:var(--panel);border:1px solid rgba(99,244,255,.25);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.hero{padding:22px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(23,63,125,.9),rgba(9,25,57,.9))}
+.hero:after{content:"🦠 🛡️ 💉 🧼 ⚕️ ✨";position:absolute;right:22px;bottom:18px;font-size:34px;letter-spacing:9px;opacity:.28}
+.logo{position:absolute;right:18px;top:18px;background:rgba(0,0,0,.28);border:1px solid rgba(99,244,255,.3);border-radius:18px;padding:10px 14px;text-align:right}
+.logo b{display:block}.logo span{color:var(--cyan);font-size:.78rem;font-weight:900}
+.badge{display:inline-block;background:rgba(99,244,255,.12);border:1px solid rgba(99,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:1000;padding:9px 14px;font-size:.8rem}
+h1{font-size:clamp(2rem,4.5vw,4.2rem);line-height:1.02;margin:14px 0 10px;max-width:1100px;text-shadow:0 4px 0 rgba(0,0,0,.18)}
+.sub{color:var(--muted);max-width:1120px;line-height:1.6}
+.btn{border:0;border-radius:18px;padding:12px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;min-height:46px;touch-action:manipulation}
+.btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}
+.btn.red{background:linear-gradient(135deg,var(--red),#ffd4dd);color:#35000a}
+.btn:disabled{opacity:.5}
+.actions,.nav,.storyBtns{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.nav{position:sticky;top:0;z-index:60;background:rgba(7,18,45,.94);padding:8px;border-radius:18px;backdrop-filter:blur(10px)}
+.nav .active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.fun{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.fun div{background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.1);padding:10px;border-radius:16px;text-align:center;font-weight:900}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.labGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,460px);gap:16px;margin-top:16px;align-items:start}
+.box{padding:18px}
+.rule,.level{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px;margin-top:10px}
+.n{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(99,244,255,.16);color:var(--cyan);font-weight:1000}
+.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:.8rem;font-weight:900}
+.done{border-color:rgba(140,255,193,.55)!important;background:rgba(140,255,193,.1)!important}
+.activeLevel{border-color:rgba(255,224,102,.55)!important;background:rgba(255,224,102,.1)!important}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.stat{padding:12px;text-align:center;background:rgba(255,255,255,.055);border-radius:15px}
+.stat b{display:block;color:var(--cyan);font-size:1.3rem}
+.section{display:none}.section.active{display:block}
+.storyBox,.explain{padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(99,244,255,.11),rgba(255,255,255,.04));border:1px solid rgba(99,244,255,.22);line-height:1.65}
+.storyBox{min-height:300px}.storyBox h2:before,.explain h4:before{content:"💡 "}
+.scene{
+  position:relative;min-height:560px;border-radius:22px;overflow:hidden;
+  background:
+    radial-gradient(circle at 18% 12%,rgba(99,244,255,.16),transparent 28%),
+    radial-gradient(circle at 78% 14%,rgba(255,138,160,.17),transparent 18%),
+    linear-gradient(180deg,#123b7a,#0a2f68 45%,#112642 45%,#091526);
+  border:1px solid rgba(255,255,255,.08)
+}
+.screen{
+  position:absolute;right:16px;top:16px;width:min(42%,390px);min-height:205px;background:rgba(5,21,46,.78);
+  border:1px solid rgba(99,244,255,.22);border-radius:22px;padding:14px;pointer-events:none
+}
+.line{background:rgba(255,255,255,.065);padding:10px;border-radius:12px;margin:8px 0}
+.ai{position:absolute;left:26px;bottom:28px;font-size:86px;pointer-events:none}
+.ai:after{content:"Dr AI";display:block;font-size:14px;background:var(--gold);color:#2c1900;border-radius:999px;padding:6px 10px;font-weight:1000;text-align:center}
+.bodyMap{
+  position:absolute;left:32%;bottom:80px;transform:translateX(-50%);
+  width:270px;height:360px;border-radius:135px 135px 70px 70px;
+  background:linear-gradient(180deg,rgba(219,234,254,.88),rgba(147,197,253,.42));
+  border:4px solid rgba(255,255,255,.55);box-shadow:0 22px 36px rgba(0,0,0,.28);overflow:hidden
+}
+.bodyMap:before{content:"Defense Zone";position:absolute;left:50%;top:16px;transform:translateX(-50%);font-size:.82rem;background:rgba(8,20,42,.72);padding:6px 12px;border-radius:999px;font-weight:1000;z-index:2}
+.lung{position:absolute;top:84px;width:76px;height:108px;border-radius:50% 50% 56% 56%;background:rgba(99,244,255,.24);border:2px solid rgba(255,255,255,.36)}
+.leftLung{left:52px}.rightLung{right:52px}
+.stomach{position:absolute;left:82px;top:212px;width:110px;height:72px;border-radius:50%;background:rgba(255,224,102,.26);border:2px solid rgba(255,255,255,.36)}
+.shieldAura{
+  position:absolute;left:32%;bottom:68px;transform:translateX(-50%);
+  width:300px;height:382px;border-radius:48%;
+  border:3px dashed rgba(140,255,193,.16);
+  animation:shieldPulse 3.2s ease-in-out infinite;pointer-events:none
+}
+.pathogen{
+  position:absolute;font-size:32px;filter:drop-shadow(0 0 10px rgba(255,138,160,.38));animation:pathogenMove 7s linear infinite;opacity:.78
+}
+.p1{left:-60px;top:110px}.p2{left:-90px;top:210px;animation-delay:1.7s}.p3{left:-70px;top:330px;animation-delay:3.2s}.p4{left:-100px;top:420px;animation-delay:4.4s}
+.antibody{
+  position:absolute;left:32%;bottom:300px;color:#dbeafe;font-size:24px;font-weight:1000;
+  text-shadow:0 0 12px rgba(255,255,255,.35);animation:antibodyOrbit 5.5s linear infinite;opacity:.74
+}
+.ab2{animation-delay:1.8s}.ab3{animation-delay:3.4s}
+.handwash{
+  position:absolute;left:54%;bottom:110px;font-size:52px;animation:cleanPulse 2.8s ease-in-out infinite
+}
+.soapBubble{position:absolute;left:55%;bottom:170px;color:#dbeafe;font-size:22px;animation:bubbleUp 4.8s linear infinite;opacity:.75}
+.sb2{left:61%;animation-delay:1.4s}.sb3{left:58%;animation-delay:2.6s}
+.vaccineSpark{
+  position:absolute;right:90px;top:170px;font-size:48px;animation:sparkPulse 2.8s ease-in-out infinite
+}
+.controlBox{padding:18px;border-radius:22px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}
+.cards{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+.choice,.opt,.predict,.mission{
+  padding:14px;border-radius:16px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.1);
+  color:white;cursor:pointer;text-align:left;min-height:52px;touch-action:manipulation
+}
+.choice b,.predict b,.mission b{color:var(--gold)}
+.choice.good,.predict.correct,.opt.correct,.mission.good{border-color:rgba(140,255,193,.65);background:rgba(140,255,193,.14)}
+.choice.bad,.predict.wrong,.opt.wrong,.mission.bad{border-color:rgba(255,138,160,.65);background:rgba(255,138,160,.14)}
+.choice.used,.mission.used{opacity:.82}
+.meter{padding:14px;background:rgba(255,255,255,.06);border-radius:16px;margin-top:10px}
+.meter label{display:flex;justify-content:space-between;color:var(--gold);font-weight:900}
+.bar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:8px}
+.bar span{height:100%;display:block;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.challengeCard{padding:14px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);margin-top:10px}
+.challengeCard h4{margin:0 0 8px}
+.cert{text-align:center;background:radial-gradient(circle at 20% 20%,rgba(99,244,255,.22),transparent 30%),linear-gradient(135deg,rgba(99,244,255,.18),rgba(255,224,102,.16));border:2px solid rgba(255,224,102,.45);border-radius:22px;padding:24px}
+.cert .seal{font-size:56px}.cert input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:white;text-align:center}
+footer{margin:20px 0 6px;padding:16px 20px;border:1px solid rgba(99,244,255,.25);border-radius:20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}
+footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@keyframes pathogenMove{0%{transform:translateX(0) translateY(0) rotate(0deg);opacity:0}10%{opacity:.8}50%{opacity:1}100%{transform:translateX(660px) translateY(-36px) rotate(180deg);opacity:0}}
+@keyframes shieldPulse{0%,100%{border-color:rgba(140,255,193,.13);box-shadow:0 0 0 rgba(140,255,193,0)}50%{border-color:rgba(140,255,193,.58);box-shadow:0 0 36px rgba(140,255,193,.22)}}
+@keyframes antibodyOrbit{0%{transform:translate(-50%,0) rotate(0deg) translateX(100px) rotate(0deg)}100%{transform:translate(-50%,0) rotate(360deg) translateX(100px) rotate(-360deg)}}
+@keyframes cleanPulse{0%,100%{transform:scale(.96)}50%{transform:scale(1.08)}}
+@keyframes bubbleUp{0%{transform:translateY(0) scale(.7);opacity:0}15%{opacity:.8}100%{transform:translateY(-150px) scale(1.2);opacity:0}}
+@keyframes sparkPulse{0%,100%{transform:scale(.94);filter:drop-shadow(0 0 8px rgba(99,244,255,.22))}50%{transform:scale(1.08);filter:drop-shadow(0 0 22px rgba(99,244,255,.55))}}
+@media(max-width:1000px){
+  .grid2,.labGrid{grid-template-columns:1fr}
+  .logo{position:static;width:max-content;margin:0 0 12px auto}
+  .fun,.stats{grid-template-columns:1fr 1fr}
+  .screen{position:relative;width:auto;right:auto;top:auto;margin:12px}
+  .scene{min-height:720px}
+  .bodyMap,.shieldAura{left:50%}
+  .ai{left:50%;transform:translateX(-50%);bottom:22px}
+  .handwash{left:70%;bottom:130px}
+  .vaccineSpark{right:36px;top:220px}
+  .nav{display:grid;grid-template-columns:1fr 1fr}
+  .actions{display:grid;grid-template-columns:1fr 1fr}
+  .actions .btn,.actions select{width:100%}
+  .hero:after{display:none}
+}
+@media(max-width:430px){
+  .fun,.stats,.nav,.actions{grid-template-columns:1fr}
+  .rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2}
+  .bodyMap{width:235px;height:330px}
+  .shieldAura{width:255px;height:350px}
+  .handwash{left:74%;font-size:44px}
+}
+@media print{
+  .hero,.nav,.section:not(#certificate),footer,.watermark,.cornerMark{display:none!important}
+  .cert{color:#111;background:white;border:4px solid #111}.cert input{border:0;color:#111}
+}
+</style>
+</head>
+<body>
+<div class="watermark">
+  <div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:20%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:36%;left:-4%">Dr AI Academy</div><div class="wm" style="top:52%;left:45%">Dr AI Academy</div>
+  <div class="wm" style="top:68%;left:6%">Dr AI Academy</div><div class="wm" style="top:84%;left:44%">Dr AI Academy</div>
+</div>
+<div class="cornerMark">Dr AI Academy</div>
+
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Invisible World Lab Series</span></div>
+  <div class="badge">LAB 12 • CHAPTER 2 • HARMFUL MICROORGANISMS + DISEASE PREVENTION</div>
+  <h1>PATHOGEN DEFENSE ARENA:<br>THE IMMUNITY SHIELD MISSION</h1>
+  <p class="sub">A dynamic Class 8 health-science game where Dr AI helps students defend the body from harmful microorganisms. Students activate hygiene, vaccination, clean water and immunity shields while learning how pathogens spread and how prevention works. Built for NCERT clarity plus Olympiad and NEET foundation.</p>
+  <div class="actions">
+    <button class="btn gold" id="startBtn">🎮 Start Lab 12</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select>
+  </div>
+  <div class="fun">
+    <div>🦠 Pathogen Attack</div><div>🛡️ Immunity Shield</div><div>💉 Vaccination</div><div>🏅 Certificate Quest</div>
+  </div>
+  <div class="grid2">
+    <div class="panel box"><h3>Game Rules</h3>
+      <div class="rule"><div class="n">1</div><div><b>Learn pathogen story</b><br>Understand harmful microbes and disease spread.</div><div class="tag">Level 1</div></div>
+      <div class="rule"><div class="n">2</div><div><b>Activate defense tools</b><br>Choose correct disease prevention methods.</div><div class="tag">Level 2</div></div>
+      <div class="rule"><div class="n">3</div><div><b>Balance immunity</b><br>Control hygiene, vaccination and exposure risk.</div><div class="tag">Level 3</div></div>
+      <div class="rule"><div class="n">4</div><div><b>Solve health missions</b><br>Apply prevention logic to real situations.</div><div class="tag">Level 4</div></div>
+    </div>
+    <div class="panel box"><h3>Level Map</h3>
+      <div class="level activeLevel" id="lvl1"><div class="n">1</div><div><b>Story Briefing</b><br><small>Complete 4 story cards.</small></div><div class="tag" id="tag1">Active</div></div>
+      <div class="level" id="lvl2"><div class="n">2</div><div><b>Defense Builder</b><br><small>Activate 4 correct defenses.</small></div><div class="tag" id="tag2">Locked</div></div>
+      <div class="level" id="lvl3"><div class="n">3</div><div><b>Immunity Lab</b><br><small>Reach defense score 75+.</small></div><div class="tag" id="tag3">Locked</div></div>
+      <div class="level" id="lvl4"><div class="n">4</div><div><b>Mission + Quiz</b><br><small>Clear health missions and answer quiz.</small></div><div class="tag" id="tag4">Locked</div></div>
+      <div class="stats">
+        <div class="stat"><b id="theoryCount">0/4</b><span>Story</span></div>
+        <div class="stat"><b id="simCount">0/3</b><span>Levels</span></div>
+        <div class="stat"><b id="quizCount">0/3</b><span>Quiz</span></div>
+        <div class="stat"><b id="score">0</b><span>Score</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="btn gold active" data-go="theory">Story</button>
+  <button class="btn secondary" data-go="defense" id="navDefense" disabled>Defense</button>
+  <button class="btn secondary" data-go="immunity" id="navImmunity" disabled>Immunity</button>
+  <button class="btn secondary" data-go="mission" id="navMission" disabled>Mission</button>
+  <button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Quiz</button>
+  <button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button>
+</div>
+
+<section class="section active" id="theory">
+  <div class="grid2">
+    <div class="panel box">
+      <h3>Dr AI Story Briefing</h3>
+      <div class="storyBox" id="storyBox"></div>
+      <div class="storyBtns">
+        <button class="btn secondary" id="prevStory">← Previous</button>
+        <button class="btn" id="nextStory">Next Story →</button>
+        <button class="btn gold" id="markTheory">Mark Story Complete</button>
+      </div>
+    </div>
+    <div class="panel box">
+      <h3>What Students Learn</h3>
+      <div class="explain">
+        <b>NCERT Link:</b> Some microorganisms are harmful and can cause diseases. Cleanliness, vaccination, safe food and safe water help prevent diseases.<br><br>
+        <b>Olympiad Link:</b> Disease transmission, prevention logic, hygiene reasoning and cause-effect thinking.<br><br>
+        <b>NEET Foundation:</b> Pathogens, immunity, vaccination, public health, host defense and infection prevention.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="defense">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 2: Dynamic Pathogen Arena</h3>
+      <div class="scene">
+        <div class="screen">
+          <h3>Dr AI Defense Scanner</h3>
+          <div class="line">Correct Defenses: <b id="defenseCount">0 / 4</b></div>
+          <div class="line">Defense Status: <b id="defenseStatus">Waiting</b></div>
+          <div class="line">Mission: Stop pathogen spread.</div>
+        </div>
+        <div class="pathogen p1">🦠</div><div class="pathogen p2">🧫</div><div class="pathogen p3">🦠</div><div class="pathogen p4">🧬</div>
+        <div class="antibody ab1">Y</div><div class="antibody ab2">Y</div><div class="antibody ab3">Y</div>
+        <div class="shieldAura" id="shieldAura"></div>
+        <div class="bodyMap">
+          <div class="lung leftLung"></div><div class="lung rightLung"></div><div class="stomach"></div>
+        </div>
+        <div class="handwash">🧼</div>
+        <div class="soapBubble sb1">○</div><div class="soapBubble sb2">○</div><div class="soapBubble sb3">○</div>
+        <div class="vaccineSpark">💉</div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Controls: Activate Defense Tools</h3>
+      <div class="controlBox">
+        <div class="cards">
+          <button class="choice" data-item="Handwashing" data-good="1"><b>🧼 Handwashing</b><br>Removes many microbes from hands.</button>
+          <button class="choice" data-item="Vaccination" data-good="1"><b>💉 Vaccination</b><br>Trains immune system to fight specific diseases.</button>
+          <button class="choice" data-item="Clean Water" data-good="1"><b>💧 Clean Water</b><br>Prevents many water-borne infections.</button>
+          <button class="choice" data-item="Safe Food" data-good="1"><b>🍲 Safe Food</b><br>Properly cooked and covered food reduces disease risk.</button>
+          <button class="choice" data-item="Dirty Water" data-good="0"><b>🧪 Dirty Water</b><br>Can spread disease-causing microbes.</button>
+          <button class="choice" data-item="Ignore Wounds" data-good="0"><b>🩹 Ignore Wounds</b><br>Open wounds need cleaning and care.</button>
+        </div>
+      </div>
+      <div class="explain" id="defenseExplain"><h4>Defense Feedback</h4>Select a prevention tool to learn how it helps fight harmful microorganisms.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="immunity">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 3: Immunity Lab Environment</h3>
+      <div class="scene">
+        <div class="screen">
+          <h3>Immunity Meter</h3>
+          <div class="line">Defense Score: <b id="defenseScore">0</b></div>
+          <div class="line">Pathogen Risk: <b id="riskLevel">High</b></div>
+          <div class="line">Target: <b>75+</b></div>
+        </div>
+        <div class="pathogen p1" id="ip1">🦠</div><div class="pathogen p2" id="ip2">🧫</div><div class="pathogen p3" id="ip3">🦠</div><div class="pathogen p4" id="ip4">🧬</div>
+        <div class="antibody ab1">Y</div><div class="antibody ab2">Y</div><div class="antibody ab3">Y</div>
+        <div class="shieldAura"></div>
+        <div class="bodyMap"><div class="lung leftLung"></div><div class="lung rightLung"></div><div class="stomach"></div></div>
+        <div class="handwash">🧼</div><div class="vaccineSpark">💉</div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Controls: Balance Protection</h3>
+      <div class="controlBox">
+        <div class="meter"><label>Hygiene Level <span id="hygieneOut">50</span></label><input type="range" min="0" max="100" value="50" id="hygiene"></div>
+        <div class="meter"><label>Vaccination Awareness <span id="vaccineOut">50</span></label><input type="range" min="0" max="100" value="50" id="vaccine"></div>
+        <div class="meter"><label>Exposure Risk Control <span id="riskOut">50</span></label><input type="range" min="0" max="100" value="50" id="risk"></div>
+        <button class="btn green" id="checkImmunity">🛡️ Check Defense Power</button>
+      </div>
+      <div class="explain" id="immunityExplain"><h4>Immunity Feedback</h4>Balance hygiene, vaccination awareness and exposure control to reduce infection risk.</div>
+      <div class="meter"><label>Defense Power <span id="activityText">0%</span></label><div class="bar"><span id="activityBar"></span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mission">
+  <div class="grid2">
+    <div class="panel box">
+      <h3>Level 4: Health Mission Challenges</h3>
+
+      <div class="challengeCard">
+        <h4>Mission 1: Avoid water-borne disease</h4>
+        <div class="cards">
+          <button class="mission" data-mission="1" data-good="1"><b>Use clean drinking water</b><br>Clean water reduces chance of many infections.</button>
+          <button class="mission" data-mission="1" data-good="0"><b>Drink dirty water</b><br>This may spread disease-causing microbes.</button>
+        </div>
+      </div>
+
+      <div class="challengeCard">
+        <h4>Mission 2: Stop hand-to-mouth spread</h4>
+        <div class="cards">
+          <button class="mission" data-mission="2" data-good="1"><b>Wash hands before eating</b><br>This removes many microbes from hands.</button>
+          <button class="mission" data-mission="2" data-good="0"><b>Eat with dirty hands</b><br>This can transfer microbes into the body.</button>
+        </div>
+      </div>
+
+      <div class="challengeCard">
+        <h4>Mission 3: Build specific protection</h4>
+        <div class="cards">
+          <button class="mission" data-mission="3" data-good="1"><b>Vaccination when recommended</b><br>Vaccines prepare the immune system for specific pathogens.</button>
+          <button class="mission" data-mission="3" data-good="0"><b>Ignore all prevention</b><br>Ignoring prevention increases disease risk.</button>
+        </div>
+      </div>
+
+      <div class="explain" id="missionExplain"><h4>Mission Feedback</h4>Clear all 3 missions to unlock the quiz.</div>
+    </div>
+
+    <div class="panel box">
+      <h3>Concept Panel</h3>
+      <div class="explain">
+        <b>Main Concept:</b> Some microbes are pathogens, but disease spread can be reduced by prevention.<br><br>
+        <b>Defense Logic:</b><br>
+        • Hygiene reduces exposure<br>
+        • Clean water and safe food block transmission<br>
+        • Vaccination prepares immune memory<br><br>
+        <b>Why this matters:</b> This is public health biology used everywhere.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel box">
+    <h3>Level 5: Pathogen Defense Boss Quiz</h3>
+    <div class="cards">
+      <div>
+        <b>Q1. What are pathogens?</b>
+        <div class="opt" data-q="q1" data-correct="1">Disease-causing microorganisms</div>
+        <div class="opt" data-q="q1">Only useful food microbes</div>
+        <div class="opt" data-q="q1">Only stones in soil</div>
+      </div>
+      <div>
+        <b>Q2. How does handwashing help?</b>
+        <div class="opt" data-q="q2" data-correct="1">It removes many microbes from hands.</div>
+        <div class="opt" data-q="q2">It makes all microbes stronger.</div>
+        <div class="opt" data-q="q2">It creates pathogens automatically.</div>
+      </div>
+      <div>
+        <b>Q3. What is the purpose of vaccination?</b>
+        <div class="opt" data-q="q3" data-correct="1">To train the immune system against specific diseases.</div>
+        <div class="opt" data-q="q3">To spread dirty water.</div>
+        <div class="opt" data-q="q3">To stop all hygiene practices.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="certificate">
+  <div class="panel box">
+    <div class="cert">
+      <div class="seal">🛡️🦠🏅</div>
+      <h2>Certificate of Pathogen Defense Science</h2>
+      <p>This certifies that</p>
+      <input id="studentName" placeholder="Enter Student Name">
+      <p>has successfully completed <b>Lab 12: Pathogen Defense Arena</b></p>
+      <p>Skills: Pathogens • Hygiene • Vaccination • Clean Water • Disease Prevention • Immunity Foundation</p>
+      <p><b>Developed by Dr AI Academy</b></p>
+      <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div>
+  <div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div>
+</footer>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const state={
+  voice:true,style:"standard",storyIndex:0,theoryDone:0,score:0,
+  defenseDone:false,immunityDone:false,missionDone:false,
+  defenses:{},missions:{},quizCorrect:{},
+  unlocked:{defense:false,immunity:false,mission:false,quiz:false,certificate:false}
+};
+
+const stories=[
+  {title:"Story 1: Not All Microbes are Friends",body:"Many microorganisms are useful, but some can cause disease. Disease-causing microorganisms are called pathogens.",points:["Some microbes are helpful.","Some microbes are harmful.","Pathogens can cause disease."]},
+  {title:"Story 2: How Pathogens Spread",body:"Pathogens may spread through dirty water, contaminated food, air droplets, insects, wounds or dirty hands.",points:["Disease can spread in different ways.","Dirty water and unsafe food can be risky.","Hand hygiene matters."]},
+  {title:"Story 3: Prevention is a Shield",body:"Clean water, safe food, handwashing and cleanliness reduce exposure to harmful microbes.",points:["Hygiene blocks transmission.","Clean water prevents many infections.","Safe food protects the body."]},
+  {title:"Story 4: Vaccination Trains the Body",body:"Vaccination helps the immune system prepare against specific pathogens. It is an important public health tool.",points:["Vaccines train immune response.","Prevention is better than cure.","Public health depends on awareness."]}
+];
+
+function speak(t){
+  if(!state.voice||!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);
+  u.lang="en-IN";
+  u.rate=state.style==="indian"?0.88:0.98;
+  speechSynthesis.speak(u);
+}
+function show(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  $(id).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+  $(id).scrollIntoView({behavior:"smooth",block:"start"});
+}
+function simDone(){return (state.defenseDone?1:0)+(state.immunityDone?1:0)+(state.missionDone?1:0)}
+function status(){
+  $("theoryCount").textContent=Math.min(state.theoryDone,4)+"/4";
+  $("simCount").textContent=simDone()+"/3";
+  $("quizCount").textContent=Object.keys(state.quizCorrect).length+"/3";
+  $("score").textContent=state.score;
+  [["lvl1","tag1",state.theoryDone>=4,true],["lvl2","tag2",state.defenseDone,state.unlocked.defense],["lvl3","tag3",state.immunityDone,state.unlocked.immunity],["lvl4","tag4",state.missionDone,state.unlocked.mission]].forEach(([id,tag,done,active])=>{
+    $(id).classList.toggle("done",done);
+    $(id).classList.toggle("activeLevel",active&&!done);
+    $(tag).textContent=done?"Done":active?"Active":"Locked";
+  });
+  $("navDefense").disabled=!state.unlocked.defense;
+  $("navImmunity").disabled=!state.unlocked.immunity;
+  $("navMission").disabled=!state.unlocked.mission;
+  $("navQuiz").disabled=!state.unlocked.quiz;
+  $("navCert").disabled=!state.unlocked.certificate;
+}
+function unlock(){
+  if(state.theoryDone>=4&&!state.unlocked.defense){state.unlocked.defense=true;speak("Defense Builder unlocked.");show("defense")}
+  if(state.defenseDone&&!state.unlocked.immunity){state.unlocked.immunity=true;speak("Immunity Lab unlocked.");show("immunity")}
+  if(state.immunityDone&&!state.unlocked.mission){state.unlocked.mission=true;speak("Health Missions unlocked.");show("mission")}
+  if(state.missionDone&&!state.unlocked.quiz){state.unlocked.quiz=true;speak("Quiz unlocked.");show("quiz")}
+  if(Object.keys(state.quizCorrect).length>=3&&!state.unlocked.certificate){state.unlocked.certificate=true;speak("Certificate unlocked.");show("certificate")}
+  status();
+}
+function renderStory(){
+  const s=stories[state.storyIndex];
+  $("storyBox").innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  speak(s.title+". "+s.body);
+}
+function markTheory(){
+  if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1;state.score+=15}
+  if(state.storyIndex<3){state.storyIndex++;renderStory()}
+  unlock();
+}
+function activateDefense(btn){
+  if(!state.unlocked.defense)return;
+  const item=btn.dataset.item, good=btn.dataset.good==="1";
+  if(good){
+    if(!state.defenses[item]){
+      state.defenses[item]=true;
+      state.score+=10;
+      btn.classList.add("good","used");
+    }
+    const c=Object.keys(state.defenses).length;
+    $("defenseCount").textContent=c+" / 4";
+    $("defenseStatus").textContent=c>=4?"Shield Ready":"Building";
+    $("defenseExplain").innerHTML=`<h4>Correct Defense</h4><b>${item}</b> helps reduce disease risk by blocking spread or preparing body defense.`;
+    if(c>=4&&!state.defenseDone){state.defenseDone=true;state.score+=20;$("shieldAura").style.borderColor="rgba(140,255,193,.75)"}
+  }else{
+    btn.classList.add("bad");
+    $("defenseExplain").innerHTML=`<h4>Risky Choice</h4><b>${item}</b> can increase infection risk or delay proper prevention.`;
+  }
+  unlock();
+}
+function updateImmunity(){
+  const h=+$("hygiene").value, v=+$("vaccine").value, r=+$("risk").value;
+  $("hygieneOut").textContent=h;
+  $("vaccineOut").textContent=v;
+  $("riskOut").textContent=r;
+  const score=Math.round((100-Math.abs(h-80)*1.0)*.35 + (100-Math.abs(v-75)*1.0)*.33 + (100-Math.abs(r-70)*1.0)*.32);
+  const finalScore=Math.max(0,Math.min(100,score));
+  $("defenseScore").textContent=finalScore;
+  $("activityText").textContent=finalScore+"%";
+  $("activityBar").style.width=finalScore+"%";
+  $("riskLevel").textContent=finalScore>=75?"Low":"High";
+  const op=finalScore>=75?.18:finalScore>=50?.42:.78;
+  ["ip1","ip2","ip3","ip4"].forEach(id=>$(id).style.opacity=op);
+  return finalScore;
+}
+function checkImmunity(){
+  const sc=updateImmunity();
+  if(sc>=75){
+    if(!state.immunityDone){state.immunityDone=true;state.score+=35}
+    $("immunityExplain").innerHTML="<h4>Defense Power Strong!</h4>High hygiene, vaccination awareness and exposure control reduce pathogen risk.";
+  }else{
+    $("immunityExplain").innerHTML="<h4>Need Stronger Defense</h4>Try hygiene around 80, vaccination awareness around 75 and exposure control around 70.";
+  }
+  unlock();
+}
+function doMission(btn){
+  if(!state.unlocked.mission)return;
+  const mission=btn.dataset.mission, good=btn.dataset.good==="1";
+  if(state.missions[mission]) return;
+  const group=[...document.querySelectorAll(`.mission[data-mission="${mission}"]`)];
+  if(good){
+    state.missions[mission]=true;
+    state.score+=18;
+    btn.classList.add("good","used");
+    $("missionExplain").innerHTML=`<h4>Mission ${mission} Cleared</h4>Correct! You selected the safer public health choice.`;
+  }else{
+    btn.classList.add("bad");
+    group.forEach(x=>{if(x.dataset.good==="1") x.classList.add("good")});
+    $("missionExplain").innerHTML=`<h4>Try Again Conceptually</h4>Think about pathogen transmission and prevention.`;
+  }
+  if(Object.keys(state.missions).length>=3&&!state.missionDone){state.missionDone=true;state.score+=25}
+  unlock();
+}
+function answerQuiz(opt){
+  if(!state.unlocked.quiz)return;
+  const q=opt.dataset.q;
+  if(state.quizCorrect[q]) return;
+  const group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)];
+  if(opt.dataset.correct){
+    state.quizCorrect[q]=true;
+    opt.classList.add("correct");
+    state.score+=20;
+  }else{
+    opt.classList.add("wrong");
+    group.forEach(x=>{if(x.dataset.correct) x.classList.add("correct")});
+  }
+  unlock();
+}
+
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{if(!b.disabled)show(b.dataset.go)});
+$("startBtn").onclick=()=>show("theory");
+$("voiceBtn").onclick=()=>{state.voice=!state.voice;$("voiceBtn").textContent=state.voice?"🔊 Voice ON":"🔇 Voice OFF"};
+$("stopVoiceBtn").onclick=()=>speechSynthesis.cancel();
+$("voiceStyle").onchange=e=>state.style=e.target.value;
+$("nextStory").onclick=()=>{state.storyIndex=Math.min(3,state.storyIndex+1);renderStory()};
+$("prevStory").onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1);renderStory()};
+$("markTheory").onclick=markTheory;
+document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>activateDefense(b));
+["hygiene","vaccine","risk"].forEach(id=>$(id).oninput=updateImmunity);
+$("checkImmunity").onclick=checkImmunity;
+document.querySelectorAll(".mission").forEach(b=>b.onclick=()=>doMission(b));
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>answerQuiz(o));
+
+renderStory(); updateImmunity(); status();
+})();
+</script>
+</body>
+</html>
