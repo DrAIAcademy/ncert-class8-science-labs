@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Microbe Crush Galaxy — Ultra Mobile Inline | Dr AI Academy</title>
+<style>
+:root{--bg:#07142c;--panel:#10264d;--cyan:#64f4ff;--gold:#ffe066;--green:#8cffc1;--red:#ff8aa0;--text:#eef8ff}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Segoe UI,sans-serif;background:linear-gradient(135deg,#061123,#123d82);color:var(--text);-webkit-text-size-adjust:100%}
+.wrap{max-width:1100px;margin:auto;padding:12px}
+.panel{background:rgba(10,25,52,.95);border:1px solid rgba(100,244,255,.25);border-radius:20px;padding:14px;margin:12px 0;box-shadow:0 12px 34px rgba(0,0,0,.35)}
+h1{font-size:clamp(1.8rem,7vw,3.2rem);line-height:1.05;margin:8px 0}
+p{line-height:1.5}
+.logo{position:fixed;right:10px;bottom:10px;z-index:999;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:7px 10px;font-weight:900;pointer-events:none}
+.btn{width:100%;border:0;border-radius:16px;padding:14px 12px;margin:6px 0;font-weight:900;font-size:16px;background:linear-gradient(135deg,var(--cyan),#d9fbff);color:#061123}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff3b0);color:#241400}
+.btn.dark{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:white}
+.grid{display:grid;grid-template-columns:1fr;gap:10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:rgba(255,255,255,.08);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;color:var(--cyan);font-size:22px}
+.board{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:5px;
+  background:rgba(255,255,255,.06);
+  border-radius:18px;
+  padding:7px;
+  width:min(100%, 390px);
+  margin:0 auto;
+}
+.tile{
+  aspect-ratio:1/1;
+  border:2px solid rgba(255,255,255,.16);
+  border-radius:13px;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.04));
+  font-size:clamp(20px,7vw,32px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+}
+.tile.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,224,102,.25)}
+.tile.power{box-shadow:0 0 16px rgba(255,224,102,.4);background:linear-gradient(180deg,rgba(255,224,102,.22),rgba(255,255,255,.04))}
+.targets{display:grid;gap:8px}
+.target{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.08);border-radius:14px;padding:10px}
+.target.done{background:rgba(140,255,193,.14);border:1px solid rgba(140,255,193,.5)}
+.log{max-height:180px;overflow:auto;background:rgba(0,0,0,.18);border-radius:14px;padding:10px}
+.cert{display:none;text-align:center;border:2px solid var(--gold)}
+.cert input{width:100%;max-width:360px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.2);color:white;text-align:center}
+.watermark{position:fixed;inset:0;z-index:-1;pointer-events:none;color:rgba(255,255,255,.05);font-size:42px;font-weight:900;overflow:hidden}
+.wm{position:absolute;transform:rotate(-24deg)}
+@media(min-width:850px){.grid{grid-template-columns:1fr 360px}.btn{width:auto;margin:6px}.controls{display:flex;flex-wrap:wrap;gap:8px}.controls .btn{flex:1}.board{gap:8px;padding:12px}.tile{border-radius:16px}}
+@media print{.game,.controls,.logbox{display:none}.cert{display:block!important;color:#111;background:white}.cert input{color:#111;border:0}}
+</style>
+</head>
+<body>
+<div class="watermark">
+<div class="wm" style="top:10%;left:-10%">Dr AI Academy</div>
+<div class="wm" style="top:35%;left:20%">Dr AI Academy</div>
+<div class="wm" style="top:65%;left:-5%">Dr AI Academy</div>
+</div>
+<div class="logo">Dr AI Academy</div>
+<div class="wrap">
+<section class="panel">
+<h1>Microbe Crush Galaxy<br>Ultra Mobile Compact Edition</h1>
+<p>This compact version is adjusted for vertical mobile screens: smaller 6×6 board, reduced spacing, and full tile visibility. Tap one tile, then tap its adjacent tile.</p>
+<div class="controls">
+<button class="btn gold" onclick="startGame()">🎮 Start / Reset Game</button>
+<button class="btn dark" onclick="shuffleBoard()">🔀 Shuffle</button>
+<button class="btn dark" onclick="hint()">💡 Hint</button>
+</div>
+</section>
+
+<section class="grid game">
+<div class="panel">
+<h2 id="levelTitle">Level 1 — Helpful Microbes</h2>
+<p id="levelStory">Tap Start Game.</p>
+<div class="board" id="board"></div>
+</div>
+<div class="panel">
+<div class="stats">
+<div class="stat"><b id="levelNo">1</b>Level</div>
+<div class="stat"><b id="score">0</b>Score</div>
+<div class="stat"><b id="moves">0</b>Moves</div>
+</div>
+<h3>Mission Targets</h3>
+<div class="targets" id="targets"></div>
+<h3>Dr AI Explanation</h3>
+<p id="explain">Start the game and match tiles.</p>
+<div class="logbox">
+<h3>Mission Log</h3>
+<div class="log" id="log"></div>
+</div>
+</div>
+</section>
+
+<section class="panel cert" id="certificate">
+<div style="font-size:54px">🏆🌌🏅</div>
+<h2>Certificate of Microbe Crush Galaxy Mastery</h2>
+<p>This certifies that</p>
+<input placeholder="Enter Student Name">
+<p>has completed <b>Microbe Crush Galaxy Ultra Mobile Compact Edition</b></p>
+<p>Skills: Useful Microbes • Harmful Microbes • Vaccines • Hygiene • Fermentation • Nitrogen Cycle • Food Safety</p>
+<p><b>Developed by Dr AI Academy</b></p>
+<button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+</section>
+
+<footer class="panel">
+Developed by <b>Dr AI Academy</b> • <a style="color:var(--cyan);font-weight:900" href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a>
+</footer>
+</div>
+
+<script>
+var SIZE=6;
+var icons=['🍞','🥛','🌱','🦠','💉','🧼','🍲'];
+var info={
+'🍞':'Yeast helps fermentation and bread making.',
+'🥛':'Lactobacillus helps make curd.',
+'🌱':'Rhizobium helps nitrogen fixation.',
+'🦠':'Pathogens can cause disease.',
+'💉':'Vaccines train the immune system.',
+'🧼':'Hygiene prevents contamination.',
+'🍲':'Food safety prevents food poisoning.'
+};
+var levels=[
+{name:'Level 1 — Helpful Microbes',story:'Match useful microbes: yeast, lactobacillus and rhizobium.',moves:22,targets:{'🍞':5,'🥛':5,'🌱':5}},
+{name:'Level 2 — Defense Against Lord Pathogen',story:'Match defense concepts: pathogen, vaccine, hygiene and food safety.',moves:24,targets:{'🦠':6,'💉':5,'🧼':5,'🍲':5}},
+{name:'Level 3 — Final Chapter Boss',story:'Use all chapter concepts to defeat Lord Pathogen.',moves:26,targets:{'🍞':4,'🥛':4,'🌱':4,'🦠':5,'💉':5,'🧼':4}}
+];
+var board=[],selected=null,level=0,score=0,moves=0,collected={},busy=false;
+
+function byId(id){return document.getElementById(id)}
+function rand(){return icons[Math.floor(Math.random()*icons.length)]}
+function addLog(t){byId('log').innerHTML='<p>'+t+'</p>'+byId('log').innerHTML}
+function startGame(){level=0;score=0;setupLevel()}
+function setupLevel(){
+selected=null;busy=false;moves=levels[level].moves;collected={};
+Object.keys(levels[level].targets).forEach(function(k){collected[k]=0});
+makeBoard();draw();update();addLog('<b>'+levels[level].name+'</b> started.');
+}
+function makeBoard(){
+board=[];
+for(var r=0;r<SIZE;r++){
+ board[r]=[];
+ for(var c=0;c<SIZE;c++){
+  var x;
+  do{x=rand()}while((c>=2&&board[r][c-1]===x&&board[r][c-2]===x)||(r>=2&&board[r-1][c]===x&&board[r-2][c]===x));
+  board[r][c]=x;
+ }
+}
+}
+function draw(){
+var html='';
+for(var r=0;r<SIZE;r++){
+ for(var c=0;c<SIZE;c++){
+  var cls='tile';
+  if(selected&&selected.r===r&&selected.c===c)cls+=' sel';
+  html+='<button class="'+cls+'" onclick="tapTile('+r+','+c+')">'+board[r][c]+'</button>';
+ }
+}
+byId('board').innerHTML=html;
+}
+function tapTile(r,c){
+if(busy)return;
+if(!selected){selected={r:r,c:c};draw();return}
+if(selected.r===r&&selected.c===c){selected=null;draw();return}
+if(Math.abs(selected.r-r)+Math.abs(selected.c-c)!==1){selected={r:r,c:c};draw();return}
+swap(selected.r,selected.c,r,c);
+var matches=findMatches();
+if(matches.length===0){
+ swap(selected.r,selected.c,r,c);
+ selected=null;draw();addLog('No match. Try another adjacent swap.');return;
+}
+moves--;selected=null;clearMatches(matches);dropTiles();draw();update();setTimeout(resolveAuto,120);checkEnd();
+}
+function swap(r1,c1,r2,c2){var t=board[r1][c1];board[r1][c1]=board[r2][c2];board[r2][c2]=t}
+function findMatches(){
+var found={},arr=[];
+for(var r=0;r<SIZE;r++){
+ var c=0;while(c<SIZE){var e=c+1;while(e<SIZE&&board[r][e]===board[r][c])e++;if(e-c>=3){for(var x=c;x<e;x++)found[r+','+x]=true}c=e}
+}
+for(var c=0;c<SIZE;c++){
+ var r=0;while(r<SIZE){var e=r+1;while(e<SIZE&&board[e][c]===board[r][c])e++;if(e-r>=3){for(var x=r;x<e;x++)found[x+','+c]=true}r=e}
+}
+Object.keys(found).forEach(function(k){var p=k.split(',');arr.push({r:+p[0],c:+p[1]})});
+return arr;
+}
+function clearMatches(matches){
+var counts={};
+matches.forEach(function(p){var sym=board[p.r][p.c];counts[sym]=(counts[sym]||0)+1;board[p.r][p.c]=null});
+Object.keys(counts).forEach(function(sym){
+ if(collected.hasOwnProperty(sym))collected[sym]+=counts[sym];
+ score+=counts[sym]*10;
+ addLog('Matched <b>'+sym+'</b> x '+counts[sym]+'. '+info[sym]);
+});
+if(matches.length>=4){score+=50;addLog('✨ Power bonus! Big match of '+matches.length+' tiles.')}
+}
+function dropTiles(){
+for(var c=0;c<SIZE;c++){
+ var col=[];
+ for(var r=SIZE-1;r>=0;r--)if(board[r][c])col.push(board[r][c]);
+ while(col.length<SIZE)col.push(rand());
+ for(var r=SIZE-1,i=0;r>=0;r--,i++)board[r][c]=col[i];
+}
+}
+function resolveAuto(){
+var m=findMatches();
+if(m.length>0){clearMatches(m);dropTiles();draw();update();setTimeout(resolveAuto,120);checkEnd();}
+}
+function update(){
+var L=levels[level];
+byId('levelTitle').textContent=L.name;
+byId('levelStory').textContent=L.story;
+byId('levelNo').textContent=level+1;
+byId('score').textContent=score;
+byId('moves').textContent=moves;
+var html='';
+Object.keys(L.targets).forEach(function(sym){
+ var need=L.targets[sym],got=Math.min(need,collected[sym]||0);
+ html+='<div class="target '+(got>=need?'done':'')+'"><span>'+sym+' '+info[sym].split('.')[0]+'</span><b>'+got+' / '+need+'</b></div>';
+});
+byId('targets').innerHTML=html;
+byId('explain').textContent=L.story+' Make matches to collect the mission targets.';
+}
+function completed(){
+var L=levels[level];
+return Object.keys(L.targets).every(function(sym){return (collected[sym]||0)>=L.targets[sym]})
+}
+function checkEnd(){
+if(completed()){
+ if(level<levels.length-1){
+  alert('Level complete! Moving to next level.');
+  level++;setupLevel();
+ }else{
+  alert('Chapter game complete! Certificate unlocked.');
+  byId('certificate').style.display='block';
+  byId('certificate').scrollIntoView({behavior:'smooth'});
+ }
+}else if(moves<=0){
+ alert('Moves finished. Restarting this level.');
+ setupLevel();
+}
+}
+function shuffleBoard(){for(var i=0;i<60;i++){var r1=Math.floor(Math.random()*SIZE),c1=Math.floor(Math.random()*SIZE),r2=Math.floor(Math.random()*SIZE),c2=Math.floor(Math.random()*SIZE);swap(r1,c1,r2,c2)}draw();addLog('Board shuffled.')}
+function hint(){alert('Tip: Tap one tile, then tap the adjacent tile. Match 3 same icons. Focus on mission target icons.')}
+setupLevel();
+</script>
+</body>
+</html>
