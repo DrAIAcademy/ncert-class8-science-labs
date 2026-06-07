@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Canteen Defense: Germ Attack India 1.0 | Dr AI Academy</title>
+<style>
+:root{
+  --panel:rgba(12,28,58,.96);--cyan:#64f4ff;--gold:#ffe066;--green:#8cffc1;--red:#ff8aa0;
+  --text:#eef8ff;--muted:#b7cce5;--road:#39435f;--soil:#744b2b
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:Arial,Segoe UI,sans-serif;color:var(--text);background:
+radial-gradient(circle at 15% 10%,rgba(100,244,255,.16),transparent 26%),
+radial-gradient(circle at 85% 10%,rgba(255,224,102,.14),transparent 26%),
+linear-gradient(135deg,#061123,#123d82 60%,#071c34);overflow-x:hidden;-webkit-text-size-adjust:100%}
+button{font-family:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.watermark{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}.wm{position:absolute;color:rgba(255,255,255,.055);font-size:clamp(28px,4vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap}
+.cornerMark{position:fixed;right:12px;bottom:12px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.75);background:rgba(4,13,24,.45);border:1px solid rgba(255,255,255,.20);padding:7px 10px;border-radius:999px;font-weight:900}
+.wrap{max-width:1450px;margin:auto;padding:12px;position:relative;z-index:1}
+.panel{background:var(--panel);border:1px solid rgba(100,244,255,.25);border-radius:20px;padding:14px;margin:12px 0;box-shadow:0 12px 34px rgba(0,0,0,.35)}
+.hero{background:linear-gradient(180deg,rgba(18,61,130,.92),rgba(7,22,48,.96));position:relative;overflow:hidden}
+.hero:after{content:"🏫 🍲 🦠 🧼 💉 🧊";position:absolute;right:18px;bottom:14px;font-size:32px;letter-spacing:8px;opacity:.22}
+.logo{position:absolute;right:14px;top:14px;background:rgba(0,0,0,.28);border:1px solid rgba(100,244,255,.3);border-radius:16px;padding:8px 11px;text-align:right}
+.logo b{display:block}.logo span{color:var(--cyan);font-size:.74rem;font-weight:900}
+.badge{display:inline-block;background:rgba(100,244,255,.12);border:1px solid rgba(100,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:900;padding:8px 12px;font-size:.78rem}
+h1{font-size:clamp(1.8rem,5vw,3.8rem);line-height:1.04;margin:10px 0 8px;max-width:1050px}
+.sub{line-height:1.55;color:var(--muted);max-width:1080px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:0;border-radius:15px;padding:12px 14px;font-weight:900;font-size:15px;background:linear-gradient(135deg,var(--cyan),#d9fbff);color:#061123;cursor:pointer;min-height:46px}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff3b0);color:#241400}.btn.dark{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:white}
+.gameGrid{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:12px;align-items:start}
+.canvasWrap{position:relative;border-radius:18px;overflow:hidden;background:#06101f;border:1px solid rgba(255,255,255,.12)}
+canvas{display:block;width:100%;height:auto;touch-action:none;background:#071225}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:rgba(255,255,255,.08);border-radius:14px;padding:10px;text-align:center}.stat b{display:block;color:var(--cyan);font-size:22px}
+.towerGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.towerBtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px;color:white;text-align:left;min-height:82px}
+.towerBtn.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,224,102,.18)}.towerBtn b{color:var(--gold)}
+.infoBox{background:linear-gradient(180deg,rgba(100,244,255,.10),rgba(255,255,255,.04));border:1px solid rgba(100,244,255,.20);border-radius:16px;padding:12px;line-height:1.55;margin-top:10px}
+#coachLine{background:rgba(255,224,102,.10);border:1px solid rgba(255,224,102,.25);border-radius:14px;padding:10px;font-weight:800;animation:pulse 2.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 rgba(255,224,102,0)}50%{box-shadow:0 0 18px rgba(255,224,102,.18)}}
+.step{display:grid;grid-template-columns:32px 1fr;gap:8px;align-items:start;margin:8px 0}.stepNo{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:rgba(255,224,102,.18);color:var(--gold);font-weight:900}
+.log{max-height:160px;overflow:auto;background:rgba(0,0,0,.18);border-radius:14px;padding:10px;font-size:.92rem}.log p{margin:0 0 8px}
+.legend{display:grid;gap:7px;margin-top:8px}.legendItem{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:8px}
+.cert{display:none;text-align:center;border:2px solid var(--gold)}.cert input{width:100%;max-width:360px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.2);color:white;text-align:center}
+.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted)}.footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;place-items:center;z-index:2000;padding:14px}.overlay.show{display:grid}.modal{max-width:760px;width:100%;background:linear-gradient(180deg,rgba(10,25,52,.98),rgba(7,19,40,.98));border:1px solid rgba(100,244,255,.24);border-radius:22px;padding:20px}
+@media(max-width:980px){.gameGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 10px auto}.hero:after{display:none}.controls{display:grid;grid-template-columns:1fr 1fr}.btn{width:100%}}
+@media(max-width:520px){.wrap{padding:6px}.panel{padding:10px;margin:8px 0;border-radius:16px}h1{font-size:1.48rem}h2{font-size:1.1rem;margin:8px 0}h3{font-size:1rem;margin:8px 0}.controls,.stats,.towerGrid{grid-template-columns:1fr}.stat{padding:8px}.stat b{font-size:18px}.infoBox{font-size:.9rem;padding:10px}}
+@media print{.hero,.gameGrid,.footer,.overlay,.watermark,.cornerMark{display:none!important}.cert{display:block!important;color:#111;background:white}.cert input{color:#111;border:0}}
+</style>
+</head>
+<body>
+<div class="watermark"><div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:30%;left:35%">Dr AI Academy</div><div class="wm" style="top:55%;left:-5%">Dr AI Academy</div><div class="wm" style="top:78%;left:35%">Dr AI Academy</div></div>
+<div class="cornerMark">Dr AI Academy</div>
+<div class="wrap">
+<section class="panel hero">
+  <div class="logo"><b>Dr AI Academy</b><span>Indian Canteen Defense Game</span></div>
+  <div class="badge">CHAPTER 2 • REAL-LIFE INDIA SCENARIO • ACTION SCIENCE GAME</div>
+  <h1>Canteen Defense:<br>Germ Attack India 1.0</h1>
+  <p class="sub">Now the game is connected to a real-life Indian scenario: <b>school canteen + chaat stall + tiffin area</b>. Flies, dirty water, uncovered food, warm samosa/chole, and pathogens move toward students. Build science defenses to protect the canteen.</p>
+  <div class="controls">
+    <button class="btn gold" onclick="startGame()">🎮 Start Tutorial Battle</button>
+    <button class="btn dark" onclick="pauseGame()">⏸ Pause</button>
+    <button class="btn dark" onclick="nextWave()">⚔️ Send Next Attack</button>
+    <button class="btn dark" onclick="toggleVoice()" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn dark" onclick="drAiTip()">🤖 Dr AI Explain</button>
+  </div>
+</section>
+
+<section class="gameGrid">
+  <div class="panel">
+    <h2 id="battleTitle">Indian School Canteen Defense Arena</h2>
+    <div class="canvasWrap"><canvas id="game" width="900" height="560"></canvas></div>
+    <div class="infoBox">
+      <b>Story:</b> Lunch break has started. Lord Pathogen is attacking the canteen through flies, dirty water, uncovered food and warm storage. Your job is to protect students by placing prevention tools on glowing build pads.
+    </div>
+  </div>
+
+  <aside class="panel">
+    <div class="stats"><div class="stat"><b id="life">20</b>Students Safe</div><div class="stat"><b id="energy">130</b>Energy</div><div class="stat"><b id="wave">0</b>Attack</div></div>
+    <div class="stats" style="margin-top:8px"><div class="stat"><b id="score">0</b>Score</div><div class="stat"><b id="kills">0</b>Stopped</div><div class="stat"><b id="level">1</b>Day</div></div>
+
+    <div class="infoBox">
+      <b>What is happening?</b>
+      <div class="step"><div class="stepNo">1</div><div>Germs and contamination sources follow the road/path toward the <b>students' lunch table</b>.</div></div>
+      <div class="step"><div class="stepNo">2</div><div>You place towers on glowing <b>+</b> pads: handwash, clean water, fridge, vaccine awareness, antibiotic guidance.</div></div>
+      <div class="step"><div class="stepNo">3</div><div>If too many germs reach students, safety goes down. If you stop them, you earn energy and score.</div></div>
+    </div>
+
+    <h3>Choose Real-Life Defense</h3>
+    <div class="towerGrid">
+      <button class="towerBtn active" onclick="selectTower('handwash')" id="tower-handwash"><b>🧼 Handwash Station</b><br>Cost 35 • slows germs</button>
+      <button class="towerBtn" onclick="selectTower('water')" id="tower-water"><b>💧 Clean Water Filter</b><br>Cost 40 • stops water-borne germs</button>
+      <button class="towerBtn" onclick="selectTower('cover')" id="tower-cover"><b>🍲 Food Cover Shield</b><br>Cost 45 • protects uncovered food</button>
+      <button class="towerBtn" onclick="selectTower('fridge')" id="tower-fridge"><b>🧊 Fridge / Cooling</b><br>Cost 55 • slows spoilage</button>
+      <button class="towerBtn" onclick="selectTower('vaccine')" id="tower-vaccine"><b>💉 Vaccine Awareness</b><br>Cost 60 • strong health defense</button>
+      <button class="towerBtn" onclick="upgradeMode()" id="tower-upgrade"><b>⬆️ Upgrade Mode</b><br>Tap tower to upgrade</button>
+    </div>
+
+    <div class="infoBox"><h3>🤖 Dr AI Live Coach</h3><p id="coachLine">Cadet, place Handwash Station near the first turn. This is a real-life hygiene defense.</p></div>
+
+    <div class="infoBox">
+      <b>Indian life connection</b>
+      <div class="legend">
+        <div class="legendItem">🧼 Washing hands before eating reduces germs.</div>
+        <div class="legendItem">💧 Clean water prevents water-borne diseases.</div>
+        <div class="legendItem">🍲 Covered food is safer from flies and dust.</div>
+        <div class="legendItem">🧊 Cooling slows microbial growth in food.</div>
+        <div class="legendItem">💉 Vaccination protects against many infectious diseases.</div>
+      </div>
+    </div>
+
+    <div class="infoBox"><b>Mission Log</b><div class="log" id="log"></div></div>
+  </aside>
+</section>
+
+<section class="panel cert" id="certificate">
+  <div style="font-size:54px">🏫🛡️🏅</div><h2>Certificate of Canteen Defense Mastery</h2><p>This certifies that</p><input placeholder="Enter Student Name">
+  <p>has completed <b>Canteen Defense: Germ Attack India 1.0</b></p><p>Skills: Hygiene • Clean Water • Food Covering • Cooling • Vaccination • Food Safety</p><p><b>Developed by Dr AI Academy</b></p><button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+</section>
+
+<footer class="panel footer"><div>Developed by <b>Dr AI Academy</b> • Real-life Indian science game</div><div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div></footer>
+</div>
+
+<div class="overlay" id="overlay"><div class="modal"><h2 id="modalTitle">Mission</h2><div id="modalBody"></div><div class="controls"><button class="btn gold" onclick="closeModal()">Continue</button></div></div></div>
+
+<script>
+var canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+var path=[{x:0,y:365},{x:130,y:365},{x:130,y:210},{x:300,y:210},{x:300,y:455},{x:500,y:455},{x:500,y:250},{x:700,y:250},{x:700,y:380},{x:900,y:380}];
+var pads=[{x:75,y:300},{x:160,y:175},{x:255,y:285},{x:230,y:420},{x:390,y:410},{x:445,y:320},{x:590,y:215},{x:640,y:335},{x:775,y:315},{x:785,y:445}];
+var towerData={
+ handwash:{emoji:'🧼',cost:35,range:120,damage:8,rate:650,slow:.45,color:'#8cffc1',lesson:'Handwashing removes many microbes before eating.'},
+ water:{emoji:'💧',cost:40,range:125,damage:13,rate:720,slow:.20,color:'#64f4ff',lesson:'Clean water helps prevent water-borne diseases.'},
+ cover:{emoji:'🍲',cost:45,range:120,damage:16,rate:760,slow:.15,color:'#ffe066',lesson:'Covered food is safer from flies, dust and contamination.'},
+ fridge:{emoji:'🧊',cost:55,range:120,damage:11,rate:760,slow:.55,color:'#b8e7ff',lesson:'Cooling slows microbial growth and food spoilage.'},
+ vaccine:{emoji:'💉',cost:60,range:140,damage:26,rate:850,slow:0,color:'#ffb3d1',lesson:'Vaccination trains immunity and protects communities.'}
+};
+var enemies=[],towers=[],shots=[],particles=[],selected='handwash',upgrade=false,life=20,energy=130,wave=0,score=0,kills=0,level=1,running=false,paused=false,voiceOn=true,lastTime=0,spawnQueue=0,spawnTimer=0,waveActive=false,tutorialStep=0;
+function byId(id){return document.getElementById(id)}
+function log(t){byId('log').innerHTML='<p>'+t+'</p>'+byId('log').innerHTML}
+function coach(t,force){byId('coachLine').textContent=t;if(voiceOn){try{if(force&&'speechSynthesis'in window)speechSynthesis.cancel();if('speechSynthesis'in window){var u=new SpeechSynthesisUtterance(t);u.lang='en-IN';u.rate=.94;u.pitch=1.05;speechSynthesis.speak(u)}}catch(e){}}}
+function updateUI(){byId('life').textContent=life;byId('energy').textContent=energy;byId('wave').textContent=wave;byId('score').textContent=score;byId('kills').textContent=kills;byId('level').textContent=level}
+function startGame(){enemies=[];towers=[];shots=[];particles=[];life=20;energy=150;wave=0;score=0;kills=0;level=1;tutorialStep=0;running=true;paused=false;waveActive=false;selected='handwash';upgrade=false;selectTower('handwash');updateUI();log('<b>Battle started.</b> A school canteen is under germ attack.');coach('Welcome to Indian School Canteen Defense. First, place a handwash station near the first turn.',true);showModal('🏫 What is happening?','<p><b>Real-life situation:</b> Students are about to eat samosa, poha, chole and tiffin in school canteen.</p><p>Germs come through dirty hands, flies, uncovered food, dirty water and warm storage.</p><p><b>Your mission:</b> Build hygiene defenses on glowing plus pads and protect students.</p>');if(!lastTime)requestAnimationFrame(loop)}
+function pauseGame(){paused=!paused;coach(paused?'Game paused.':'Game resumed.',true)}
+function toggleVoice(){voiceOn=!voiceOn;byId('voiceBtn').textContent=voiceOn?'🔊 Voice ON':'🔇 Voice OFF';if(voiceOn)coach('Voice is on. Dr AI will explain the real-life science.',true)}
+function drAiTip(){var tips=['Indian canteen tip: place Handwash Station before the food zone. Dirty hands are a common contamination route.','Clean Water Filter is important because unsafe water can carry disease-causing microbes.','Food Cover Shield protects samosa, chaat and tiffin from flies and dust.','Fridge Tower slows microbial growth in curd, milk and cooked food.','Use Vaccine Awareness for strong community-level protection against infectious diseases.'];var t=tips[Math.floor(Math.random()*tips.length)];coach(t,true);alert(t)}
+function selectTower(type){selected=type;upgrade=false;document.querySelectorAll('.towerBtn').forEach(function(b){b.classList.remove('active')});byId('tower-'+type).classList.add('active');coach('Selected '+towerData[type].emoji+' '+type+'. '+towerData[type].lesson,true)}
+function upgradeMode(){upgrade=true;document.querySelectorAll('.towerBtn').forEach(function(b){b.classList.remove('active')});byId('tower-upgrade').classList.add('active');coach('Upgrade mode active. Tap an existing tower to upgrade it.',true)}
+function nextWave(){if(!running)startGame();if(waveActive){coach('Attack is already active. Watch the moving germs.',true);return}wave++;level=Math.floor((wave-1)/2)+1;spawnQueue=7+wave*3;spawnTimer=0;waveActive=true;energy+=20;updateUI();var msg='Attack '+wave+': dirty hands and flies are moving toward the students.';if(wave===2)msg='Attack 2: dirty water microbes are entering. Clean Water Filter helps here.';if(wave===3)msg='Attack 3: uncovered chaat and samosa attract flies. Use Food Cover Shield.';if(wave===4)msg='Attack 4: warm stored food can spoil faster. Use Fridge Tower.';if(wave===5)msg='Boss attack: Lord Pathogen enters the canteen. Upgrade your best towers.';log('<b>'+msg+'</b>');coach(msg,true)}
+function spawnEnemy(){var types=[{emoji:'🦠',hp:65+wave*16,speed:54+wave*4,reward:12,name:'Germ from dirty hands'},{emoji:'🪰',hp:55+wave*13,speed:68+wave*4,reward:10,name:'Fly contamination'},{emoji:'💧',hp:80+wave*18,speed:45+wave*3,reward:14,name:'Dirty water microbe'},{emoji:'🍲',hp:92+wave*20,speed:42+wave*3,reward:15,name:'Spoilage microbe'}];if(wave>=5&&spawnQueue===1)types=[{emoji:'👾',hp:420+wave*80,speed:34+wave*2,reward:90,name:'Lord Pathogen'}];var t=types[Math.floor(Math.random()*types.length)];enemies.push({x:path[0].x,y:path[0].y,seg:0,hp:t.hp,maxHp:t.hp,speed:t.speed,reward:t.reward,emoji:t.emoji,name:t.name,slow:0})}
+function getCanvasPos(e){var rect=canvas.getBoundingClientRect(),clientX,clientY;if(e.touches&&e.touches.length){clientX=e.touches[0].clientX;clientY=e.touches[0].clientY}else if(e.changedTouches&&e.changedTouches.length){clientX=e.changedTouches[0].clientX;clientY=e.changedTouches[0].clientY}else{clientX=e.clientX;clientY=e.clientY}return{x:(clientX-rect.left)*canvas.width/rect.width,y:(clientY-rect.top)*canvas.height/rect.height}}
+function canvasTap(e){e.preventDefault();if(!running)startGame();var p=getCanvasPos(e);if(upgrade){for(var i=0;i<towers.length;i++){var tw=towers[i];if(dist(p,tw)<32){var cost=45*tw.level;if(energy>=cost){energy-=cost;tw.level++;tw.range+=12;tw.damage=Math.round(tw.damage*1.35);tw.rate=Math.max(320,tw.rate*.9);log('⬆️ Upgraded '+tw.emoji+' to level '+tw.level+'.');coach('Upgrade done. This real-life prevention tool is now stronger.',true)}else coach('Not enough energy to upgrade.',true);updateUI();return}}coach('Tap directly on an existing tower to upgrade.',true);return}
+var nearest=null,nd=9999;pads.forEach(function(pad){var d=dist(p,pad);if(d<nd){nd=d;nearest=pad}});if(nearest&&nd<42){for(var j=0;j<towers.length;j++){if(dist(nearest,towers[j])<15){coach('This build pad is already occupied.',true);return}}var data=towerData[selected];if(energy<data.cost){coach('Not enough energy. Stop more germs to earn energy.',true);return}energy-=data.cost;towers.push({x:nearest.x,y:nearest.y,type:selected,emoji:data.emoji,range:data.range,damage:data.damage,rate:data.rate,slow:data.slow,last:0,level:1,color:data.color});log(data.emoji+' built: '+data.lesson);coach(data.emoji+' built. '+data.lesson,true);if(tutorialStep===0){tutorialStep=1;coach('Good. Now press Send Next Attack to see germs moving in the canteen.',true)}updateUI();return}coach('Tap a glowing plus pad near the road to place your tower.',false)}
+canvas.addEventListener('click',canvasTap,false);canvas.addEventListener('touchend',canvasTap,false);
+function dist(a,b){var dx=a.x-b.x,dy=a.y-b.y;return Math.sqrt(dx*dx+dy*dy)}
+function loop(ts){if(!lastTime)lastTime=ts;var dt=Math.min(0.05,(ts-lastTime)/1000);lastTime=ts;if(running&&!paused){update(dt,ts);draw()}else draw();requestAnimationFrame(loop)}
+function update(dt,ts){if(waveActive&&spawnQueue>0){spawnTimer-=dt;if(spawnTimer<=0){spawnEnemy();spawnQueue--;spawnTimer=Math.max(.35,1.05-wave*.06)}}enemies.forEach(function(e){var sp=e.speed*(e.slow>0?.55:1);e.slow=Math.max(0,e.slow-dt);var target=path[e.seg+1];if(!target)return;var dx=target.x-e.x,dy=target.y-e.y,len=Math.sqrt(dx*dx+dy*dy),move=sp*dt;if(move>=len){e.x=target.x;e.y=target.y;e.seg++;if(e.seg>=path.length-1){e.reached=true;life--;coach(e.name+' reached students. Improve hygiene defense.',true)}}else{e.x+=dx/len*move;e.y+=dy/len*move}});enemies=enemies.filter(function(e){return !e.reached&&e.hp>0});towers.forEach(function(t){if(ts-t.last<t.rate)return;var target=null,far=-1;enemies.forEach(function(e){var d=dist(t,e);if(d<t.range&&e.seg*1000+e.x+e.y>far){far=e.seg*1000+e.x+e.y;target=e}});if(target){target.hp-=t.damage;if(t.slow>0)target.slow=Math.max(target.slow,1.2+t.level*.15);shots.push({x:t.x,y:t.y,tx:target.x,ty:target.y,color:t.color,life:.18});t.last=ts;if(target.hp<=0){kills++;score+=target.reward;energy+=target.reward;particles.push({x:target.x,y:target.y,text:'+ '+target.reward,life:1});if(kills%6===0)coach('Excellent. You are protecting students using real science prevention.',true);updateUI()}}});shots.forEach(function(s){s.life-=dt});shots=shots.filter(function(s){return s.life>0});particles.forEach(function(p){p.life-=dt;p.y-=30*dt});particles=particles.filter(function(p){return p.life>0});if(waveActive&&spawnQueue<=0&&enemies.length===0){waveActive=false;energy+=35;score+=50;updateUI();if(wave>=5){running=false;byId('certificate').style.display='block';coach('Victory. Students are safe. Lord Pathogen is defeated.',true);showModal('🏆 Victory!','<p>You protected the Indian school canteen through 5 attacks.</p><p><b>What you learned:</b> handwashing, clean water, covered food, cooling, and vaccination prevent diseases in real life.</p>')}else{coach('Attack stopped. Use energy to build or upgrade, then send the next attack.',true);showModal('✅ Attack Stopped','<p>Attack '+wave+' stopped. Build or upgrade towers, then send the next attack.</p>')}}if(life<=0){running=false;coach('Students became unsafe. Restart and place defenses near turns.',true);showModal('Mission Failed','<p>Too many germs reached students. Restart and build Handwash Station near the first turn.</p>')}}
+function draw(){ctx.clearRect(0,0,W,H);drawEnvironment();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='rgba(80,70,70,.85)';ctx.lineWidth=52;drawPath();ctx.strokeStyle='rgba(245,216,130,.85)';ctx.lineWidth=34;drawPath();ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=3;drawPath();drawBuildPads();drawStudents();towers.forEach(drawTower);enemies.forEach(drawEnemy);shots.forEach(function(s){ctx.strokeStyle=s.color;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.tx,s.ty);ctx.stroke()});particles.forEach(function(p){ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle='#ffe066';ctx.font='18px Arial';ctx.fillText(p.text,p.x,p.y);ctx.globalAlpha=1});ctx.fillStyle='rgba(255,255,255,.8)';ctx.font='14px Arial';ctx.textAlign='left';ctx.fillText('Dr AI Academy',18,H-18)}
+function drawEnvironment(){var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#9ddcff');g.addColorStop(.42,'#b7e989');g.addColorStop(.43,'#6da954');g.addColorStop(1,'#5a3b24');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.font='32px Arial';ctx.textAlign='center';ctx.fillText('🏫',95,92);ctx.fillText('School',95,125);ctx.fillText('🍛',395,90);ctx.fillText('Canteen',395,123);ctx.fillText('🛺',760,105);ctx.fillText('Chaat Stall',760,138);for(var i=0;i<10;i++){ctx.fillStyle='rgba(255,255,255,.16)';ctx.beginPath();ctx.arc((i*101)%W,55+(i%3)*18,20+i%2*8,0,Math.PI*2);ctx.fill()}}
+function drawBuildPads(){pads.forEach(function(pad){var occupied=towers.some(function(t){return dist(t,pad)<15});ctx.beginPath();ctx.arc(pad.x,pad.y,28,0,Math.PI*2);ctx.fillStyle=occupied?'rgba(255,255,255,.08)':'rgba(255,224,102,.18)';ctx.fill();ctx.strokeStyle=occupied?'rgba(255,255,255,.18)':'rgba(255,224,102,.8)';ctx.lineWidth=2;ctx.stroke();if(!occupied){ctx.fillStyle='rgba(80,50,0,.9)';ctx.font='20px Arial';ctx.textAlign='center';ctx.fillText('+',pad.x,pad.y+7)}})}
+function drawStudents(){ctx.fillStyle='rgba(140,255,193,.18)';ctx.beginPath();ctx.arc(860,380,54,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(140,255,193,.8)';ctx.lineWidth=3;ctx.stroke();ctx.font='30px Arial';ctx.textAlign='center';ctx.fillText('👧👦',860,377);ctx.font='14px Arial';ctx.fillStyle='#fff';ctx.fillText('Students Lunch Table',860,420)}
+function drawPath(){ctx.beginPath();ctx.moveTo(path[0].x,path[0].y);for(var i=1;i<path.length;i++)ctx.lineTo(path[i].x,path[i].y);ctx.stroke()}
+function drawTower(t){ctx.beginPath();ctx.arc(t.x,t.y,t.range,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.025)';ctx.fill();ctx.beginPath();ctx.arc(t.x,t.y,25,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.18)';ctx.fill();ctx.strokeStyle=t.color;ctx.lineWidth=3;ctx.stroke();ctx.font='30px Arial';ctx.textAlign='center';ctx.fillText(t.emoji,t.x,t.y+10);ctx.fillStyle='white';ctx.font='12px Arial';ctx.fillText('Lv '+t.level,t.x,t.y+39)}
+function drawEnemy(e){ctx.font=e.emoji==='👾'?'42px Arial':'32px Arial';ctx.textAlign='center';ctx.fillText(e.emoji,e.x,e.y+12);var w=e.emoji==='👾'?58:42;ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(e.x-w/2,e.y-35,w,6);ctx.fillStyle=e.hp/e.maxHp>.5?'#8cffc1':e.hp/e.maxHp>.25?'#ffe066':'#ff8aa0';ctx.fillRect(e.x-w/2,e.y-35,w*(e.hp/e.maxHp),6);ctx.fillStyle='#fff';ctx.font='10px Arial';ctx.fillText(e.name,e.x,e.y+28)}
+function showModal(title,body){byId('modalTitle').innerHTML=title;byId('modalBody').innerHTML=body;byId('overlay').classList.add('show')}function closeModal(){byId('overlay').classList.remove('show')}
+draw();updateUI();
+</script>
+</body>
+</html>
