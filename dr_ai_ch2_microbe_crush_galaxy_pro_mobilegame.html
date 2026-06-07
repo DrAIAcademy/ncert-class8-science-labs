@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Microbe Crush Galaxy Pro Mobile Stable | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#061123;--bg2:#123d82;--panel:rgba(10,25,52,.94);--cyan:#67f4ff;--gold:#ffe066;
+  --green:#8dffc6;--red:#ff8fa6;--text:#eef8ff;--muted:#b7cce5;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;font-family:Arial,Segoe UI,sans-serif;color:var(--text);
+  background:linear-gradient(135deg,var(--bg),var(--bg2) 60%,#071c34);
+  overflow-x:hidden;-webkit-text-size-adjust:100%;touch-action:manipulation;
+}
+button{font-family:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.watermark{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.06);font-size:clamp(28px,4vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap}
+.cornerMark{position:fixed;right:12px;bottom:12px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.75);background:rgba(4,13,24,.45);border:1px solid rgba(255,255,255,.20);padding:7px 12px;border-radius:999px;font-weight:900}
+.wrap{max-width:1350px;margin:auto;padding:14px;position:relative;z-index:1}
+.panel{background:var(--panel);border:1px solid rgba(103,244,255,.22);border-radius:22px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.hero{padding:20px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(18,61,130,.92),rgba(7,22,48,.96))}
+.logo{position:absolute;right:16px;top:16px;background:rgba(0,0,0,.28);border:1px solid rgba(103,244,255,.3);border-radius:16px;padding:9px 12px;text-align:right}
+.logo b{display:block}.logo span{color:var(--cyan);font-size:.76rem;font-weight:900}
+.badge{display:inline-block;background:rgba(103,244,255,.12);border:1px solid rgba(103,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:900;padding:8px 12px;font-size:.78rem}
+h1{font-size:clamp(1.9rem,4.3vw,4rem);line-height:1.04;margin:14px 0 10px;max-width:1000px}
+.sub{color:var(--muted);max-width:1050px;line-height:1.6}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.btn{
+  border:0;border-radius:16px;padding:12px 15px;font-weight:900;cursor:pointer;
+  background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;min-height:48px;
+}
+.btn.secondary{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);color:var(--text)}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.fun{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.fun div{background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.1);padding:10px;border-radius:16px;text-align:center;font-weight:900}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.gameGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,430px);gap:14px;margin-top:14px;align-items:start}
+.box{padding:16px}
+.infoBox,.explain{padding:16px;border-radius:16px;background:linear-gradient(180deg,rgba(103,244,255,.10),rgba(255,255,255,.04));border:1px solid rgba(103,244,255,.20);line-height:1.6}
+.rule{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:15px;padding:11px;margin-top:9px}
+.n{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(103,244,255,.16);color:var(--cyan);font-weight:1000}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{padding:12px;text-align:center;background:rgba(255,255,255,.055);border-radius:14px}
+.stat b{display:block;color:var(--cyan);font-size:1.2rem}
+.levelBanner{padding:14px 16px;border-radius:17px;background:linear-gradient(135deg,rgba(255,224,102,.14),rgba(255,255,255,.04));border:1px solid rgba(255,224,102,.28);margin-bottom:12px}
+.progressBar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:10px}
+.progressBar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.boardWrap{padding:12px;border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.1)}
+.board{
+  display:grid;grid-template-columns:repeat(8,1fr);gap:7px;
+  touch-action:none;user-select:none;-webkit-user-select:none;
+}
+.tile{
+  aspect-ratio:1/1;border-radius:16px;border:2px solid rgba(255,255,255,.10);
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04));
+  display:flex;align-items:center;justify-content:center;font-size:clamp(21px,4vw,34px);
+  cursor:pointer;user-select:none;-webkit-user-select:none;position:relative;
+}
+.tile.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,224,102,.25)}
+.tile.matched{opacity:.15;transform:scale(.72)}
+.power-row{box-shadow:0 0 0 2px rgba(103,244,255,.35),0 0 18px rgba(103,244,255,.26)}
+.power-col{box-shadow:0 0 0 2px rgba(141,255,198,.35),0 0 18px rgba(141,255,198,.26)}
+.power-bomb{box-shadow:0 0 0 2px rgba(255,143,166,.35),0 0 18px rgba(255,143,166,.26)}
+.power-rainbow{box-shadow:0 0 0 2px rgba(255,224,102,.45),0 0 22px rgba(255,224,102,.30)}
+.mark{position:absolute;right:4px;bottom:2px;font-size:12px}
+.power-rainbow .mark{left:50%;top:50%;transform:translate(-50%,-50%);right:auto;bottom:auto;font-size:25px}
+.targetList{display:grid;gap:9px;margin-top:12px}
+.targetCard{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;font-weight:900}
+.targetCard.done{border-color:rgba(141,255,198,.55);background:rgba(141,255,198,.12)}
+.boosters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.boost{padding:11px;border-radius:15px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);text-align:center;font-weight:900}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.legendItem{padding:11px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);border-radius:14px}
+.log{min-height:120px;max-height:230px;overflow:auto;padding:12px;background:rgba(255,255,255,.05);border-radius:15px;border:1px solid rgba(255,255,255,.08)}
+.log p{margin:0 0 9px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;place-items:center;z-index:2000;padding:16px}
+.overlay.show{display:grid}
+.modal{max-width:720px;width:100%;padding:22px;background:linear-gradient(180deg,rgba(10,25,52,.98),rgba(7,19,40,.98));border:1px solid rgba(103,244,255,.24);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.4)}
+.cert{text-align:center;background:radial-gradient(circle at 20% 20%,rgba(103,244,255,.22),transparent 30%),linear-gradient(135deg,rgba(103,244,255,.18),rgba(255,224,102,.16));border:2px solid rgba(255,224,102,.45);border-radius:22px;padding:24px;margin-top:16px;display:none}
+.cert.show{display:block}.cert .seal{font-size:56px}
+.cert input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:white;text-align:center}
+footer{margin:20px 0 6px;padding:16px 20px;border:1px solid rgba(103,244,255,.25);border-radius:20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}
+footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:1000px){
+  .grid2,.gameGrid{grid-template-columns:1fr}
+  .logo{position:static;width:max-content;margin:0 0 12px auto}
+  .fun,.stats{grid-template-columns:1fr 1fr}
+  .actions{display:grid;grid-template-columns:1fr 1fr}
+  .actions .btn,.actions select{width:100%}
+}
+@media(max-width:520px){
+  .wrap{padding:10px}.hero{padding:16px}
+  .fun,.stats,.legend,.boosters,.actions{grid-template-columns:1fr}
+  .board{gap:5px}
+  .tile{border-radius:12px;font-size:24px}
+}
+@media print{
+  .hero,.actions,footer,.overlay,.watermark,.cornerMark,#gameArea,.infoOnlyHide{display:none!important}
+  .cert{display:block!important;color:#111;background:white;border:4px solid #111}
+  .cert input{border:0;color:#111}
+}
+</style>
+</head>
+<body>
+<div class="watermark">
+  <div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:20%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:36%;left:-4%">Dr AI Academy</div><div class="wm" style="top:52%;left:45%">Dr AI Academy</div>
+  <div class="wm" style="top:68%;left:6%">Dr AI Academy</div><div class="wm" style="top:84%;left:44%">Dr AI Academy</div>
+</div>
+<div class="cornerMark">Dr AI Academy</div>
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Mobile Stable Game</span></div>
+  <div class="badge">MOBILE-STABLE • ADVANCED MATCH-3 • POWER TILES</div>
+  <h1>MICROBE CRUSH GALAXY PRO:<br>MOBILE STABLE EDITION</h1>
+  <p class="sub">This version is rebuilt with simpler, stronger mobile input handling. Tap one tile and then tap an adjacent tile. It includes Row Blasters, Column Blasters, Bomb Orbs and Rainbow Stars.</p>
+  <div class="actions">
+    <button class="btn gold" id="startBtn">🎮 Start Pro Game</button>
+    <button class="btn secondary" id="restartBtn">🔄 Restart Level</button>
+    <button class="btn secondary" id="shuffleBtn">🔀 Shuffle Board</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle" class="btn secondary"><option value="standard">Standard English</option><option value="indian">Indian English</option></select>
+  </div>
+  <div class="fun"><div>✨ Row Blasters</div><div>🌟 Column Blasters</div><div>💣 Bomb Orbs</div><div>🌈 Rainbow Stars</div></div>
+</section>
+
+<section class="grid2">
+  <div class="panel box">
+    <h3>Story Setup</h3>
+    <div class="infoBox"><b>Astra + Dr AI vs Lord Pathogen</b><br>Astra and Dr AI are inside Microbe Galaxy. Lord Pathogen has spread confusion. Match science tiles, create power tiles and complete chapter missions.</div>
+  </div>
+  <div class="panel box">
+    <h3>Mobile Rules</h3>
+    <div class="rule"><div class="n">1</div><div>Tap one tile.</div></div>
+    <div class="rule"><div class="n">2</div><div>Tap its left/right/up/down neighbour to swap.</div></div>
+    <div class="rule"><div class="n">3</div><div>Match 3 or more same concept tiles.</div></div>
+    <div class="rule"><div class="n">4+</div><div>Match 4/5 or T/L shapes to create power tiles.</div></div>
+  </div>
+</section>
+
+<section id="gameArea" class="gameGrid">
+  <div class="panel box infoOnlyHide">
+    <div class="levelBanner"><b id="levelTitle">Level 1</b><br><span id="levelStory"></span><div class="progressBar"><span id="levelProgress"></span></div></div>
+    <div class="boardWrap"><div class="board" id="board"></div></div>
+  </div>
+  <div class="panel box">
+    <div class="stats"><div class="stat"><b id="levelNo">1</b><span>Level</span></div><div class="stat"><b id="score">0</b><span>Score</span></div><div class="stat"><b id="moves">0</b><span>Moves</span></div><div class="stat"><b id="bestChain">0</b><span>Best</span></div></div>
+    <div class="boosters"><div class="boost">✨ <b id="rowMade">0</b><br><small>Row</small></div><div class="boost">🌟 <b id="colMade">0</b><br><small>Column</small></div><div class="boost">💣 <b id="bombMade">0</b><br><small>Bomb</small></div><div class="boost">🌈 <b id="rainbowMade">0</b><br><small>Rainbow</small></div></div>
+    <div class="infoBox" style="margin-top:14px"><b>Mission Objective</b><br><span id="missionText"></span><div class="targetList" id="targets"></div></div>
+    <div class="explain" style="margin-top:14px" id="explainBox"><h4>Dr AI Explanation</h4>Start the game and match the science tiles.</div>
+    <div class="infoBox" style="margin-top:14px"><b>Power Tile Guide</b><div class="legend">
+      <div class="legendItem">✨ Row clears row</div><div class="legendItem">🌟 Column clears column</div>
+      <div class="legendItem">💣 Bomb clears area</div><div class="legendItem">🌈 Rainbow clears symbol</div>
+    </div></div>
+    <div class="infoBox" style="margin-top:14px"><b>Mission Log</b><div class="log" id="log"></div></div>
+  </div>
+</section>
+
+<section class="panel box cert" id="certificate">
+  <div class="seal">🏆🌌🏅</div>
+  <h2>Certificate of Microbe Crush Galaxy Pro Mastery</h2>
+  <p>This certifies that</p>
+  <input id="studentName" placeholder="Enter Student Name">
+  <p>has successfully completed <b>Microbe Crush Galaxy Pro: Mobile Stable Edition</b></p>
+  <p>Skills: Useful Microbes • Harmful Microbes • Vaccines • Hygiene • Fermentation • Nitrogen Cycle • Food Safety</p>
+  <p><b>Developed by Dr AI Academy</b></p>
+  <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+</section>
+
+<footer><div>Developed by <b>Dr AI Academy</b> • Mobile-friendly browser game</div><div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div></footer>
+</div>
+
+<div class="overlay" id="overlay"><div class="modal"><h2 id="modalTitle">Level Complete</h2><div id="modalBody"></div><div class="miniActions"><button class="btn gold" id="modalPrimary">Next</button><button class="btn secondary" id="modalClose">Close</button></div></div></div>
+
+<script>
+(function(){
+'use strict';
+var SIZE=8;
+var SYMBOLS=['🍞','🥛','🌱','🦠','💉','🔬','🧼','🍲'];
+var INFO={
+ '🍞':'Yeast helps fermentation and bread making.',
+ '🥛':'Lactobacillus helps make curd.',
+ '🌱':'Rhizobium helps nitrogen fixation for plants.',
+ '🦠':'Pathogens can cause disease.',
+ '💉':'Vaccines train the immune system.',
+ '🔬':'Microscope helps us observe tiny organisms.',
+ '🧼':'Hygiene prevents spread of harmful microbes.',
+ '🍲':'Food safety prevents food poisoning.'
+};
+var LEVELS=[
+ {name:'Level 1 — Helpful Microbe Power Lab',story:'Match helpful microbes and microscope tools.',mission:'Collect useful microbes and create at least 2 power tiles.',moves:26,targets:{'🍞':8,'🥛':8,'🌱':6,'🔬':6},powerNeed:2,learn:'Useful microbes support food, agriculture and science observation.'},
+ {name:'Level 2 — Defense Grid Against Lord Pathogen',story:'Use vaccines, hygiene and food safety to stop contamination.',mission:'Clear harmful concepts and create at least 3 power tiles.',moves:28,targets:{'🦠':10,'💉':8,'🧼':8,'🍲':6},powerNeed:3,learn:'Harmful microbes can cause disease, while vaccines, hygiene and food safety protect us.'},
+ {name:'Level 3 — Final Boss Galaxy Board',story:'Use all chapter concepts to defeat Lord Pathogen.',mission:'Complete mixed targets and create at least 4 power tiles.',moves:30,targets:{'🍞':6,'🥛':6,'🌱':6,'🦠':8,'💉':8,'🧼':6},powerNeed:4,learn:'You completed full chapter mastery: microbes can be useful or harmful, and science helps us understand both.'}
+];
+var state={board:[],selected:null,score:0,movesLeft:0,level:0,collected:{},voice:true,voiceStyle:'standard',busy:false,bestChain:0,powersMade:{row:0,col:0,bomb:0,rainbow:0},levelPowerMade:0,lastSwap:null};
+function $(id){return document.getElementById(id);}
+function tileKey(r,c){return r+','+c;}
+function makeTile(symbol,kind){return {symbol:symbol,kind:kind||'normal'};}
+function randSymbol(){return SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];}
+function log(msg){var p=document.createElement('p');p.innerHTML=msg;$('log').prepend(p);}
+function speak(text){try{if(!state.voice||!('speechSynthesis' in window))return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang='en-IN';u.rate=state.voiceStyle==='indian'?0.88:0.98;speechSynthesis.speak(u);}catch(e){}}
+function addTap(el,fn){
+  var last=0;
+  function run(e){
+    var now=Date.now();
+    if(now-last<250)return;
+    last=now;
+    fn(e);
+  }
+  el.addEventListener('click',run,false);
+  el.addEventListener('touchend',function(e){e.preventDefault();run(e);},false);
+}
+function levelData(){return LEVELS[state.level];}
+function resetCollected(){state.collected={};Object.keys(levelData().targets).forEach(function(k){state.collected[k]=0;});state.levelPowerMade=0;}
+function initLevel(index){
+ state.level=index;state.selected=null;state.busy=false;state.movesLeft=levelData().moves;state.bestChain=0;state.lastSwap=null;resetCollected();createBoard();renderBoard();updateUI();$('certificate').classList.remove('show');$('explainBox').innerHTML='<h4>Dr AI Explanation</h4>'+levelData().story;log('<b>'+levelData().name+'</b> started.');speak(levelData().story);
+}
+function createBoard(){
+ state.board=[];
+ for(var r=0;r<SIZE;r++){
+  state.board[r]=[];
+  for(var c=0;c<SIZE;c++){
+   var sym;
+   do{sym=randSymbol();}
+   while((c>=2&&state.board[r][c-1].symbol===sym&&state.board[r][c-2].symbol===sym)||(r>=2&&state.board[r-1][c].symbol===sym&&state.board[r-2][c].symbol===sym));
+   state.board[r][c]=makeTile(sym);
+  }
+ }
+}
+function renderBoard(){
+ var board=$('board');board.innerHTML='';
+ for(var r=0;r<SIZE;r++){
+  for(var c=0;c<SIZE;c++){
+   var t=state.board[r][c], btn=document.createElement('button');
+   btn.type='button';btn.className='tile';btn.setAttribute('data-r',r);btn.setAttribute('data-c',c);
+   if(state.selected&&state.selected.r===r&&state.selected.c===c)btn.classList.add('selected');
+   if(t.kind!=='normal')btn.classList.add('power-'+t.kind);
+   btn.textContent=t.kind==='rainbow'?'🌈':t.symbol;
+   if(t.kind!=='normal'){var m=document.createElement('span');m.className='mark';m.textContent=t.kind==='row'?'✨':t.kind==='col'?'🌟':t.kind==='bomb'?'💣':'🌈';btn.appendChild(m);}
+   board.appendChild(btn);
+  }
+ }
+}
+function boardTap(e){
+ var target=e.target.closest('.tile');
+ if(!target||!$('board').contains(target))return;
+ e.preventDefault();
+ selectTile(parseInt(target.getAttribute('data-r')),parseInt(target.getAttribute('data-c')));
+}
+function selectTile(r,c){
+ if(state.busy)return;
+ if(!state.selected){state.selected={r:r,c:c};renderBoard();return;}
+ if(state.selected.r===r&&state.selected.c===c){state.selected=null;renderBoard();return;}
+ if(Math.abs(state.selected.r-r)+Math.abs(state.selected.c-c)!==1){state.selected={r:r,c:c};renderBoard();return;}
+ attemptSwap({r:state.selected.r,c:state.selected.c},{r:r,c:c});
+}
+function swapPos(a,b){var temp=state.board[a.r][a.c];state.board[a.r][a.c]=state.board[b.r][b.c];state.board[b.r][b.c]=temp;}
+function getTile(p){return state.board[p.r][p.c];}
+function sleep(ms){return new Promise(function(res){setTimeout(res,ms);});}
+async function attemptSwap(a,b){
+ state.busy=true;state.lastSwap={from:{r:a.r,c:a.c},to:{r:b.r,c:b.c}};swapPos(a,b);state.selected=null;renderBoard();await sleep(100);
+ var special=await trySpecialSwap(a,b);
+ if(special){state.movesLeft--;await settleBoard();state.busy=false;updateUI();checkLevelStatus();return;}
+ var matches=analyzeMatches();
+ if(matches.clear.size===0){swapPos(a,b);renderBoard();state.busy=false;log('No match formed. Try another swap.');return;}
+ state.movesLeft--;await resolveMatches(matches);state.busy=false;updateUI();checkLevelStatus();
+}
+async function trySpecialSwap(a,b){
+ var A=getTile(a),B=getTile(b);
+ if(A.kind==='normal'&&B.kind==='normal')return false;
+ var clear=new Set();
+ if(A.kind==='rainbow'&&B.kind==='rainbow'){for(var r=0;r<SIZE;r++)for(var c=0;c<SIZE;c++)clear.add(tileKey(r,c));}
+ else if(A.kind==='rainbow'){clearBySymbol(B.symbol,clear);clear.add(tileKey(a.r,a.c));}
+ else if(B.kind==='rainbow'){clearBySymbol(A.symbol,clear);clear.add(tileKey(b.r,b.c));}
+ else{activateSpecialAt(a,clear);activateSpecialAt(b,clear);}
+ log('<b>Special power activated!</b>');
+ await applyClearSet(clear);return true;
+}
+function clearBySymbol(symbol,clear){for(var r=0;r<SIZE;r++)for(var c=0;c<SIZE;c++)if(state.board[r][c]&&state.board[r][c].symbol===symbol)clear.add(tileKey(r,c));}
+function addBombArea(pos,clear,radius){for(var rr=Math.max(0,pos.r-radius);rr<=Math.min(SIZE-1,pos.r+radius);rr++)for(var cc=Math.max(0,pos.c-radius);cc<=Math.min(SIZE-1,pos.c+radius);cc++)clear.add(tileKey(rr,cc));}
+function activateSpecialAt(pos,clear){
+ var t=getTile(pos);if(!t)return;clear.add(tileKey(pos.r,pos.c));
+ if(t.kind==='row'){for(var c=0;c<SIZE;c++)clear.add(tileKey(pos.r,c));}
+ else if(t.kind==='col'){for(var r=0;r<SIZE;r++)clear.add(tileKey(r,pos.c));}
+ else if(t.kind==='bomb'){addBombArea(pos,clear,1);}
+ else if(t.kind==='rainbow'){clearBySymbol(t.symbol,clear);}
+}
+function analyzeMatches(){
+ var clear=new Set(),counts={},powerMap=new Map(),longest=0,horiz=[],vert=[];
+ for(var r=0;r<SIZE;r++){
+  var c=0;while(c<SIZE){var end=c+1;while(end<SIZE&&state.board[r][end].symbol===state.board[r][c].symbol)end++;var len=end-c;if(len>=3){var cells=[];for(var x=c;x<end;x++){cells.push({r:r,c:x});clear.add(tileKey(r,x));counts[state.board[r][x].symbol]=(counts[state.board[r][x].symbol]||0)+1;}horiz.push({cells:cells,len:len,symbol:state.board[r][c].symbol});longest=Math.max(longest,len);}c=end;}
+ }
+ for(var c2=0;c2<SIZE;c2++){
+  var r2=0;while(r2<SIZE){var end2=r2+1;while(end2<SIZE&&state.board[end2][c2].symbol===state.board[r2][c2].symbol)end2++;var len2=end2-r2;if(len2>=3){var cells2=[];for(var y=r2;y<end2;y++){cells2.push({r:y,c:c2});var k=tileKey(y,c2);if(!clear.has(k))counts[state.board[y][c2].symbol]=(counts[state.board[y][c2].symbol]||0)+1;clear.add(k);}vert.push({cells:cells2,len:len2,symbol:state.board[r2][c2].symbol});longest=Math.max(longest,len2);}r2=end2;}
+ }
+ var overlap={};horiz.forEach(function(g){g.cells.forEach(function(p){overlap[tileKey(p.r,p.c)]=(overlap[tileKey(p.r,p.c)]||0)+1;});});vert.forEach(function(g){g.cells.forEach(function(p){overlap[tileKey(p.r,p.c)]=(overlap[tileKey(p.r,p.c)]||0)+1;});});
+ var pref=state.lastSwap?state.lastSwap.to:{r:0,c:0};
+ horiz.forEach(function(g){if(g.len>=5){var p=choosePowerPos(g.cells,pref);powerMap.set(tileKey(p.r,p.c),{kind:'rainbow',symbol:g.symbol});}else if(g.len===4){var p2=choosePowerPos(g.cells,pref);if(!powerMap.has(tileKey(p2.r,p2.c)))powerMap.set(tileKey(p2.r,p2.c),{kind:'row',symbol:g.symbol});}});
+ vert.forEach(function(g){if(g.len>=5){var p=choosePowerPos(g.cells,pref);powerMap.set(tileKey(p.r,p.c),{kind:'rainbow',symbol:g.symbol});}else if(g.len===4){var p2=choosePowerPos(g.cells,pref);if(!powerMap.has(tileKey(p2.r,p2.c)))powerMap.set(tileKey(p2.r,p2.c),{kind:'col',symbol:g.symbol});}});
+ Object.keys(overlap).forEach(function(k){if(overlap[k]>=2){var parts=k.split(',');var rr=parseInt(parts[0]),cc=parseInt(parts[1]);powerMap.set(k,{kind:'bomb',symbol:state.board[rr][cc].symbol});}});
+ powerMap.forEach(function(v,k){clear.delete(k);});
+ return{clear:clear,counts:counts,longest:longest,powerMap:powerMap};
+}
+function choosePowerPos(cells,pref){for(var i=0;i<cells.length;i++)if(cells[i].r===pref.r&&cells[i].c===pref.c)return cells[i];return cells[Math.floor(cells.length/2)];}
+async function resolveMatches(initial){var current=initial;while(current.clear.size>0||current.powerMap.size>0){state.bestChain=Math.max(state.bestChain,current.longest||0);animateClear(current.clear,current.powerMap);applyCounts(current.counts);createPowers(current.powerMap);state.score+=current.clear.size*12+current.powerMap.size*25;updateUI();await sleep(220);clearCells(current.clear);collapseBoard();renderBoard();await sleep(100);current=analyzeMatches();}}
+function animateClear(clear,powerMap){var children=[].slice.call($('board').children);for(var r=0;r<SIZE;r++)for(var c=0;c<SIZE;c++){var idx=r*SIZE+c,k=tileKey(r,c);if(clear.has(k))children[idx].classList.add('matched');if(powerMap.has(k))children[idx].classList.add('selected');}}
+function applyCounts(counts){Object.keys(counts).forEach(function(sym){var count=counts[sym];if(sym in state.collected){state.collected[sym]+=count;log('Matched <b>'+sym+'</b> x '+count+'. '+INFO[sym]);}else log('Matched <b>'+sym+'</b> x '+count+'.');});}
+function createPowers(powerMap){powerMap.forEach(function(power,k){var p=k.split(','),r=parseInt(p[0]),c=parseInt(p[1]);state.board[r][c]=makeTile(power.symbol,power.kind);state.levelPowerMade++;state.powersMade[power.kind]++;log('<b>Power Tile Created:</b> '+powerName(power.kind)+'.');});}
+function powerName(kind){return kind==='row'?'Row Blaster':kind==='col'?'Column Blaster':kind==='bomb'?'Bomb Orb':'Rainbow Star';}
+function clearCells(clear){clear.forEach(function(k){var p=k.split(','),r=parseInt(p[0]),c=parseInt(p[1]);state.board[r][c]=null;});}
+function collapseBoard(){for(var c=0;c<SIZE;c++){var col=[];for(var r=SIZE-1;r>=0;r--)if(state.board[r][c])col.push(state.board[r][c]);while(col.length<SIZE)col.push(makeTile(randSymbol()));for(var rr=SIZE-1,i=0;rr>=0;rr--,i++)state.board[rr][c]=col[i];}}
+async function applyClearSet(clear){var counts={};clear.forEach(function(k){var p=k.split(','),r=parseInt(p[0]),c=parseInt(p[1]);var t=state.board[r][c];if(t)counts[t.symbol]=(counts[t.symbol]||0)+1;});animateClear(clear,new Map());applyCounts(counts);state.score+=clear.size*14;updateUI();await sleep(220);clearCells(clear);collapseBoard();renderBoard();await sleep(100);}
+async function settleBoard(){var current=analyzeMatches();while(current.clear.size>0||current.powerMap.size>0){await resolveMatches(current);current=analyzeMatches();}}
+function renderTargets(){var wrap=$('targets');wrap.innerHTML='';Object.keys(levelData().targets).forEach(function(sym){var need=levelData().targets[sym],got=Math.min(need,state.collected[sym]||0);var div=document.createElement('div');div.className='targetCard'+(got>=need?' done':'');div.innerHTML='<span>'+sym+' '+INFO[sym].split('.')[0]+'</span><span>'+got+' / '+need+'</span>';wrap.appendChild(div);});var p=document.createElement('div');p.className='targetCard'+(state.levelPowerMade>=levelData().powerNeed?' done':'');p.innerHTML='<span>✨ Power Tiles Created</span><span>'+state.levelPowerMade+' / '+levelData().powerNeed+'</span>';wrap.appendChild(p);}
+function updateUI(){var lvl=levelData();$('levelNo').textContent=state.level+1;$('score').textContent=state.score;$('moves').textContent=state.movesLeft;$('bestChain').textContent=state.bestChain;$('levelTitle').textContent=lvl.name;$('levelStory').textContent=lvl.story;$('missionText').textContent=lvl.mission;$('rowMade').textContent=state.powersMade.row;$('colMade').textContent=state.powersMade.col;$('bombMade').textContent=state.powersMade.bomb;$('rainbowMade').textContent=state.powersMade.rainbow;renderTargets();var totalNeeded=Object.values(lvl.targets).reduce(function(a,b){return a+b;},0)+lvl.powerNeed;var totalGot=Object.keys(lvl.targets).reduce(function(sum,sym){return sum+Math.min(lvl.targets[sym],state.collected[sym]||0);},0)+Math.min(lvl.powerNeed,state.levelPowerMade);$('levelProgress').style.width=(totalGot/totalNeeded*100).toFixed(0)+'%';}
+function levelCompleted(){return Object.keys(levelData().targets).every(function(sym){return(state.collected[sym]||0)>=levelData().targets[sym];})&&state.levelPowerMade>=levelData().powerNeed;}
+function checkLevelStatus(){if(levelCompleted()){showModal('🎉 Level Complete!','<p><b>'+levelData().name+'</b> completed.</p><p>'+levelData().learn+'</p><p><b>Power tiles this level:</b> '+state.levelPowerMade+'</p>',function(){if(state.level<LEVELS.length-1){initLevel(state.level+1);hideModal();}else{finishGame();hideModal();}});speak('Level complete. '+levelData().learn);return;}if(state.movesLeft<=0){showModal('⚠️ Mission Failed','<p>Moves finished. Restart this level and focus on target tiles.</p>',function(){initLevel(state.level);hideModal();});speak('Moves finished. Try again.');}}
+function finishGame(){$('certificate').classList.add('show');$('explainBox').innerHTML='<h4>Dr AI Final Result</h4>You completed the mobile-stable advanced chapter game.';log('<b>Final Mission Complete:</b> Lord Pathogen defeated!');showModal('🏆 Chapter Complete!','<p>You completed <b>Microbe Crush Galaxy Pro Mobile Stable Edition</b>.</p><p>You revised useful microbes, harmful microbes, vaccines, hygiene, food safety, fermentation and nitrogen cycle concepts.</p>',function(){hideModal();$('certificate').scrollIntoView({behavior:'smooth'});});speak('Congratulations. You completed the chapter game.');}
+function shuffleBoard(){if(state.busy)return;var flat=[];for(var r=0;r<SIZE;r++)for(var c=0;c<SIZE;c++)flat.push(state.board[r][c]);for(var i=flat.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=flat[i];flat[i]=flat[j];flat[j]=tmp;}for(var rr=0,k=0;rr<SIZE;rr++)for(var cc=0;cc<SIZE;cc++,k++)state.board[rr][cc]=flat[k];renderBoard();log('<b>Board shuffled.</b>');}
+function showModal(title,body,primaryAction){$('modalTitle').innerHTML=title;$('modalBody').innerHTML=body;$('overlay').classList.add('show');$('modalPrimary').onclick=primaryAction;}
+function hideModal(){$('overlay').classList.remove('show');}
+function setup(){
+ $('board').addEventListener('click',boardTap,false);
+ $('board').addEventListener('touchend',boardTap,false);
+ addTap($('startBtn'),function(){state.score=0;state.powersMade={row:0,col:0,bomb:0,rainbow:0};log('Game started.');initLevel(0);});
+ addTap($('restartBtn'),function(){initLevel(state.level);});
+ addTap($('shuffleBtn'),shuffleBoard);
+ addTap($('voiceBtn'),function(){state.voice=!state.voice;$('voiceBtn').textContent=state.voice?'🔊 Voice ON':'🔇 Voice OFF';});
+ addTap($('stopVoiceBtn'),function(){try{speechSynthesis.cancel();}catch(e){}});
+ $('voiceStyle').addEventListener('change',function(e){state.voiceStyle=e.target.value;});
+ addTap($('modalClose'),hideModal);
+ initLevel(0);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
+})();
+</script>
+</body>
+</html>
