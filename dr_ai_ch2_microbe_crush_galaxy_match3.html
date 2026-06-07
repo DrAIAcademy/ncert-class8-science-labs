@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Microbe Crush Galaxy | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#061123;--bg2:#123d82;--panel:rgba(10,25,52,.92);--cyan:#67f4ff;--gold:#ffe066;
+  --green:#8dffc6;--red:#ff8fa6;--violet:#d9b3ff;--text:#eef8ff;--muted:#b7cce5;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);background:
+radial-gradient(circle at 12% 8%,rgba(103,244,255,.18),transparent 26%),
+radial-gradient(circle at 88% 12%,rgba(255,224,102,.16),transparent 27%),
+radial-gradient(circle at 60% 90%,rgba(217,179,255,.12),transparent 24%),
+linear-gradient(135deg,var(--bg),var(--bg2) 60%,#071c34);overflow-x:hidden}
+body::before,body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:
+radial-gradient(circle at 10% 30%,rgba(255,255,255,.9) 0 1px,transparent 1.8px),
+radial-gradient(circle at 80% 20%,rgba(255,255,255,.85) 0 1.2px,transparent 1.8px),
+radial-gradient(circle at 60% 70%,rgba(255,255,255,.7) 0 1px,transparent 1.6px),
+radial-gradient(circle at 25% 80%,rgba(255,255,255,.8) 0 1px,transparent 1.6px),
+radial-gradient(circle at 45% 10%,rgba(255,255,255,.75) 0 1px,transparent 1.6px),
+radial-gradient(circle at 95% 55%,rgba(255,255,255,.7) 0 1.3px,transparent 1.8px);
+opacity:.75;animation:starsDrift 30s linear infinite}
+body::after{opacity:.35;filter:blur(1px);animation-duration:45s}
+@keyframes starsDrift{0%{transform:translateY(0)}100%{transform:translateY(20px)}}
+.watermark{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}.wm{position:absolute;color:rgba(255,255,255,.065);font-size:clamp(28px,4vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap;letter-spacing:1px}
+.cornerMark{position:fixed;right:14px;bottom:14px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.76);background:rgba(4,13,24,.42);border:1px solid rgba(255,255,255,.20);padding:7px 12px;border-radius:999px;font-weight:1000;backdrop-filter:blur(6px)}
+.wrap{max-width:1480px;margin:auto;padding:16px;position:relative;z-index:5}
+.panel{background:var(--panel);border:1px solid rgba(103,244,255,.22);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.hero{padding:24px;position:relative;overflow:hidden;background:
+radial-gradient(circle at 18% 20%,rgba(103,244,255,.16),transparent 24%),
+radial-gradient(circle at 84% 22%,rgba(255,224,102,.14),transparent 24%),
+linear-gradient(180deg,rgba(18,61,130,.9),rgba(7,22,48,.95))}
+.hero:after{content:"🍞 🥛 🌱 🦠 💉 🔬";position:absolute;right:20px;bottom:18px;font-size:34px;letter-spacing:10px;opacity:.25}
+.logo{position:absolute;right:18px;top:18px;background:rgba(0,0,0,.28);border:1px solid rgba(103,244,255,.3);border-radius:18px;padding:10px 14px;text-align:right}.logo b{display:block}.logo span{color:var(--cyan);font-size:.78rem;font-weight:900}
+.badge{display:inline-block;background:rgba(103,244,255,.12);border:1px solid rgba(103,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:1000;padding:9px 14px;font-size:.8rem}
+h1{font-size:clamp(2.1rem,4.5vw,4.2rem);line-height:1.02;margin:14px 0 10px;max-width:1050px;text-shadow:0 4px 0 rgba(0,0,0,.18)}.sub{color:var(--muted);max-width:1100px;line-height:1.65}
+.actions,.nav,.miniActions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}.nav{position:sticky;top:0;z-index:60;background:rgba(4,11,24,.92);padding:8px;border-radius:18px;backdrop-filter:blur(10px)}.nav .active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.btn{border:0;border-radius:18px;padding:12px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;min-height:46px;touch-action:manipulation}.btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)}.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}.btn:disabled{opacity:.55}
+.fun{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.fun div{background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.1);padding:10px;border-radius:16px;text-align:center;font-weight:900}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:16px}.gameGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,430px);gap:16px;margin-top:16px;align-items:start}.box{padding:18px}
+.storyBox,.explain,.infoBox{padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(103,244,255,.11),rgba(255,255,255,.04));border:1px solid rgba(103,244,255,.22);line-height:1.7}.storyBox h3:before,.explain h4:before{content:"💡 "}
+.rule{display:grid;grid-template-columns:38px 1fr;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px;margin-top:10px}.n{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(103,244,255,.16);color:var(--cyan);font-weight:1000}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{padding:14px;text-align:center;background:rgba(255,255,255,.055);border-radius:15px}.stat b{display:block;color:var(--cyan);font-size:1.3rem}
+.targetList{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}.targetCard{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:15px;font-weight:900}.targetCard.done{border-color:rgba(141,255,198,.55);background:rgba(141,255,198,.12)}
+.boardWrap{padding:14px;border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.1)}
+.board{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;touch-action:manipulation}
+.tile{aspect-ratio:1/1;border-radius:18px;border:2px solid rgba(255,255,255,.10);background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));display:grid;place-items:center;font-size:clamp(22px,4vw,34px);cursor:pointer;user-select:none;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease,opacity .18s ease}.tile:hover{transform:translateY(-2px)}.tile.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,224,102,.25)}.tile.matched{opacity:.15;transform:scale(.75)}
+.log{min-height:120px;max-height:240px;overflow:auto;padding:14px;background:rgba(255,255,255,.05);border-radius:16px;border:1px solid rgba(255,255,255,.08)}.log p{margin:0 0 10px}.legend{display:grid;grid-template-columns:1fr 1fr;gap:10px}.legendItem{padding:12px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);border-radius:15px}
+.levelBanner{padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,rgba(255,224,102,.14),rgba(255,255,255,.04));border:1px solid rgba(255,224,102,.28);margin-bottom:12px}
+.progressBar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:10px}.progressBar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;place-items:center;z-index:2000;padding:16px}.overlay.show{display:grid}.modal{max-width:720px;width:100%;padding:22px;background:linear-gradient(180deg,rgba(10,25,52,.98),rgba(7,19,40,.98));border:1px solid rgba(103,244,255,.24);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.4)}
+.cert{display:none;text-align:center;background:radial-gradient(circle at 20% 20%,rgba(103,244,255,.22),transparent 30%),linear-gradient(135deg,rgba(103,244,255,.18),rgba(255,224,102,.16));border:2px solid rgba(255,224,102,.45);border-radius:22px;padding:24px;margin-top:16px}.cert.show{display:block}.cert .seal{font-size:56px}.cert input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:white;text-align:center}
+footer{margin:20px 0 6px;padding:16px 20px;border:1px solid rgba(103,244,255,.25);border-radius:20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:1000px){.grid2,.gameGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 12px auto}.fun,.stats{grid-template-columns:1fr 1fr}.actions{display:grid;grid-template-columns:1fr 1fr}.actions .btn,.actions select{width:100%}.hero:after{display:none}}
+@media(max-width:520px){.fun,.stats,.legend{grid-template-columns:1fr}.board{gap:6px}.tile{border-radius:14px}.actions,.nav{grid-template-columns:1fr}.nav{display:grid}.targetCard{padding:10px 12px}}
+@media print{.hero,.actions,.nav,.overlay,footer,.watermark,.cornerMark,#gameArea,.infoOnlyHide{display:none!important}.cert{display:block!important;color:#111;background:white;border:4px solid #111}.cert input{border:0;color:#111}}
+</style>
+</head>
+<body>
+<div class="watermark"><div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:20%;left:34%">Dr AI Academy</div><div class="wm" style="top:36%;left:-4%">Dr AI Academy</div><div class="wm" style="top:52%;left:45%">Dr AI Academy</div><div class="wm" style="top:68%;left:6%">Dr AI Academy</div><div class="wm" style="top:84%;left:44%">Dr AI Academy</div></div>
+<div class="cornerMark">Dr AI Academy</div>
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Chapter 2 Match-3 Game</span></div>
+  <div class="badge">CANDY-CRUSH STYLE • MICROORGANISMS • STORY MODE</div>
+  <h1>MICROBE CRUSH GALAXY:<br>THE MATCH-3 SCIENCE QUEST</h1>
+  <p class="sub">Yes — I built the chapter as a <b>Candy Crush style browser game</b>. Students match microbiology tiles, complete story missions, defeat contamination, and revise the whole chapter through play. This is designed for Class 8, but concept-building also supports <b>Olympiad and NEET foundation</b>.</p>
+  <div class="actions"><button class="btn gold" id="startBtn">🎮 Start Game</button><button class="btn" id="voiceBtn">🔊 Voice ON</button><button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button><button class="btn secondary" id="restartBtn">🔄 Restart Level</button><select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select></div>
+  <div class="fun"><div>🍬 Match-3 Gameplay</div><div>🦠 Chapter Concepts</div><div>🚀 Story Missions</div><div>🏅 Final Certificate</div></div>
+</section>
+
+<section class="grid2" style="margin-top:16px">
+  <div class="panel box">
+    <h3>Story Setup</h3>
+    <div class="storyBox"><h3>The Story</h3><p><b>Astra</b>, the young science cadet, is flying through the <b>Microbe Galaxy</b> with <b>Dr AI</b>. The villain <b>Lord Pathogen</b> is spreading confusion — making students think all microbes are harmful. To restore balance, Astra must match science tiles and complete 3 galaxy missions: helpful microbes, defense against harmful microbes, and final mastery of the chapter.</p></div>
+  </div>
+  <div class="panel box">
+    <h3>How to Play</h3>
+    <div class="rule"><div class="n">1</div><div>Tap one tile, then tap an adjacent tile to swap.</div></div>
+    <div class="rule"><div class="n">2</div><div>Make a line of <b>3 or more matching tiles</b>.</div></div>
+    <div class="rule"><div class="n">3</div><div>Complete the <b>mission targets</b> before moves finish.</div></div>
+    <div class="rule"><div class="n">4</div><div>Each level teaches what students learned from the chapter.</div></div>
+  </div>
+</section>
+
+<section id="gameArea" class="gameGrid">
+  <div class="panel box infoOnlyHide">
+    <div class="levelBanner"><b id="levelTitle">Level 1</b><br><span id="levelStory"></span><div class="progressBar"><span id="levelProgress"></span></div></div>
+    <div class="boardWrap"><div class="board" id="board"></div></div>
+  </div>
+  <div class="panel box">
+    <div class="stats"><div class="stat"><b id="levelNo">1</b><span>Level</span></div><div class="stat"><b id="score">0</b><span>Score</span></div><div class="stat"><b id="moves">0</b><span>Moves Left</span></div><div class="stat"><b id="bestChain">0</b><span>Best Match</span></div></div>
+    <div class="infoBox" style="margin-top:14px"><b>Mission Objective</b><br><span id="missionText"></span><div class="targetList" id="targets"></div></div>
+    <div class="explain" style="margin-top:14px" id="explainBox"><h4>Dr AI Explanation</h4>Welcome cadet! Start the mission and match the chapter concepts.</div>
+    <div class="infoBox" style="margin-top:14px"><b>What each tile means</b><div class="legend" style="margin-top:10px">
+      <div class="legendItem">🍞 <b>Yeast</b><br><small>Fermentation, bread making</small></div>
+      <div class="legendItem">🥛 <b>Lactobacillus</b><br><small>Curd formation</small></div>
+      <div class="legendItem">🌱 <b>Rhizobium</b><br><small>Nitrogen fixation</small></div>
+      <div class="legendItem">🦠 <b>Pathogen</b><br><small>Disease-causing microbes</small></div>
+      <div class="legendItem">💉 <b>Vaccine Shield</b><br><small>Immunity training</small></div>
+      <div class="legendItem">🔬 <b>Microscope</b><br><small>Observe the invisible world</small></div>
+      <div class="legendItem">🧼 <b>Hygiene Shield</b><br><small>Prevents contamination</small></div>
+      <div class="legendItem">🍲 <b>Food Safety</b><br><small>Storage and prevention</small></div>
+    </div></div>
+    <div class="infoBox" style="margin-top:14px"><b>Mission Log</b><div class="log" id="log"></div></div>
+  </div>
+</section>
+
+<section class="panel box cert" id="certificate">
+  <div class="seal">🏆🌌🏅</div>
+  <h2>Certificate of Microbe Crush Galaxy Mastery</h2>
+  <p>This certifies that</p>
+  <input id="studentName" placeholder="Enter Student Name" />
+  <p>has successfully completed <b>Microbe Crush Galaxy: The Match-3 Science Quest</b></p>
+  <p>Skills: Useful Microbes • Harmful Microbes • Fermentation • Nitrogen Cycle • Vaccines • Hygiene • Food Safety</p>
+  <p><b>Developed by Dr AI Academy</b></p>
+  <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+</section>
+
+<footer><div>Developed by <b>Dr AI Academy</b> • AI-powered browser game</div><div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div></footer>
+</div>
+
+<div class="overlay" id="overlay"><div class="modal"><h2 id="modalTitle">Level Complete</h2><div id="modalBody"></div><div class="miniActions"><button class="btn gold" id="modalPrimary">Next</button><button class="btn secondary" id="modalClose">Close</button></div></div></div>
+
+<script>
+(()=>{
+const SIZE=8;
+const SYMBOLS=['🍞','🥛','🌱','🦠','💉','🔬','🧼','🍲'];
+const INFO={
+  '🍞':'Yeast helps fermentation and bread making.',
+  '🥛':'Lactobacillus helps make curd.',
+  '🌱':'Rhizobium helps nitrogen fixation for plant growth.',
+  '🦠':'Pathogens can cause disease.',
+  '💉':'Vaccines train the immune system.',
+  '🔬':'Microscope helps us observe tiny organisms.',
+  '🧼':'Hygiene helps prevent spread of harmful microbes.',
+  '🍲':'Food safety prevents food poisoning.'
+};
+const LEVELS=[
+  {
+    name:'Level 1 — Helpful Microbe Orbit',
+    story:'Astra enters the Friendly Microbe Zone. Match useful microbe tiles to learn how microorganisms help in daily life.',
+    mission:'Collect helpful microbes and microscope tools to understand the invisible world.',
+    moves:24,
+    targets:{'🍞':8,'🥛':8,'🌱':6,'🔬':6},
+    learn:'You learned that microorganisms are not only harmful. Yeast helps fermentation, Lactobacillus helps curd formation, Rhizobium helps nitrogen fixation, and the microscope helps us study the invisible world. This builds strong biology reasoning for Olympiad and NEET foundation.'
+  },
+  {
+    name:'Level 2 — Defense Against Lord Pathogen',
+    story:'Lord Pathogen attacks the galaxy. Astra must use vaccines, hygiene, and food safety to stop contamination and disease.',
+    mission:'Match defense tiles and harmful-microbe concepts to understand prevention.',
+    moves:26,
+    targets:{'🦠':10,'💉':8,'🧼':8,'🍲':6},
+    learn:'You learned how harmful microbes spread disease and spoil food. Vaccines help build immunity, hygiene helps reduce spread, and food safety protects health. These ideas connect directly with public health and microbiology.'
+  },
+  {
+    name:'Level 3 — Final Chapter Boss',
+    story:'The final chapter battle begins. Astra must balance useful microbes and defense concepts to defeat confusion forever.',
+    mission:'Complete the final mixed challenge and master the chapter.',
+    moves:28,
+    targets:{'🍞':6,'🥛':6,'🌱':6,'🦠':8,'💉':8,'🧼':6},
+    learn:'You completed the full chapter revision. Now you know that some microorganisms are useful, some are harmful, and science helps us decide how to use, control, and understand them. This is concept-based learning beyond rote memorization.'
+  }
+];
+const state={board:[],selected:null,score:0,movesLeft:0,level:0,collected:{},voice:true,voiceStyle:'standard',busy:false,bestChain:0};
+const $=id=>document.getElementById(id);
+function speak(text){if(!state.voice||!("speechSynthesis" in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='en-IN'; u.rate=state.voiceStyle==='indian'?0.88:0.98; speechSynthesis.speak(u);} 
+function randSymbol(){return SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]}
+function log(msg){const p=document.createElement('p'); p.innerHTML=msg; $('log').prepend(p)}
+function levelData(){return LEVELS[state.level]}
+function resetCollected(){state.collected={}; Object.keys(levelData().targets).forEach(k=>state.collected[k]=0)}
+function initLevel(index){state.level=index; state.selected=null; state.busy=false; state.movesLeft=levelData().moves; state.bestChain=0; resetCollected(); createBoard(); renderBoard(); updateUI(); $('certificate').classList.remove('show'); $('explainBox').innerHTML='<h4>Dr AI Explanation</h4>'+levelData().story; log(`<b>${levelData().name}</b> started.`); speak(levelData().story)}
+function createBoard(){state.board=[]; for(let r=0;r<SIZE;r++){ for(let c=0;c<SIZE;c++){ let sym; do{ sym=randSymbol(); }while((c>=2 && state.board[r*SIZE+c-1]===sym && state.board[r*SIZE+c-2]===sym) || (r>=2 && state.board[(r-1)*SIZE+c]===sym && state.board[(r-2)*SIZE+c]===sym)); state.board.push(sym);} }}
+function renderBoard(){const board=$('board'); board.innerHTML=''; state.board.forEach((sym,index)=>{const btn=document.createElement('button'); btn.className='tile'; if(state.selected===index) btn.classList.add('selected'); btn.textContent=sym; btn.dataset.index=index; btn.addEventListener('click',()=>selectTile(index)); board.appendChild(btn);});}
+function selectTile(index){if(state.busy) return; if(state.selected===null){state.selected=index; renderBoard(); return;} if(state.selected===index){state.selected=null; renderBoard(); return;} if(!isAdjacent(state.selected,index)){state.selected=index; renderBoard(); return;} attemptSwap(state.selected,index);}
+function isAdjacent(a,b){const ar=Math.floor(a/SIZE), ac=a%SIZE, br=Math.floor(b/SIZE), bc=b%SIZE; return Math.abs(ar-br)+Math.abs(ac-bc)===1}
+async function attemptSwap(a,b){state.busy=true; swap(a,b); renderBoard(); await sleep(120); const matches=findMatches(); if(matches.indices.size===0){ swap(a,b); state.selected=null; renderBoard(); state.busy=false; log('No match formed. Try another swap.'); return; } state.movesLeft--; state.selected=null; await resolveBoard(matches); state.busy=false; updateUI(); checkLevelStatus(); }
+function swap(a,b){[state.board[a],state.board[b]]=[state.board[b],state.board[a]]}
+function findMatches(){const matched=new Set(); const counts={}; let longest=0;
+  for(let r=0;r<SIZE;r++){
+    let start=0;
+    while(start<SIZE){ let end=start+1; while(end<SIZE && state.board[r*SIZE+end]===state.board[r*SIZE+start]) end++; let len=end-start; if(len>=3){ longest=Math.max(longest,len); for(let c=start;c<end;c++){ const idx=r*SIZE+c; matched.add(idx); counts[state.board[idx]]=(counts[state.board[idx]]||0)+1; } } start=end; }
+  }
+  for(let c=0;c<SIZE;c++){
+    let start=0;
+    while(start<SIZE){ let end=start+1; while(end<SIZE && state.board[end*SIZE+c]===state.board[start*SIZE+c]) end++; let len=end-start; if(len>=3){ longest=Math.max(longest,len); for(let r=start;r<end;r++){ const idx=r*SIZE+c; if(!matched.has(idx)) counts[state.board[idx]]=(counts[state.board[idx]]||0)+1; matched.add(idx);} } start=end; }
+  }
+  return {indices:matched, counts, longest};
+}
+async function resolveBoard(initial){let current=initial; while(current.indices.size>0){ state.bestChain=Math.max(state.bestChain,current.longest||0); animateMatches(current.indices); applyCounts(current.counts); state.score += current.indices.size*10; updateUI(); await sleep(220); collapseBoard(current.indices); renderBoard(); await sleep(120); current=findMatches(); } }
+function animateMatches(indices){[...$('board').children].forEach((el,i)=>{ if(indices.has(i)) el.classList.add('matched'); });}
+function applyCounts(counts){Object.entries(counts).forEach(([sym,count])=>{ if(sym in state.collected){ state.collected[sym]+=count; log(`Matched <b>${sym}</b> x ${count}. ${INFO[sym]}`); } else { log(`Matched <b>${sym}</b> x ${count}.`); } }); }
+function collapseBoard(indices){ for(let c=0;c<SIZE;c++){ let col=[]; for(let r=SIZE-1;r>=0;r--){ const idx=r*SIZE+c; if(!indices.has(idx)) col.push(state.board[idx]); } while(col.length<SIZE) col.push(randSymbol()); for(let r=SIZE-1, k=0;r>=0;r--,k++) state.board[r*SIZE+c]=col[k]; } }
+function updateUI(){const lvl=levelData(); $('levelNo').textContent=state.level+1; $('score').textContent=state.score; $('moves').textContent=state.movesLeft; $('bestChain').textContent=state.bestChain; $('levelTitle').textContent=lvl.name; $('levelStory').textContent=lvl.story; $('missionText').textContent=lvl.mission; renderTargets(); const totalNeeded=Object.values(lvl.targets).reduce((a,b)=>a+b,0); const totalGot=Object.entries(lvl.targets).reduce((sum,[sym,need])=>sum+Math.min(need,state.collected[sym]||0),0); $('levelProgress').style.width=(totalGot/totalNeeded*100).toFixed(0)+'%'; }
+function renderTargets(){const wrap=$('targets'); wrap.innerHTML=''; Object.entries(levelData().targets).forEach(([sym,need])=>{ const got=Math.min(need,state.collected[sym]||0); const div=document.createElement('div'); div.className='targetCard'+(got>=need?' done':''); div.innerHTML=`<span>${sym} ${INFO[sym].split('.')[0]}</span><span>${got} / ${need}</span>`; wrap.appendChild(div); }); }
+function levelCompleted(){ return Object.entries(levelData().targets).every(([sym,need])=>(state.collected[sym]||0)>=need); }
+function checkLevelStatus(){ if(levelCompleted()){ showModal('🎉 Level Complete!', `<p><b>${levelData().name}</b> completed.</p><p>${levelData().learn}</p><p><b>Score:</b> ${state.score}</p>`, ()=>{ if(state.level<LEVELS.length-1){ initLevel(state.level+1); hideModal(); } else { finishGame(); hideModal(); } }); speak('Level complete. '+levelData().learn); return; } if(state.movesLeft<=0){ showModal('⚠️ Mission Failed', `<p>You used all moves in <b>${levelData().name}</b>.</p><p>Try again and focus on the target tiles.</p>`, ()=>{ initLevel(state.level); hideModal(); }); speak('Moves finished. Try the level again.'); } }
+function finishGame(){ $('certificate').classList.add('show'); $('explainBox').innerHTML='<h4>Dr AI Final Result</h4>You completed the full Candy Crush style chapter game. You revised useful microbes, harmful microbes, vaccines, hygiene, food safety and nitrogen cycle concepts through gameplay. This is concept-based science learning.'; log('<b>Final Mission Complete:</b> Lord Pathogen has been defeated with science!'); showModal('🏆 Chapter Complete!', `<p>You completed <b>Microbe Crush Galaxy</b>.</p><p>You now understand the full chapter through match-3 gameplay.</p><p><b>What you learned:</b> Microorganisms can be useful or harmful. Science helps us use them, control them and protect health.</p>`, ()=>{ hideModal(); $('certificate').scrollIntoView({behavior:'smooth'}); }); speak('Congratulations. You completed the chapter game and earned your certificate.'); }
+function showModal(title,body,primaryAction){ $('modalTitle').innerHTML=title; $('modalBody').innerHTML=body; $('overlay').classList.add('show'); $('modalPrimary').onclick=primaryAction; }
+function hideModal(){ $('overlay').classList.remove('show'); }
+function sleep(ms){return new Promise(res=>setTimeout(res,ms))}
+$('startBtn').onclick=()=>{ state.score=0; log('Game session started.'); initLevel(0); };
+$('restartBtn').onclick=()=>initLevel(state.level);
+$('voiceBtn').onclick=()=>{ state.voice=!state.voice; $('voiceBtn').textContent=state.voice?'🔊 Voice ON':'🔇 Voice OFF'; };
+$('stopVoiceBtn').onclick=()=>speechSynthesis.cancel();
+$('voiceStyle').onchange=e=>state.voiceStyle=e.target.value;
+$('modalClose').onclick=hideModal;
+initLevel(0);
+})();
+</script>
+</body>
+</html>
