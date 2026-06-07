@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 14 3D — Vaccine Training Academy | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#07122d;--bg2:#123b7a;--panel:rgba(12,30,62,.94);--cyan:#63f4ff;--gold:#ffe066;
+  --green:#8cffc1;--red:#ff8aa0;--violet:#d3a5ff;--text:#eef8ff;--muted:#b5cbe4;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);overflow-x:hidden;
+  background:
+    radial-gradient(circle at 12% 8%,rgba(99,244,255,.20),transparent 26%),
+    radial-gradient(circle at 88% 12%,rgba(255,224,102,.18),transparent 27%),
+    radial-gradient(circle at 60% 90%,rgba(179,136,255,.12),transparent 24%),
+    linear-gradient(135deg,var(--bg),var(--bg2) 60%,#0a2248);
+}
+.watermark{position:fixed;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.07);font-size:clamp(30px,4vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap;letter-spacing:1px}
+.cornerMark{position:fixed;right:14px;bottom:14px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.76);background:rgba(4,13,24,.42);border:1px solid rgba(255,255,255,.20);padding:7px 12px;border-radius:999px;font-weight:1000;backdrop-filter:blur(6px)}
+.wrap{max-width:1500px;margin:auto;padding:16px;position:relative;z-index:10}
+.panel{background:var(--panel);border:1px solid rgba(99,244,255,.25);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.hero{padding:22px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(23,63,125,.9),rgba(9,25,57,.9))}
+.hero:after{content:"💉 🛡️ Y 🧠 ✨";position:absolute;right:22px;bottom:18px;font-size:34px;letter-spacing:10px;opacity:.28}
+.logo{position:absolute;right:18px;top:18px;background:rgba(0,0,0,.28);border:1px solid rgba(99,244,255,.3);border-radius:18px;padding:10px 14px;text-align:right}
+.logo b{display:block}.logo span{color:var(--cyan);font-size:.78rem;font-weight:900}
+.badge{display:inline-block;background:rgba(99,244,255,.12);border:1px solid rgba(99,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:1000;padding:9px 14px;font-size:.8rem}
+h1{font-size:clamp(2rem,4.5vw,4.2rem);line-height:1.02;margin:14px 0 10px;max-width:1100px;text-shadow:0 4px 0 rgba(0,0,0,.18)}
+.sub{color:var(--muted);max-width:1120px;line-height:1.6}
+.btn{border:0;border-radius:18px;padding:12px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;min-height:46px;touch-action:manipulation}
+.btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}.btn:disabled{opacity:.55}
+.actions,.nav,.storyBtns{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.nav{position:sticky;top:0;z-index:60;background:rgba(7,18,45,.94);padding:8px;border-radius:18px;backdrop-filter:blur(10px)}
+.nav .active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.fun{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.fun div{background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.1);padding:10px;border-radius:16px;text-align:center;font-weight:900}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.labGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,470px);gap:16px;margin-top:16px;align-items:start}.box{padding:18px}
+.rule,.level{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px;margin-top:10px}
+.n{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(99,244,255,.16);color:var(--cyan);font-weight:1000}.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:.8rem;font-weight:900}
+.done{border-color:rgba(140,255,193,.55)!important;background:rgba(140,255,193,.1)!important}.activeLevel{border-color:rgba(255,224,102,.55)!important;background:rgba(255,224,102,.1)!important}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.stat{padding:12px;text-align:center;background:rgba(255,255,255,.055);border-radius:15px}.stat b{display:block;color:var(--cyan);font-size:1.3rem}
+.section{display:none}.section.active{display:block}
+.storyBox,.explain{padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(99,244,255,.11),rgba(255,255,255,.04));border:1px solid rgba(99,244,255,.22);line-height:1.65}.storyBox{min-height:300px}.storyBox h2:before,.explain h4:before{content:"💡 "}
+.scene{position:relative;min-height:620px;border-radius:22px;overflow:hidden;background:radial-gradient(circle at 20% 15%,rgba(99,244,255,.16),transparent 28%),radial-gradient(circle at 78% 14%,rgba(179,136,255,.20),transparent 18%),linear-gradient(180deg,#123b7a,#0a2f68 45%,#10213a 45%,#091526);border:1px solid rgba(255,255,255,.08);perspective:1300px}
+.sceneTip{position:absolute;left:16px;top:16px;z-index:3;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.14);padding:8px 12px;border-radius:14px;font-size:.85rem;color:#d7ebff}
+.screen{position:absolute;right:16px;top:16px;width:min(42%,390px);min-height:205px;background:rgba(5,21,46,.78);border:1px solid rgba(99,244,255,.22);border-radius:22px;padding:14px;pointer-events:none;z-index:3}.line{background:rgba(255,255,255,.065);padding:10px;border-radius:12px;margin:8px 0}
+.world3d{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .18s ease}
+.floor{position:absolute;left:50%;bottom:24px;transform:translateX(-50%) rotateX(82deg);width:72%;height:380px;background:radial-gradient(circle,rgba(99,244,255,.12),rgba(99,244,255,.02) 60%,transparent 74%);border-radius:50%;filter:blur(2px)}
+.ai{position:absolute;left:26px;bottom:28px;font-size:86px;z-index:3}.ai:after{content:"Dr AI";display:block;font-size:14px;background:var(--gold);color:#2c1900;border-radius:999px;padding:6px 10px;font-weight:1000;text-align:center}
+.bodyCore{position:absolute;left:32%;bottom:70px;transform:translateX(-50%) translateZ(20px);width:290px;height:370px;border-radius:145px 145px 82px 82px;background:linear-gradient(180deg,rgba(219,234,254,.88),rgba(147,197,253,.40));border:4px solid rgba(255,255,255,.55);box-shadow:0 22px 36px rgba(0,0,0,.28);overflow:hidden;z-index:2}
+.bodyCore:before{content:"Immune Training Chamber";position:absolute;left:50%;top:16px;transform:translateX(-50%);font-size:.82rem;background:rgba(8,20,42,.72);padding:6px 12px;border-radius:999px;font-weight:1000;z-index:2}
+.brain{position:absolute;left:50%;top:70px;transform:translateX(-50%);width:88px;height:66px;border-radius:50%;background:rgba(211,165,255,.35);border:2px solid rgba(255,255,255,.35)}
+.heart{position:absolute;left:50%;top:160px;transform:translateX(-50%);font-size:54px;animation:heartBeat 2.2s ease-in-out infinite}
+.memoryCell{position:absolute;font-size:28px;color:#dbeafe;font-weight:1000;text-shadow:0 0 12px rgba(255,255,255,.35);animation:memoryOrbit 7s linear infinite;left:50%;top:185px}.mc2{animation-delay:2.1s}.mc3{animation-delay:4.2s}
+.shieldAura{position:absolute;left:32%;bottom:58px;transform:translateX(-50%) translateZ(0);width:322px;height:392px;border-radius:48%;border:3px dashed rgba(140,255,193,.14);animation:shieldPulse 3.2s ease-in-out infinite;pointer-events:none;z-index:1}
+.vaccineJet{position:absolute;right:78px;top:124px;font-size:68px;animation:jetPulse 3.4s ease-in-out infinite;z-index:2;transform:translateZ(30px)}
+.spark{position:absolute;right:118px;top:220px;font-size:26px;color:#d8b4fe;animation:sparkMove 4s linear infinite;z-index:2}.sp2{animation-delay:1.4s}.sp3{animation-delay:2.8s}
+.pathogen{position:absolute;font-size:32px;filter:drop-shadow(0 0 10px rgba(255,138,160,.38));animation:pathogenMove 8s linear infinite;opacity:.78;cursor:pointer;transition:transform .2s ease,opacity .2s ease;z-index:2}
+.pathogen:hover{transform:scale(1.15)}.p1{left:-60px;top:110px}.p2{left:-90px;top:210px;animation-delay:1.8s}.p3{left:-70px;top:340px;animation-delay:3.5s}
+.pathogen.dead{opacity:.15 !important;transform:scale(.2) !important;pointer-events:none}
+.antibody{position:absolute;font-size:30px;color:#e0f2fe;font-weight:1000;text-shadow:0 0 12px rgba(255,255,255,.3);animation:antibodyIntercept 5.5s linear infinite;z-index:2}.ab1{left:18%;top:150px}.ab2{left:22%;top:280px;animation-delay:1.7s}.ab3{left:18%;top:390px;animation-delay:3.4s}
+.wave{position:absolute;height:2px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.85),rgba(99,244,255,.18),rgba(255,255,255,0));box-shadow:0 0 12px rgba(255,255,255,.22);opacity:.55;z-index:1}.w1{top:82px;left:-120px;width:180px;animation:waveMove 8s linear infinite}.w2{top:132px;left:-160px;width:210px;animation:waveMove 9s linear infinite 1.5s}.w3{top:182px;left:-130px;width:160px;animation:waveMove 7.6s linear infinite 3.2s}
+.tray,.socketGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.interactiveChip,.socket{padding:12px;border-radius:16px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.10);min-height:78px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;cursor:pointer;user-select:none;touch-action:manipulation;transition:transform .18s ease,border-color .18s ease,background .18s ease}.interactiveChip:hover,.socket:hover{transform:translateY(-2px)}.interactiveChip.ok{border-color:rgba(140,255,193,.55);background:rgba(140,255,193,.12)}.interactiveChip.bad{border-color:rgba(255,138,160,.55);background:rgba(255,138,160,.12)}.interactiveChip.used{opacity:.55;pointer-events:none}.socket.filled{border-color:rgba(99,244,255,.5);background:rgba(99,244,255,.12);color:var(--cyan)}
+.controlBox{padding:18px;border-radius:22px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}.cards{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}.opt,.mission{padding:14px;border-radius:16px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.1);color:white;cursor:pointer;text-align:left;min-height:52px;touch-action:manipulation}.mission b{color:var(--gold)}.opt.correct,.mission.good{border-color:rgba(140,255,193,.65);background:rgba(140,255,193,.14)}.opt.wrong,.mission.bad{border-color:rgba(255,138,160,.65);background:rgba(255,138,160,.14)}.mission.used{opacity:.82}
+.meter{padding:14px;background:rgba(255,255,255,.06);border-radius:16px;margin-top:10px}.meter label{display:flex;justify-content:space-between;color:var(--gold);font-weight:900}.bar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:8px}.bar span{height:100%;display:block;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.challengeCard{padding:14px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);margin-top:10px}.challengeCard h4{margin:0 0 8px}
+.cert{text-align:center;background:radial-gradient(circle at 20% 20%,rgba(99,244,255,.22),transparent 30%),linear-gradient(135deg,rgba(99,244,255,.18),rgba(255,224,102,.16));border:2px solid rgba(255,224,102,.45);border-radius:22px;padding:24px}.cert .seal{font-size:56px}.cert input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:white;text-align:center}
+footer{margin:20px 0 6px;padding:16px 20px;border:1px solid rgba(99,244,255,.25);border-radius:20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@keyframes heartBeat{0%,100%{transform:translateX(-50%) scale(.96)}25%{transform:translateX(-50%) scale(1.08)}50%{transform:translateX(-50%) scale(1)}}
+@keyframes memoryOrbit{0%{transform:translate(-50%,0) rotate(0deg) translateX(105px) rotate(0deg)}100%{transform:translate(-50%,0) rotate(360deg) translateX(105px) rotate(-360deg)}}
+@keyframes shieldPulse{0%,100%{border-color:rgba(140,255,193,.12);box-shadow:0 0 0 rgba(140,255,193,0)}50%{border-color:rgba(140,255,193,.60);box-shadow:0 0 38px rgba(140,255,193,.24)}}
+@keyframes jetPulse{0%,100%{transform:translateZ(30px) scale(.96)}50%{transform:translateZ(30px) scale(1.08)}}
+@keyframes sparkMove{0%{transform:translate(0,0) scale(.8);opacity:0}15%{opacity:.9}100%{transform:translate(-280px,80px) scale(1.15);opacity:0}}
+@keyframes pathogenMove{0%{transform:translateX(0) translateY(0) rotate(0deg);opacity:0}10%{opacity:.85}50%{opacity:1}100%{transform:translateX(680px) translateY(-28px) rotate(180deg);opacity:0}}
+@keyframes antibodyIntercept{0%{transform:translateX(0) scale(.9);opacity:.25}25%{opacity:1}50%{transform:translateX(110px) scale(1.05);opacity:1}100%{transform:translateX(210px) scale(.88);opacity:0}}
+@keyframes waveMove{0%{transform:translateX(0) scaleX(.85);opacity:0}10%{opacity:.5}60%{opacity:.8}100%{transform:translateX(760px) scaleX(1.08);opacity:0}}
+@media(max-width:1000px){
+  .grid2,.labGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 12px auto}.fun,.stats{grid-template-columns:1fr 1fr}.screen{position:relative;width:auto;right:auto;top:auto;margin:12px}.scene{min-height:780px}.bodyCore,.shieldAura{left:50%}.vaccineJet{right:26px;top:180px}.spark{right:60px;top:278px}.ai{left:50%;transform:translateX(-50%);bottom:20px}.nav{display:grid;grid-template-columns:1fr 1fr}.actions{display:grid;grid-template-columns:1fr 1fr}.actions .btn,.actions select{width:100%}.hero:after{display:none}
+}
+@media(max-width:430px){
+  .fun,.stats,.nav,.actions,.tray,.socketGrid{grid-template-columns:1fr}.rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2}.bodyCore{width:250px;height:340px}.shieldAura{width:280px;height:362px}.vaccineJet{font-size:58px}.ai{font-size:72px}
+}
+@media print{.hero,.nav,.section:not(#certificate),footer,.watermark,.cornerMark{display:none!important}.cert{color:#111;background:white;border:4px solid #111}.cert input{border:0;color:#111}}
+</style>
+</head>
+<body>
+<div class="watermark">
+  <div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:20%;left:34%">Dr AI Academy</div>
+  <div class="wm" style="top:36%;left:-4%">Dr AI Academy</div><div class="wm" style="top:52%;left:45%">Dr AI Academy</div>
+  <div class="wm" style="top:68%;left:6%">Dr AI Academy</div><div class="wm" style="top:84%;left:44%">Dr AI Academy</div>
+</div>
+<div class="cornerMark">Dr AI Academy</div>
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Invisible World Lab Series</span></div>
+  <div class="badge">LAB 14 • 3D ENHANCED • VACCINES + IMMUNE MEMORY</div>
+  <h1>VACCINE TRAINING ACADEMY:<br>THE IMMUNE MEMORY MISSION — 3D EDITION</h1>
+  <p class="sub">This upgraded version is more interactive and gives a 3D-style lab feel using layered visuals, parallax movement, live pathogen tapping, and an interactive immune-training console. Dr AI guides students through vaccine science in simple language.</p>
+  <div class="actions">
+    <button class="btn gold" id="startBtn">🎮 Start 3D Lab 14</button>
+    <button class="btn" id="voiceBtn">🔊 Voice ON</button>
+    <button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button>
+    <select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select>
+  </div>
+  <div class="fun"><div>🌀 3D Parallax Scene</div><div>🎯 Tap Pathogens</div><div>🛡️ Immune Shield</div><div>🏅 Certificate Quest</div></div>
+  <div class="grid2">
+    <div class="panel box"><h3>Game Rules</h3>
+      <div class="rule"><div class="n">1</div><div><b>Learn vaccine story</b><br>Understand vaccines, antibodies and immune memory.</div><div class="tag">Level 1</div></div>
+      <div class="rule"><div class="n">2</div><div><b>Activate immune training</b><br>Fill the 4 training sockets, then tap 3 pathogens.</div><div class="tag">Level 2</div></div>
+      <div class="rule"><div class="n">3</div><div><b>Balance protection</b><br>Use sliders and run a future-attack test.</div><div class="tag">Level 3</div></div>
+      <div class="rule"><div class="n">4</div><div><b>Solve vaccine missions</b><br>Clear concept challenges and quiz.</div><div class="tag">Level 4</div></div>
+    </div>
+    <div class="panel box"><h3>Level Map</h3>
+      <div class="level activeLevel" id="lvl1"><div class="n">1</div><div><b>Story Briefing</b><br><small>Complete 4 story cards.</small></div><div class="tag" id="tag1">Active</div></div>
+      <div class="level" id="lvl2"><div class="n">2</div><div><b>Immune Trainer</b><br><small>4 factors + 3 pathogens neutralized.</small></div><div class="tag" id="tag2">Locked</div></div>
+      <div class="level" id="lvl3"><div class="n">3</div><div><b>Protection Lab</b><br><small>Reach 75+ and pass future attack test.</small></div><div class="tag" id="tag3">Locked</div></div>
+      <div class="level" id="lvl4"><div class="n">4</div><div><b>Mission + Quiz</b><br><small>Clear challenges and answer quiz.</small></div><div class="tag" id="tag4">Locked</div></div>
+      <div class="stats"><div class="stat"><b id="theoryCount">0/4</b><span>Story</span></div><div class="stat"><b id="simCount">0/3</b><span>Levels</span></div><div class="stat"><b id="quizCount">0/3</b><span>Quiz</span></div><div class="stat"><b id="score">0</b><span>Score</span></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="btn gold active" data-go="theory">Story</button>
+  <button class="btn secondary" data-go="trainer" id="navTrainer" disabled>Trainer</button>
+  <button class="btn secondary" data-go="lab" id="navLab" disabled>Lab</button>
+  <button class="btn secondary" data-go="mission" id="navMission" disabled>Mission</button>
+  <button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Quiz</button>
+  <button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button>
+</div>
+
+<section class="section active" id="theory">
+  <div class="grid2">
+    <div class="panel box">
+      <h3>Dr AI Story Briefing</h3>
+      <div class="storyBox" id="storyBox"></div>
+      <div class="storyBtns"><button class="btn secondary" id="prevStory">← Previous</button><button class="btn" id="nextStory">Next Story →</button><button class="btn gold" id="markTheory">Mark Story Complete</button></div>
+    </div>
+    <div class="panel box"><h3>What Students Learn</h3><div class="explain"><b>NCERT Link:</b> Vaccines protect us by preparing the body to fight specific pathogens.<br><br><b>Olympiad Link:</b> Immune response, prevention logic, memory cells, evidence-based health decisions.<br><br><b>NEET Foundation:</b> Antigens, antibodies, immune memory, vaccination, secondary response, disease prevention.</div></div>
+  </div>
+</section>
+
+<section class="section" id="trainer">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 2: 3D Immune Training Arena</h3>
+      <div class="scene scene3d" id="sceneTrainer">
+        <div class="sceneTip">Move your finger / mouse for 3D feel • Tap pathogens after training</div>
+        <div class="screen"><h3>Dr AI Immune Scanner</h3><div class="line">Correct Factors: <b id="factorCount">0 / 4</b></div><div class="line">Pathogens Neutralized: <b id="neutralizedCount">0 / 3</b></div><div class="line">Training Status: <b id="trainingStatus">Waiting</b></div></div>
+        <div class="world3d" id="worldTrainer">
+          <div class="floor"></div>
+          <div class="wave w1"></div><div class="wave w2"></div><div class="wave w3"></div>
+          <div class="pathogen p1 trainPathogen">🦠</div><div class="pathogen p2 trainPathogen">🧫</div><div class="pathogen p3 trainPathogen">🦠</div>
+          <div class="antibody ab1">Y</div><div class="antibody ab2">Y</div><div class="antibody ab3">Y</div>
+          <div class="shieldAura" id="shieldAura"></div>
+          <div class="bodyCore"><div class="brain"></div><div class="heart">❤️</div><div class="memoryCell mc1">M</div><div class="memoryCell mc2">M</div><div class="memoryCell mc3">M</div></div>
+          <div class="vaccineJet">💉</div><div class="spark sp1">✦</div><div class="spark sp2">✦</div><div class="spark sp3">✦</div>
+        </div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+
+    <div class="panel box">
+      <h3>Interactive Immune Console</h3>
+      <div class="controlBox">
+        <p><b>Step A:</b> Tap the correct training chips below to fill the 4 sockets.</p>
+        <div class="tray" id="chipTray">
+          <div class="interactiveChip" data-item="Vaccine Dose" data-good="1">💉 Vaccine Dose</div>
+          <div class="interactiveChip" data-item="Antibody Response" data-good="1">Y Antibody Response</div>
+          <div class="interactiveChip" data-item="Memory Cells" data-good="1">🧠 Memory Cells</div>
+          <div class="interactiveChip" data-item="Booster Awareness" data-good="1">🔔 Booster Awareness</div>
+          <div class="interactiveChip" data-item="Ignore Schedule" data-good="0">⏳ Ignore Schedule</div>
+          <div class="interactiveChip" data-item="Rumour-Based Fear" data-good="0">📢 Rumour-Based Fear</div>
+        </div>
+        <p style="margin-top:14px"><b>Immune Training Sockets</b></p>
+        <div class="socketGrid">
+          <div class="socket" id="socket1">Socket 1</div><div class="socket" id="socket2">Socket 2</div>
+          <div class="socket" id="socket3">Socket 3</div><div class="socket" id="socket4">Socket 4</div>
+        </div>
+      </div>
+      <div class="explain" id="trainerExplain"><h4>Training Feedback</h4>Fill the four correct sockets first. Then tap 3 moving pathogens in the arena to test trained protection.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="lab">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 3: Future Attack Simulation Lab</h3>
+      <div class="scene scene3d" id="sceneLab">
+        <div class="sceneTip">3D view • Set sliders • Run future attack test</div>
+        <div class="screen"><h3>Protection Meter</h3><div class="line">Defense Score: <b id="defenseScore">0</b></div><div class="line">Immune Readiness: <b id="readiness">Low</b></div><div class="line">Future Attack Test: <b id="futureTest">Not Run</b></div></div>
+        <div class="world3d" id="worldLab">
+          <div class="floor"></div>
+          <div class="wave w1"></div><div class="wave w2"></div><div class="wave w3"></div>
+          <div class="pathogen p1" id="labP1">🦠</div><div class="pathogen p2" id="labP2">🧫</div><div class="pathogen p3" id="labP3">🦠</div>
+          <div class="antibody ab1">Y</div><div class="antibody ab2">Y</div><div class="antibody ab3">Y</div>
+          <div class="shieldAura"></div>
+          <div class="bodyCore"><div class="brain"></div><div class="heart">❤️</div><div class="memoryCell mc1">M</div><div class="memoryCell mc2">M</div><div class="memoryCell mc3">M</div></div>
+          <div class="vaccineJet">💉</div><div class="spark sp1">✦</div><div class="spark sp2">✦</div><div class="spark sp3">✦</div>
+        </div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+    <div class="panel box">
+      <h3>Controls: Balance Protection</h3>
+      <div class="controlBox">
+        <div class="meter"><label>Vaccination Coverage <span id="coverageOut">50</span></label><input type="range" min="0" max="100" value="50" id="coverage"></div>
+        <div class="meter"><label>Immune Memory Strength <span id="memoryOut">50</span></label><input type="range" min="0" max="100" value="50" id="memory"></div>
+        <div class="meter"><label>Exposure Safety Control <span id="safetyOut">50</span></label><input type="range" min="0" max="100" value="50" id="safety"></div>
+        <button class="btn green" id="checkLab">🛡️ Check Protection Score</button>
+        <button class="btn gold" id="runAttack">⚡ Run Future Attack Test</button>
+      </div>
+      <div class="explain" id="labExplain"><h4>Protection Feedback</h4>Set the sliders, then run the future attack test. You need a score of 75+ to pass.</div>
+      <div class="meter"><label>Protection Power <span id="activityText">0%</span></label><div class="bar"><span id="activityBar"></span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mission">
+  <div class="grid2">
+    <div class="panel box">
+      <h3>Level 4: Vaccine Mission Challenges</h3>
+      <div class="challengeCard"><h4>Mission 1: Why do vaccines help?</h4><div class="cards"><button class="mission" data-mission="1" data-good="1"><b>They train the immune system</b><br>The body learns to respond faster to the real pathogen later.</button><button class="mission" data-mission="1" data-good="0"><b>They replace the whole immune system</b><br>Vaccines train the existing immune system, they do not replace it.</button></div></div>
+      <div class="challengeCard"><h4>Mission 2: What is immune memory?</h4><div class="cards"><button class="mission" data-mission="2" data-good="1"><b>The body remembers the pathogen</b><br>Memory cells help give a faster response on future exposure.</button><button class="mission" data-mission="2" data-good="0"><b>The body forgets everything</b><br>This is opposite to the idea of immune memory.</button></div></div>
+      <div class="challengeCard"><h4>Mission 3: Best public health action</h4><div class="cards"><button class="mission" data-mission="3" data-good="1"><b>Follow recommended vaccination guidance</b><br>Use trusted medical advice and correct schedule.</button><button class="mission" data-mission="3" data-good="0"><b>Believe random rumours</b><br>Health decisions should be science-based.</button></div></div>
+      <div class="explain" id="missionExplain"><h4>Mission Feedback</h4>Clear all 3 missions to unlock the quiz.</div>
+    </div>
+    <div class="panel box"><h3>Concept Panel</h3><div class="explain"><b>Main Concept:</b> Vaccines safely prepare the immune system before the real pathogen attacks.<br><br><b>Protection Logic:</b><br>• Vaccine gives training signal<br>• Body forms antibodies and memory cells<br>• Future response becomes faster and stronger<br><br><b>Why this matters:</b> Vaccination is one of the most powerful disease-prevention tools in public health.</div></div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel box">
+    <h3>Level 5: Vaccine Boss Quiz</h3>
+    <div class="cards">
+      <div><b>Q1. What is the main role of a vaccine?</b><div class="opt" data-q="q1" data-correct="1">To train the immune system against a specific disease</div><div class="opt" data-q="q1">To remove all blood from the body</div><div class="opt" data-q="q1">To replace the brain completely</div></div>
+      <div><b>Q2. What helps the body remember a pathogen?</b><div class="opt" data-q="q2" data-correct="1">Memory cells</div><div class="opt" data-q="q2">Plastic cells</div><div class="opt" data-q="q2">Only stomach acid</div></div>
+      <div><b>Q3. Why is vaccination important in public health?</b><div class="opt" data-q="q3" data-correct="1">It helps prevent disease and builds protection in communities</div><div class="opt" data-q="q3">It spreads rumours</div><div class="opt" data-q="q3">It increases infection on purpose</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="certificate">
+  <div class="panel box"><div class="cert"><div class="seal">💉🛡️🏅</div><h2>Certificate of Vaccine Science</h2><p>This certifies that</p><input id="studentName" placeholder="Enter Student Name"><p>has successfully completed <b>Lab 14: Vaccine Training Academy — 3D Edition</b></p><p>Skills: Vaccines • Antibodies • Memory Cells • Immune Training • Public Health • Disease Prevention</p><p><b>Developed by Dr AI Academy</b></p><button class="btn gold" onclick="window.print()">Print / Save Certificate</button></div></div>
+</section>
+
+<footer><div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div><div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div></footer>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const state={
+  voice:true,style:"standard",storyIndex:0,theoryDone:0,score:0,
+  trainerDone:false,labDone:false,missionDone:false,
+  factors:{},neutralized:0,missions:{},quizCorrect:{},
+  unlocked:{trainer:false,lab:false,mission:false,quiz:false,certificate:false},
+  futureAttackPassed:false
+};
+const stories=[
+  {title:"Story 1: What is a Vaccine?",body:"A vaccine is a preparation that helps the immune system learn how to fight a specific disease-causing pathogen. It gives training before the real danger comes.",points:["Vaccine trains the body.","Training happens before disease attack.","Vaccination is a prevention tool."]},
+  {title:"Story 2: Antibodies and Memory Cells",body:"After vaccination, the body can make antibodies and also form memory cells. These memory cells help the body remember the pathogen.",points:["Antibodies help in defense.","Memory cells store information.","Future response becomes faster."]},
+  {title:"Story 3: Faster Future Protection",body:"If the same pathogen enters later, the immune system can respond more quickly because it has already been trained. This reduces disease risk.",points:["Trained response is faster.","Protection becomes stronger.","Disease prevention improves."]},
+  {title:"Story 4: Public Health Importance",body:"Vaccination protects individuals and also helps communities. Following trusted medical guidance and proper schedules is important.",points:["Vaccines support public health.","Trusted guidance matters.","Correct schedule improves protection."]}
+];
+function speak(t){if(!state.voice||!("speechSynthesis" in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="en-IN"; u.rate=state.style==="indian"?0.88:0.98; speechSynthesis.speak(u)}
+function show(id){document.querySelectorAll(".section").forEach(s=>s.classList.remove("active")); $(id).classList.add("active"); document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id)); $(id).scrollIntoView({behavior:"smooth",block:"start"})}
+function simDone(){return (state.trainerDone?1:0)+(state.labDone?1:0)+(state.missionDone?1:0)}
+function status(){
+  $("theoryCount").textContent=Math.min(state.theoryDone,4)+"/4";
+  $("simCount").textContent=simDone()+"/3";
+  $("quizCount").textContent=Object.keys(state.quizCorrect).length+"/3";
+  $("score").textContent=state.score;
+  [["lvl1","tag1",state.theoryDone>=4,true],["lvl2","tag2",state.trainerDone,state.unlocked.trainer],["lvl3","tag3",state.labDone,state.unlocked.lab],["lvl4","tag4",state.missionDone,state.unlocked.mission]].forEach(([id,tag,done,active])=>{ $(id).classList.toggle("done",done); $(id).classList.toggle("activeLevel",active&&!done); $(tag).textContent=done?"Done":active?"Active":"Locked"; });
+  $("navTrainer").disabled=!state.unlocked.trainer; $("navLab").disabled=!state.unlocked.lab; $("navMission").disabled=!state.unlocked.mission; $("navQuiz").disabled=!state.unlocked.quiz; $("navCert").disabled=!state.unlocked.certificate;
+}
+function unlock(){
+  if(state.theoryDone>=4&&!state.unlocked.trainer){state.unlocked.trainer=true; speak("Immune Trainer unlocked."); show("trainer")}
+  if(state.trainerDone&&!state.unlocked.lab){state.unlocked.lab=true; speak("Protection Lab unlocked."); show("lab")}
+  if(state.labDone&&!state.unlocked.mission){state.unlocked.mission=true; speak("Vaccine Missions unlocked."); show("mission")}
+  if(state.missionDone&&!state.unlocked.quiz){state.unlocked.quiz=true; speak("Quiz unlocked."); show("quiz")}
+  if(Object.keys(state.quizCorrect).length>=3&&!state.unlocked.certificate){state.unlocked.certificate=true; speak("Certificate unlocked."); show("certificate")}
+  status();
+}
+function renderStory(){const s=stories[state.storyIndex]; $("storyBox").innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(x=>`<li>${x}</li>`).join("")}</ul>`; speak(s.title+". "+s.body)}
+function markTheory(){if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1; state.score+=15} if(state.storyIndex<3){state.storyIndex++; renderStory()} unlock();}
+
+const socketIds=["socket1","socket2","socket3","socket4"];
+function fillNextSocket(label){const next=socketIds.find(id=>!$(id).classList.contains("filled")); if(!next) return; $(next).classList.add("filled"); $(next).textContent=label;}
+function useChip(chip){
+  if(!state.unlocked.trainer || chip.classList.contains("used")) return;
+  const item=chip.dataset.item, good=chip.dataset.good==="1";
+  if(good){
+    if(!state.factors[item]){state.factors[item]=true; state.score+=10; fillNextSocket(item); chip.classList.add("ok","used");}
+    const c=Object.keys(state.factors).length;
+    $("factorCount").textContent=c+" / 4";
+    $("trainingStatus").textContent=c>=4?"Training Ready — Tap Pathogens":"Building";
+    $("trainerExplain").innerHTML=`<h4>Correct Factor</h4><b>${item}</b> helps the immune system become ready for future protection.`;
+    if(c>=4){ $("shieldAura").style.borderColor="rgba(140,255,193,.75)"; speak("Immune training ready. Now tap 3 pathogens in the arena."); }
+  }else{
+    chip.classList.add("bad");
+    $("trainerExplain").innerHTML=`<h4>Not a Good Protection Step</h4><b>${item}</b> does not help correct vaccine-based protection.`;
+  }
+  maybeCompleteTrainer();
+}
+function maybeCompleteTrainer(){
+  const c=Object.keys(state.factors).length;
+  if(c>=4 && state.neutralized>=3 && !state.trainerDone){
+    state.trainerDone=true; state.score+=30; $("trainingStatus").textContent="Complete";
+    $("trainerExplain").innerHTML="<h4>Immune Training Complete!</h4>You selected the correct vaccine-training factors and successfully neutralized 3 pathogens.";
+  }
+  unlock();
+}
+function neutralizePathogen(el){
+  if(Object.keys(state.factors).length<4 || el.classList.contains("dead")) return;
+  el.classList.add("dead");
+  state.neutralized += 1; state.score += 8; $("neutralizedCount").textContent=state.neutralized+" / 3";
+  $("trainerExplain").innerHTML=`<h4>Pathogen Neutralized</h4>Great! Trained antibodies respond faster after vaccination. Neutralized: ${state.neutralized}/3.`;
+  speak("Pathogen neutralized.");
+  maybeCompleteTrainer();
+}
+function updateLab(){
+  const c=+$("coverage").value, m=+$("memory").value, s=+$("safety").value;
+  $("coverageOut").textContent=c; $("memoryOut").textContent=m; $("safetyOut").textContent=s;
+  const score=Math.round((100-Math.abs(c-78))*0.35 + (100-Math.abs(m-82))*0.35 + (100-Math.abs(s-72))*0.30);
+  const finalScore=Math.max(0,Math.min(100,score));
+  $("defenseScore").textContent=finalScore; $("activityText").textContent=finalScore+"%"; $("activityBar").style.width=finalScore+"%";
+  $("readiness").textContent=finalScore>=75?"High":finalScore>=50?"Improving":"Low";
+  const op=finalScore>=75?.20:finalScore>=50?.48:.82;
+  ["labP1","labP2","labP3"].forEach(id=>$(id).style.opacity=op);
+  return finalScore;
+}
+function checkLab(){ const sc=updateLab(); if(sc>=75){ $("labExplain").innerHTML="<h4>Good Protection Score</h4>Now run the future attack test to see whether trained immunity works strongly."; } else { $("labExplain").innerHTML="<h4>Need Better Protection</h4>Try coverage around 78, memory strength around 82 and exposure safety around 72."; } }
+function runFutureAttack(){
+  const sc=updateLab();
+  if(sc>=75){
+    state.futureAttackPassed=true; state.score+=25; $("futureTest").textContent="Passed";
+    ["labP1","labP2","labP3"].forEach(id=>$(id).classList.add("dead"));
+    $("labExplain").innerHTML="<h4>Future Attack Test Passed!</h4>The immune system responded faster because vaccination and memory were strong.";
+    if(!state.labDone){state.labDone=true; state.score+=20;}
+    speak("Future attack successfully blocked.");
+  }else{
+    state.futureAttackPassed=false; $("futureTest").textContent="Failed";
+    $("labExplain").innerHTML="<h4>Future Attack Test Failed</h4>Your protection score is too low. Improve the sliders and test again.";
+  }
+  unlock();
+}
+function doMission(btn){
+  if(!state.unlocked.mission) return; const mission=btn.dataset.mission, good=btn.dataset.good==="1"; if(state.missions[mission]) return;
+  const group=[...document.querySelectorAll(`.mission[data-mission="${mission}"]`)];
+  if(good){ state.missions[mission]=true; state.score+=18; btn.classList.add("good","used"); $("missionExplain").innerHTML=`<h4>Mission ${mission} Cleared</h4>Correct! You used vaccine science reasoning properly.`; }
+  else { btn.classList.add("bad"); group.forEach(x=>{if(x.dataset.good==="1") x.classList.add("good")}); $("missionExplain").innerHTML=`<h4>Try Again Conceptually</h4>Think about immune memory, guidance and disease prevention.`; }
+  if(Object.keys(state.missions).length>=3&&!state.missionDone){state.missionDone=true; state.score+=25}
+  unlock();
+}
+function answerQuiz(opt){
+  if(!state.unlocked.quiz) return; const q=opt.dataset.q; if(state.quizCorrect[q]) return; const group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)];
+  if(opt.dataset.correct){ state.quizCorrect[q]=true; opt.classList.add("correct"); state.score+=20; }
+  else { opt.classList.add("wrong"); group.forEach(x=>{if(x.dataset.correct) x.classList.add("correct")}); }
+  unlock();
+}
+function attachParallax(sceneId, worldId){
+  const scene=$(sceneId), world=$(worldId); if(!scene||!world) return;
+  function move(clientX,clientY){ const r=scene.getBoundingClientRect(); const x=(clientX-r.left)/r.width-.5; const y=(clientY-r.top)/r.height-.5; world.style.transform=`rotateX(${(-y*10).toFixed(2)}deg) rotateY(${(x*16).toFixed(2)}deg)`; }
+  function reset(){ world.style.transform='rotateX(0deg) rotateY(0deg)'; }
+  scene.addEventListener('mousemove',e=>move(e.clientX,e.clientY));
+  scene.addEventListener('mouseleave',reset);
+  scene.addEventListener('touchmove',e=>{ const t=e.touches[0]; if(t) move(t.clientX,t.clientY); },{passive:true});
+  scene.addEventListener('touchend',reset);
+}
+
+$("startBtn").onclick=()=>show("theory");
+$("voiceBtn").onclick=()=>{state.voice=!state.voice; $("voiceBtn").textContent=state.voice?"🔊 Voice ON":"🔇 Voice OFF"};
+$("stopVoiceBtn").onclick=()=>speechSynthesis.cancel();
+$("voiceStyle").onchange=e=>state.style=e.target.value;
+$("nextStory").onclick=()=>{state.storyIndex=Math.min(3,state.storyIndex+1); renderStory()};
+$("prevStory").onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1); renderStory()};
+$("markTheory").onclick=markTheory;
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{ if(!b.disabled) show(b.dataset.go) });
+document.querySelectorAll('.interactiveChip').forEach(chip=>chip.onclick=()=>useChip(chip));
+document.querySelectorAll('.trainPathogen').forEach(p=>p.onclick=()=>neutralizePathogen(p));
+['coverage','memory','safety'].forEach(id=>$(id).oninput=updateLab);
+$("checkLab").onclick=checkLab; $("runAttack").onclick=runFutureAttack;
+document.querySelectorAll('.mission').forEach(m=>m.onclick=()=>doMission(m));
+document.querySelectorAll('.opt').forEach(o=>o.onclick=()=>answerQuiz(o));
+attachParallax('sceneTrainer','worldTrainer'); attachParallax('sceneLab','worldLab');
+renderStory(); updateLab(); status();
+})();
+</script>
+</body>
+</html>
