@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 15 — Nitrogen Cycle Reactor | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#07122d;--bg2:#0d4c68;--panel:rgba(12,30,62,.94);--cyan:#63f4ff;--gold:#ffe066;
+  --green:#8cffc1;--red:#ff8aa0;--violet:#d3a5ff;--text:#eef8ff;--muted:#b5cbe4;--soil:#5a3e2b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);overflow-x:hidden;background:
+radial-gradient(circle at 12% 8%,rgba(99,244,255,.20),transparent 26%),
+radial-gradient(circle at 88% 12%,rgba(255,224,102,.18),transparent 27%),
+radial-gradient(circle at 60% 90%,rgba(140,255,193,.12),transparent 24%),
+linear-gradient(135deg,var(--bg),var(--bg2) 60%,#09233d)}
+.watermark{position:fixed;inset:0;z-index:5;pointer-events:none;overflow:hidden}.wm{position:absolute;color:rgba(255,255,255,.07);font-size:clamp(30px,4vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap;letter-spacing:1px}
+.cornerMark{position:fixed;right:14px;bottom:14px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.76);background:rgba(4,13,24,.42);border:1px solid rgba(255,255,255,.20);padding:7px 12px;border-radius:999px;font-weight:1000;backdrop-filter:blur(6px)}
+.wrap{max-width:1500px;margin:auto;padding:16px;position:relative;z-index:10}.panel{background:var(--panel);border:1px solid rgba(99,244,255,.25);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.hero{padding:22px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(23,63,125,.9),rgba(9,25,57,.9))}.hero:after{content:"⚡ 🌱 🧪 ☁️ ♻️ ✨";position:absolute;right:22px;bottom:18px;font-size:34px;letter-spacing:10px;opacity:.28}
+.logo{position:absolute;right:18px;top:18px;background:rgba(0,0,0,.28);border:1px solid rgba(99,244,255,.3);border-radius:18px;padding:10px 14px;text-align:right}.logo b{display:block}.logo span{color:var(--cyan);font-size:.78rem;font-weight:900}
+.badge{display:inline-block;background:rgba(99,244,255,.12);border:1px solid rgba(99,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:1000;padding:9px 14px;font-size:.8rem}
+h1{font-size:clamp(2rem,4.5vw,4.2rem);line-height:1.02;margin:14px 0 10px;max-width:1100px;text-shadow:0 4px 0 rgba(0,0,0,.18)}.sub{color:var(--muted);max-width:1120px;line-height:1.6}
+.btn{border:0;border-radius:18px;padding:12px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;min-height:46px;touch-action:manipulation}.btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)}.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}.btn:disabled{opacity:.55}
+.actions,.nav,.storyBtns{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}.nav{position:sticky;top:0;z-index:60;background:rgba(7,18,45,.94);padding:8px;border-radius:18px;backdrop-filter:blur(10px)}.nav .active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.fun{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.fun div{background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.1);padding:10px;border-radius:16px;text-align:center;font-weight:900}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.labGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,470px);gap:16px;margin-top:16px;align-items:start}.box{padding:18px}
+.rule,.level{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px;margin-top:10px}.n{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(99,244,255,.16);color:var(--cyan);font-weight:1000}.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:.8rem;font-weight:900}
+.done{border-color:rgba(140,255,193,.55)!important;background:rgba(140,255,193,.1)!important}.activeLevel{border-color:rgba(255,224,102,.55)!important;background:rgba(255,224,102,.1)!important}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.stat{padding:12px;text-align:center;background:rgba(255,255,255,.055);border-radius:15px}.stat b{display:block;color:var(--cyan);font-size:1.3rem}
+.section{display:none}.section.active{display:block}.storyBox,.explain{padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(99,244,255,.11),rgba(255,255,255,.04));border:1px solid rgba(99,244,255,.22);line-height:1.65}.storyBox{min-height:300px}.storyBox h2:before,.explain h4:before{content:"💡 "}
+.scene{position:relative;min-height:660px;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#0e4e8f 0%,#6ecbff 28%,#9ce98a 28%,#6db35f 52%,#5a3e2b 52%,#332116 100%);border:1px solid rgba(255,255,255,.08);perspective:1300px}
+.sceneTip{position:absolute;left:16px;top:16px;z-index:3;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.14);padding:8px 12px;border-radius:14px;font-size:.85rem;color:#d7ebff}.screen{position:absolute;right:16px;top:16px;width:min(42%,390px);min-height:205px;background:rgba(5,21,46,.78);border:1px solid rgba(99,244,255,.22);border-radius:22px;padding:14px;pointer-events:none;z-index:8}.line{background:rgba(255,255,255,.065);padding:10px;border-radius:12px;margin:8px 0}
+.world3d{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .18s ease}
+.floor{position:absolute;left:50%;bottom:35px;transform:translateX(-50%) rotateX(82deg);width:72%;height:360px;background:radial-gradient(circle,rgba(140,255,193,.18),rgba(140,255,193,.02) 60%,transparent 74%);border-radius:50%;filter:blur(2px)}
+.cloud{position:absolute;top:55px;width:110px;height:42px;background:rgba(255,255,255,.88);border-radius:40px;box-shadow:40px 10px 0 8px rgba(255,255,255,.82),-22px 10px 0 8px rgba(255,255,255,.82);opacity:.92;animation:floatCloud 18s linear infinite}.c1{left:-120px}.c2{left:30%;top:95px;transform:scale(.8);animation-duration:24s}.c3{left:58%;top:70px;transform:scale(.95);animation-duration:20s}
+.lightning{position:absolute;left:18%;top:110px;font-size:58px;animation:flash 3.2s infinite}.lightning2{left:68%;top:128px;animation-delay:1.6s}
+.n2{position:absolute;font-weight:1000;color:#e3faff;text-shadow:0 0 10px rgba(255,255,255,.3);animation:nitrogenDrift 10s linear infinite;font-size:20px;z-index:2}.n2.small{font-size:16px;opacity:.8}
+.plant{position:absolute;left:50%;bottom:140px;transform:translateX(-50%) translateZ(30px);width:210px;height:240px;z-index:4}.stem{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:16px;height:165px;background:linear-gradient(180deg,#9cff8e,#0f6f38);border-radius:20px}.leaf{position:absolute;width:78px;height:36px;background:linear-gradient(135deg,#aaf58c,#2f9b48);border-radius:100% 0 100% 0;box-shadow:0 0 16px rgba(140,255,193,.25)}.leaf.l1{left:18px;bottom:68px;transform:rotate(-26deg)}.leaf.l2{right:18px;bottom:102px;transform:scaleX(-1) rotate(-18deg)}.leaf.l3{left:20px;bottom:145px;transform:rotate(-12deg)}.leaf.l4{right:22px;bottom:162px;transform:scaleX(-1) rotate(-10deg)}.flower{position:absolute;left:50%;top:6px;transform:translateX(-50%);font-size:36px;animation:flowerBob 2.8s ease-in-out infinite}
+.rootNet{position:absolute;left:50%;bottom:35px;transform:translateX(-50%) translateZ(8px);width:250px;height:150px;z-index:4}.root{position:absolute;background:linear-gradient(180deg,#d7b38c,#8b5e3c);border-radius:999px}.r1{left:114px;top:0;width:12px;height:72px}.r2{left:88px;top:44px;width:10px;height:78px;transform:rotate(28deg)}.r3{left:140px;top:40px;width:10px;height:85px;transform:rotate(-26deg)}.r4{left:66px;top:84px;width:8px;height:56px;transform:rotate(70deg)}.r5{left:162px;top:82px;width:8px;height:56px;transform:rotate(-70deg)}
+.node{position:absolute;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle,#fff7c2,#ffd84d);box-shadow:0 0 12px rgba(255,224,102,.55);display:grid;place-items:center;font-size:12px;font-weight:1000;color:#4a3200;animation:pulseNode 2.6s infinite}.node.n1{left:78px;top:70px}.node.n2r{left:154px;top:68px}.node.n3{left:49px;top:116px}.node.n4{left:182px;top:118px}
+.bug{position:absolute;font-size:26px;animation:crawl 7s linear infinite}.b1{left:20%;bottom:110px}.b2{left:72%;bottom:95px;animation-delay:2.4s}.b3{left:60%;bottom:140px;animation-delay:4.2s}
+.soilLabel{position:absolute;left:16px;bottom:16px;background:rgba(25,12,4,.28);border:1px solid rgba(255,255,255,.14);padding:8px 12px;border-radius:14px;z-index:7}.ai{position:absolute;left:26px;bottom:28px;font-size:86px;z-index:8}.ai:after{content:"Dr AI";display:block;font-size:14px;background:var(--gold);color:#2c1900;border-radius:999px;padding:6px 10px;font-weight:1000;text-align:center}
+.stageGrid,.socketGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.chip,.socket{padding:12px;border-radius:16px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.10);min-height:78px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;cursor:pointer;user-select:none;touch-action:manipulation;transition:transform .18s ease,border-color .18s ease,background .18s ease}.chip:hover,.socket:hover{transform:translateY(-2px)}.chip.ok{border-color:rgba(140,255,193,.55);background:rgba(140,255,193,.12)}.chip.bad{border-color:rgba(255,138,160,.55);background:rgba(255,138,160,.12)}.chip.used{opacity:.55;pointer-events:none}.socket.filled{border-color:rgba(99,244,255,.5);background:rgba(99,244,255,.12);color:var(--cyan)}
+.controlBox{padding:18px;border-radius:22px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}.cards{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}.opt,.mission{padding:14px;border-radius:16px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.1);color:white;cursor:pointer;text-align:left;min-height:52px;touch-action:manipulation}.mission b{color:var(--gold)}.opt.correct,.mission.good{border-color:rgba(140,255,193,.65);background:rgba(140,255,193,.14)}.opt.wrong,.mission.bad{border-color:rgba(255,138,160,.65);background:rgba(255,138,160,.14)}.mission.used{opacity:.82}
+.meter{padding:14px;background:rgba(255,255,255,.06);border-radius:16px;margin-top:10px}.meter label{display:flex;justify-content:space-between;color:var(--gold);font-weight:900}.bar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:8px}.bar span{height:100%;display:block;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.challengeCard{padding:14px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);margin-top:10px}.challengeCard h4{margin:0 0 8px}
+.cert{text-align:center;background:radial-gradient(circle at 20% 20%,rgba(99,244,255,.22),transparent 30%),linear-gradient(135deg,rgba(99,244,255,.18),rgba(255,224,102,.16));border:2px solid rgba(255,224,102,.45);border-radius:22px;padding:24px}.cert .seal{font-size:56px}.cert input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:white;text-align:center}
+footer{margin:20px 0 6px;padding:16px 20px;border:1px solid rgba(99,244,255,.25);border-radius:20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@keyframes floatCloud{0%{transform:translateX(0)}100%{transform:translateX(120vw)}}@keyframes flash{0%,90%,100%{opacity:.2;transform:scale(.9)}5%,7%{opacity:1;transform:scale(1.15)}}@keyframes nitrogenDrift{0%{transform:translate(0,0);opacity:0}10%{opacity:.9}100%{transform:translate(220px,320px);opacity:0}}@keyframes flowerBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}@keyframes pulseNode{0%,100%{transform:scale(.95)}50%{transform:scale(1.12)}}@keyframes crawl{0%{transform:translateX(0)}100%{transform:translateX(160px)}}
+@media(max-width:1000px){.grid2,.labGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 12px auto}.fun,.stats{grid-template-columns:1fr 1fr}.screen{position:relative;width:auto;right:auto;top:auto;margin:12px}.scene{min-height:810px}.nav{display:grid;grid-template-columns:1fr 1fr}.actions{display:grid;grid-template-columns:1fr 1fr}.actions .btn,.actions select{width:100%}.hero:after{display:none}.plant{left:50%}}
+@media(max-width:430px){.fun,.stats,.nav,.actions,.stageGrid,.socketGrid{grid-template-columns:1fr}.rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2}.ai{font-size:72px}.plant{width:180px}.rootNet{width:210px}}
+@media print{.hero,.nav,.section:not(#certificate),footer,.watermark,.cornerMark{display:none!important}.cert{color:#111;background:white;border:4px solid #111}.cert input{border:0;color:#111}}
+</style>
+</head>
+<body>
+<div class="watermark"><div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:20%;left:34%">Dr AI Academy</div><div class="wm" style="top:36%;left:-4%">Dr AI Academy</div><div class="wm" style="top:52%;left:45%">Dr AI Academy</div><div class="wm" style="top:68%;left:6%">Dr AI Academy</div><div class="wm" style="top:84%;left:44%">Dr AI Academy</div></div>
+<div class="cornerMark">Dr AI Academy</div>
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Invisible World Lab Series</span></div>
+  <div class="badge">LAB 15 • 3D INTERACTIVE • NITROGEN CYCLE</div>
+  <h1>NITROGEN CYCLE REACTOR:<br>THE ATMOSPHERE TO SOIL MISSION</h1>
+  <p class="sub">A dynamic Class 8 science lab game where Dr AI guides students through the nitrogen cycle. Students build the cycle stages, watch nitrogen move from air to soil to plants, and understand fixation, decomposition and plant uptake with Olympiad and NEET foundation.</p>
+  <div class="actions"><button class="btn gold" id="startBtn">🎮 Start Lab 15</button><button class="btn" id="voiceBtn">🔊 Voice ON</button><button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button><select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select></div>
+  <div class="fun"><div>☁️ Atmosphere to Soil</div><div>⚡ Nitrogen Fixation</div><div>🌱 Plant Uptake</div><div>🏅 Certificate Quest</div></div>
+  <div class="grid2">
+    <div class="panel box"><h3>Game Rules</h3>
+      <div class="rule"><div class="n">1</div><div><b>Learn nitrogen story</b><br>Understand why nitrogen is important and how it moves.</div><div class="tag">Level 1</div></div>
+      <div class="rule"><div class="n">2</div><div><b>Build the cycle</b><br>Select 4 correct nitrogen-cycle stages.</div><div class="tag">Level 2</div></div>
+      <div class="rule"><div class="n">3</div><div><b>Run the reactor</b><br>Balance fixation, decomposition and uptake.</div><div class="tag">Level 3</div></div>
+      <div class="rule"><div class="n">4</div><div><b>Solve mission challenges</b><br>Apply the cycle to real biology concepts.</div><div class="tag">Level 4</div></div>
+    </div>
+    <div class="panel box"><h3>Level Map</h3>
+      <div class="level activeLevel" id="lvl1"><div class="n">1</div><div><b>Story Briefing</b><br><small>Complete 4 story cards.</small></div><div class="tag" id="tag1">Active</div></div>
+      <div class="level" id="lvl2"><div class="n">2</div><div><b>Cycle Builder</b><br><small>Fill 4 cycle sockets.</small></div><div class="tag" id="tag2">Locked</div></div>
+      <div class="level" id="lvl3"><div class="n">3</div><div><b>Reactor Lab</b><br><small>Reach 75+ and pass nitrogen flow test.</small></div><div class="tag" id="tag3">Locked</div></div>
+      <div class="level" id="lvl4"><div class="n">4</div><div><b>Mission + Quiz</b><br><small>Clear challenges and answer quiz.</small></div><div class="tag" id="tag4">Locked</div></div>
+      <div class="stats"><div class="stat"><b id="theoryCount">0/4</b><span>Story</span></div><div class="stat"><b id="simCount">0/3</b><span>Levels</span></div><div class="stat"><b id="quizCount">0/3</b><span>Quiz</span></div><div class="stat"><b id="score">0</b><span>Score</span></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="nav"><button class="btn gold active" data-go="theory">Story</button><button class="btn secondary" data-go="builder" id="navBuilder" disabled>Builder</button><button class="btn secondary" data-go="reactor" id="navReactor" disabled>Reactor</button><button class="btn secondary" data-go="mission" id="navMission" disabled>Mission</button><button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Quiz</button><button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button></div>
+
+<section class="section active" id="theory">
+  <div class="grid2">
+    <div class="panel box"><h3>Dr AI Story Briefing</h3><div class="storyBox" id="storyBox"></div><div class="storyBtns"><button class="btn secondary" id="prevStory">← Previous</button><button class="btn" id="nextStory">Next Story →</button><button class="btn gold" id="markTheory">Mark Story Complete</button></div></div>
+    <div class="panel box"><h3>What Students Learn</h3><div class="explain"><b>NCERT Link:</b> Nitrogen is important for living organisms. Atmospheric nitrogen cannot be used directly by most plants, so it must be converted into usable forms.<br><br><b>Olympiad Link:</b> Biogeochemical cycles, soil fertility, nitrogen fixation and plant nutrition.<br><br><b>NEET Foundation:</b> Nitrogen fixation, Rhizobium, decomposition, nitrates, plant uptake and nutrient cycles.</div></div>
+  </div>
+</section>
+
+<section class="section" id="builder">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 2: 3D Nitrogen Cycle Arena</h3>
+      <div class="scene" id="sceneBuilder">
+        <div class="sceneTip">Move mouse / finger for 3D feel • Watch nitrogen travel from air to roots</div>
+        <div class="screen"><h3>Dr AI Cycle Scanner</h3><div class="line">Correct Stages: <b id="stageCount">0 / 4</b></div><div class="line">Cycle Status: <b id="cycleStatus">Waiting</b></div><div class="line">Mission: Build the nitrogen cycle path.</div></div>
+        <div class="world3d" id="worldBuilder">
+          <div class="floor"></div>
+          <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+          <div class="lightning">⚡</div><div class="lightning lightning2">⚡</div>
+          <div class="n2" style="left:16%;top:92px">N₂</div><div class="n2 small" style="left:22%;top:70px;animation-delay:1.2s">N₂</div><div class="n2" style="left:62%;top:116px;animation-delay:2.5s">N₂</div><div class="n2 small" style="left:72%;top:82px;animation-delay:3.5s">N₂</div>
+          <div class="plant"><div class="stem"></div><div class="leaf l1"></div><div class="leaf l2"></div><div class="leaf l3"></div><div class="leaf l4"></div><div class="flower">🌼</div></div>
+          <div class="rootNet"><div class="root r1"></div><div class="root r2"></div><div class="root r3"></div><div class="root r4"></div><div class="root r5"></div><div class="node n1">N</div><div class="node n2r">N</div><div class="node n3">N</div><div class="node n4">N</div></div>
+          <div class="bug b1">🪱</div><div class="bug b2">🦠</div><div class="bug b3">🍂</div>
+        </div>
+        <div class="soilLabel">Soil Zone • Rhizobium • Decomposers • Nitrates</div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+    <div class="panel box">
+      <h3>Interactive Cycle Console</h3>
+      <div class="controlBox">
+        <p><b>Step A:</b> Tap the correct cycle stages to fill the 4 sockets.</p>
+        <div class="stageGrid">
+          <div class="chip" data-item="Nitrogen Fixation" data-good="1">⚡ Nitrogen Fixation</div>
+          <div class="chip" data-item="Rhizobium in Root Nodules" data-good="1">🟡 Rhizobium in Root Nodules</div>
+          <div class="chip" data-item="Decomposition" data-good="1">🍂 Decomposition</div>
+          <div class="chip" data-item="Plant Uptake" data-good="1">🌱 Plant Uptake</div>
+          <div class="chip" data-item="Plastic Formation" data-good="0">🧴 Plastic Formation</div>
+          <div class="chip" data-item="Metal Melting" data-good="0">🔩 Metal Melting</div>
+        </div>
+        <p style="margin-top:14px"><b>Nitrogen Cycle Sockets</b></p>
+        <div class="socketGrid"><div class="socket" id="socket1">Socket 1</div><div class="socket" id="socket2">Socket 2</div><div class="socket" id="socket3">Socket 3</div><div class="socket" id="socket4">Socket 4</div></div>
+      </div>
+      <div class="explain" id="builderExplain"><h4>Builder Feedback</h4>Fill the four correct cycle sockets to complete the nitrogen-cycle builder.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="reactor">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 3: Nitrogen Flow Reactor</h3>
+      <div class="scene" id="sceneReactor">
+        <div class="sceneTip">3D view • Adjust sliders • Run nitrogen flow test</div>
+        <div class="screen"><h3>Reactor Meter</h3><div class="line">Nitrogen Score: <b id="flowScore">0</b></div><div class="line">Plant Nutrition: <b id="nutritionState">Low</b></div><div class="line">Flow Test: <b id="flowTest">Not Run</b></div></div>
+        <div class="world3d" id="worldReactor">
+          <div class="floor"></div>
+          <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+          <div class="lightning">⚡</div><div class="lightning lightning2">⚡</div>
+          <div class="n2" style="left:18%;top:96px">N₂</div><div class="n2 small" style="left:26%;top:76px;animation-delay:1.2s">NH₄⁺</div><div class="n2" style="left:63%;top:120px;animation-delay:2.5s">NO₃⁻</div><div class="n2 small" style="left:73%;top:86px;animation-delay:3.5s">N₂</div>
+          <div class="plant" id="reactorPlant"><div class="stem"></div><div class="leaf l1"></div><div class="leaf l2"></div><div class="leaf l3"></div><div class="leaf l4"></div><div class="flower">🌼</div></div>
+          <div class="rootNet"><div class="root r1"></div><div class="root r2"></div><div class="root r3"></div><div class="root r4"></div><div class="root r5"></div><div class="node n1">N</div><div class="node n2r">N</div><div class="node n3">N</div><div class="node n4">N</div></div>
+          <div class="bug b1">🪱</div><div class="bug b2">🦠</div><div class="bug b3">🍂</div>
+        </div>
+        <div class="soilLabel">Reactor Mode • Balance the nitrogen cycle for plant growth</div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+    <div class="panel box">
+      <h3>Controls: Balance the Nitrogen Cycle</h3>
+      <div class="controlBox">
+        <div class="meter"><label>Nitrogen Fixation <span id="fixOut">50</span></label><input type="range" min="0" max="100" value="50" id="fix"></div>
+        <div class="meter"><label>Decomposition Rate <span id="decompOut">50</span></label><input type="range" min="0" max="100" value="50" id="decomp"></div>
+        <div class="meter"><label>Plant Uptake <span id="uptakeOut">50</span></label><input type="range" min="0" max="100" value="50" id="uptake"></div>
+        <button class="btn green" id="checkFlow">♻️ Check Nitrogen Score</button>
+        <button class="btn gold" id="runFlow">⚡ Run Nitrogen Flow Test</button>
+      </div>
+      <div class="explain" id="reactorExplain"><h4>Reactor Feedback</h4>Set the sliders, then run the flow test. You need a score of 75+ to pass.</div>
+      <div class="meter"><label>Cycle Power <span id="activityText">0%</span></label><div class="bar"><span id="activityBar"></span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mission">
+  <div class="grid2">
+    <div class="panel box">
+      <h3>Level 4: Nitrogen Cycle Mission Challenges</h3>
+      <div class="challengeCard"><h4>Mission 1: Why can't most plants use atmospheric nitrogen directly?</h4><div class="cards"><button class="mission" data-mission="1" data-good="1"><b>It must first be converted into usable nitrogen compounds</b><br>Plants mainly take usable forms like nitrates from soil.</button><button class="mission" data-mission="1" data-good="0"><b>Plants use only oxygen as food</b><br>This does not explain nitrogen nutrition.</button></div></div>
+      <div class="challengeCard"><h4>Mission 2: What is the role of Rhizobium?</h4><div class="cards"><button class="mission" data-mission="2" data-good="1"><b>It helps fix nitrogen in root nodules</b><br>Rhizobium converts atmospheric nitrogen into usable forms.</button><button class="mission" data-mission="2" data-good="0"><b>It melts metals in the soil</b><br>This is unrelated.</button></div></div>
+      <div class="challengeCard"><h4>Mission 3: Why are decomposers important?</h4><div class="cards"><button class="mission" data-mission="3" data-good="1"><b>They return nutrients to the soil</b><br>Decomposition recycles matter in ecosystems.</button><button class="mission" data-mission="3" data-good="0"><b>They remove all roots from plants</b><br>This is incorrect.</button></div></div>
+      <div class="explain" id="missionExplain"><h4>Mission Feedback</h4>Clear all 3 missions to unlock the quiz.</div>
+    </div>
+    <div class="panel box"><h3>Concept Panel</h3><div class="explain"><b>Main Concept:</b> Nitrogen moves between atmosphere, soil, microorganisms and plants.<br><br><b>Cycle Logic:</b><br>• Nitrogen fixation makes atmospheric nitrogen usable<br>• Decomposers recycle nitrogen back to soil<br>• Plants absorb usable nitrogen compounds<br><br><b>Why this matters:</b> The nitrogen cycle supports growth, proteins, DNA and overall ecosystem balance.</div></div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel box"><h3>Level 5: Nitrogen Boss Quiz</h3><div class="cards">
+    <div><b>Q1. Which bacterium is famous for nitrogen fixation in root nodules?</b><div class="opt" data-q="q1" data-correct="1">Rhizobium</div><div class="opt" data-q="q1">Lactobacillus</div><div class="opt" data-q="q1">Yeast</div></div>
+    <div><b>Q2. Which process returns nutrients from dead matter back to soil?</b><div class="opt" data-q="q2" data-correct="1">Decomposition</div><div class="opt" data-q="q2">Plastic making</div><div class="opt" data-q="q2">Metal polishing</div></div>
+    <div><b>Q3. Why is nitrogen important for living organisms?</b><div class="opt" data-q="q3" data-correct="1">It is needed for proteins and other biomolecules</div><div class="opt" data-q="q3">It is only for rock formation</div><div class="opt" data-q="q3">It has no role in growth</div></div>
+  </div></div>
+</section>
+
+<section class="section" id="certificate"><div class="panel box"><div class="cert"><div class="seal">⚡🌱🏅</div><h2>Certificate of Nitrogen Cycle Science</h2><p>This certifies that</p><input id="studentName" placeholder="Enter Student Name"><p>has successfully completed <b>Lab 15: Nitrogen Cycle Reactor</b></p><p>Skills: Nitrogen Fixation • Rhizobium • Decomposition • Plant Uptake • Soil Fertility • Nutrient Cycles</p><p><b>Developed by Dr AI Academy</b></p><button class="btn gold" onclick="window.print()">Print / Save Certificate</button></div></div></section>
+
+<footer><div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div><div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div></footer>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const state={voice:true,style:"standard",storyIndex:0,theoryDone:0,score:0,builderDone:false,reactorDone:false,missionDone:false,stages:{},missions:{},quizCorrect:{},unlocked:{builder:false,reactor:false,mission:false,quiz:false,certificate:false},flowTestPassed:false};
+const stories=[
+{title:"Story 1: Why Nitrogen Matters",body:"Nitrogen is needed to make proteins and other important biomolecules. But most plants cannot use atmospheric nitrogen directly.",points:["Nitrogen is essential for life.","Atmospheric nitrogen is not directly usable by most plants.","Living systems need nitrogen compounds."]},
+{title:"Story 2: Nitrogen Fixation",body:"Nitrogen fixation changes atmospheric nitrogen into usable forms. Lightning and certain bacteria help in this process.",points:["Lightning can help nitrogen fixation.","Some bacteria also fix nitrogen.","This makes nitrogen available to ecosystems."]},
+{title:"Story 3: Rhizobium and Plants",body:"Rhizobium bacteria live in root nodules of some plants and help convert nitrogen into usable compounds. Plants then absorb these nutrients.",points:["Rhizobium lives in root nodules.","It helps convert nitrogen.","Plants absorb usable nitrogen from soil."]},
+{title:"Story 4: Decomposers Recycle Nutrients",body:"When plants and animals die, decomposers break them down and return nutrients to the soil. This keeps the nitrogen cycle running.",points:["Decomposers recycle matter.","Nitrogen returns to soil.","The cycle supports ecosystem balance."]}
+];
+function speak(t){if(!state.voice||!("speechSynthesis" in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="en-IN"; u.rate=state.style==="indian"?0.88:0.98; speechSynthesis.speak(u)}
+function show(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.go===id)); $(id).scrollIntoView({behavior:'smooth',block:'start'})}
+function simDone(){return (state.builderDone?1:0)+(state.reactorDone?1:0)+(state.missionDone?1:0)}
+function status(){ $('theoryCount').textContent=Math.min(state.theoryDone,4)+"/4"; $('simCount').textContent=simDone()+"/3"; $('quizCount').textContent=Object.keys(state.quizCorrect).length+"/3"; $('score').textContent=state.score; [["lvl1","tag1",state.theoryDone>=4,true],["lvl2","tag2",state.builderDone,state.unlocked.builder],["lvl3","tag3",state.reactorDone,state.unlocked.reactor],["lvl4","tag4",state.missionDone,state.unlocked.mission]].forEach(([id,tag,done,active])=>{$(id).classList.toggle('done',done); $(id).classList.toggle('activeLevel',active&&!done); $(tag).textContent=done?'Done':active?'Active':'Locked'}); $('navBuilder').disabled=!state.unlocked.builder; $('navReactor').disabled=!state.unlocked.reactor; $('navMission').disabled=!state.unlocked.mission; $('navQuiz').disabled=!state.unlocked.quiz; $('navCert').disabled=!state.unlocked.certificate; }
+function unlock(){ if(state.theoryDone>=4&&!state.unlocked.builder){state.unlocked.builder=true; speak('Cycle Builder unlocked.'); show('builder')} if(state.builderDone&&!state.unlocked.reactor){state.unlocked.reactor=true; speak('Nitrogen Reactor unlocked.'); show('reactor')} if(state.reactorDone&&!state.unlocked.mission){state.unlocked.mission=true; speak('Mission level unlocked.'); show('mission')} if(state.missionDone&&!state.unlocked.quiz){state.unlocked.quiz=true; speak('Quiz unlocked.'); show('quiz')} if(Object.keys(state.quizCorrect).length>=3&&!state.unlocked.certificate){state.unlocked.certificate=true; speak('Certificate unlocked.'); show('certificate')} status(); }
+function renderStory(){const s=stories[state.storyIndex]; $('storyBox').innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(x=>`<li>${x}</li>`).join('')}</ul>`; speak(s.title+'. '+s.body)}
+function markTheory(){if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1; state.score+=15} if(state.storyIndex<3){state.storyIndex++; renderStory()} unlock();}
+const socketIds=['socket1','socket2','socket3','socket4'];
+function fillNextSocket(label){const next=socketIds.find(id=>!$(id).classList.contains('filled')); if(!next) return; $(next).classList.add('filled'); $(next).textContent=label;}
+function useChip(chip){ if(!state.unlocked.builder||chip.classList.contains('used')) return; const item=chip.dataset.item, good=chip.dataset.good==='1'; if(good){ if(!state.stages[item]){state.stages[item]=true; state.score+=10; fillNextSocket(item); chip.classList.add('ok','used');} const c=Object.keys(state.stages).length; $('stageCount').textContent=c+' / 4'; $('cycleStatus').textContent=c>=4?'Cycle Ready':'Building'; $('builderExplain').innerHTML=`<h4>Correct Cycle Stage</h4><b>${item}</b> is an important part of the nitrogen cycle.`; if(c>=4&&!state.builderDone){state.builderDone=true; state.score+=25; $('builderExplain').innerHTML='<h4>Cycle Builder Complete!</h4>You successfully built the nitrogen cycle path from atmosphere to soil to plants.'; speak('Nitrogen cycle builder complete.'); }} else { chip.classList.add('bad'); $('builderExplain').innerHTML=`<h4>Not a Cycle Stage</h4><b>${item}</b> is not part of the nitrogen cycle.`; } unlock(); }
+function updateReactor(){ const f=+$('fix').value, d=+$('decomp').value, u=+$('uptake').value; $('fixOut').textContent=f; $('decompOut').textContent=d; $('uptakeOut').textContent=u; const score=Math.round((100-Math.abs(f-80))*0.35 + (100-Math.abs(d-72))*0.30 + (100-Math.abs(u-78))*0.35); const finalScore=Math.max(0,Math.min(100,score)); $('flowScore').textContent=finalScore; $('activityText').textContent=finalScore+'%'; $('activityBar').style.width=finalScore+'%'; $('nutritionState').textContent=finalScore>=75?'Strong':finalScore>=50?'Improving':'Low'; const plant=$('reactorPlant'); plant.style.filter=finalScore>=75?'drop-shadow(0 0 18px rgba(140,255,193,.6))':'none'; plant.style.transform=`translateX(-50%) translateZ(30px) scale(${0.88+finalScore/500})`; return finalScore; }
+function checkFlow(){ const sc=updateReactor(); if(sc>=75){ $('reactorExplain').innerHTML='<h4>Good Nitrogen Balance</h4>Now run the nitrogen flow test to see whether the cycle supports strong plant nutrition.'; } else { $('reactorExplain').innerHTML='<h4>Need Better Balance</h4>Try nitrogen fixation around 80, decomposition around 72 and plant uptake around 78.'; }}
+function runFlow(){ const sc=updateReactor(); if(sc>=75){ state.flowTestPassed=true; state.score+=25; $('flowTest').textContent='Passed'; $('reactorExplain').innerHTML='<h4>Nitrogen Flow Test Passed!</h4>Atmosphere, microbes, soil and plants are working together well. The plant is receiving nitrogen properly.'; if(!state.reactorDone){state.reactorDone=true; state.score+=20;} speak('Nitrogen flow test passed.'); } else { state.flowTestPassed=false; $('flowTest').textContent='Failed'; $('reactorExplain').innerHTML='<h4>Nitrogen Flow Test Failed</h4>Your reactor balance is too low. Improve the sliders and test again.'; } unlock(); }
+function doMission(btn){ if(!state.unlocked.mission) return; const mission=btn.dataset.mission, good=btn.dataset.good==='1'; if(state.missions[mission]) return; const group=[...document.querySelectorAll(`.mission[data-mission="${mission}"]`)]; if(good){ state.missions[mission]=true; state.score+=18; btn.classList.add('good','used'); $('missionExplain').innerHTML=`<h4>Mission ${mission} Cleared</h4>Correct! You applied nitrogen-cycle logic properly.`; } else { btn.classList.add('bad'); group.forEach(x=>{if(x.dataset.good==='1') x.classList.add('good')}); $('missionExplain').innerHTML='<h4>Try Again Conceptually</h4>Think about fixation, root nodules and decomposition.'; } if(Object.keys(state.missions).length>=3&&!state.missionDone){state.missionDone=true; state.score+=25} unlock(); }
+function answerQuiz(opt){ if(!state.unlocked.quiz) return; const q=opt.dataset.q; if(state.quizCorrect[q]) return; const group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)]; if(opt.dataset.correct){ state.quizCorrect[q]=true; opt.classList.add('correct'); state.score+=20; } else { opt.classList.add('wrong'); group.forEach(x=>{if(x.dataset.correct) x.classList.add('correct')}); } unlock(); }
+function attachParallax(sceneId, worldId){ const scene=$(sceneId), world=$(worldId); if(!scene||!world) return; function move(clientX,clientY){ const r=scene.getBoundingClientRect(); const x=(clientX-r.left)/r.width-.5; const y=(clientY-r.top)/r.height-.5; world.style.transform=`rotateX(${(-y*9).toFixed(2)}deg) rotateY(${(x*15).toFixed(2)}deg)`; } function reset(){ world.style.transform='rotateX(0deg) rotateY(0deg)'; } scene.addEventListener('mousemove',e=>move(e.clientX,e.clientY)); scene.addEventListener('mouseleave',reset); scene.addEventListener('touchmove',e=>{const t=e.touches[0]; if(t) move(t.clientX,t.clientY)}, {passive:true}); scene.addEventListener('touchend',reset); }
+$('startBtn').onclick=()=>show('theory'); $('voiceBtn').onclick=()=>{state.voice=!state.voice; $('voiceBtn').textContent=state.voice?'🔊 Voice ON':'🔇 Voice OFF'}; $('stopVoiceBtn').onclick=()=>speechSynthesis.cancel(); $('voiceStyle').onchange=e=>state.style=e.target.value; $('nextStory').onclick=()=>{state.storyIndex=Math.min(3,state.storyIndex+1); renderStory()}; $('prevStory').onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1); renderStory()}; $('markTheory').onclick=markTheory; document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(!b.disabled) show(b.dataset.go)}); document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>useChip(c)); ['fix','decomp','uptake'].forEach(id=>$(id).oninput=updateReactor); $('checkFlow').onclick=checkFlow; $('runFlow').onclick=runFlow; document.querySelectorAll('.mission').forEach(m=>m.onclick=()=>doMission(m)); document.querySelectorAll('.opt').forEach(o=>o.onclick=()=>answerQuiz(o)); attachParallax('sceneBuilder','worldBuilder'); attachParallax('sceneReactor','worldReactor'); renderStory(); updateReactor(); status();
+})();
+</script>
+</body>
+</html>

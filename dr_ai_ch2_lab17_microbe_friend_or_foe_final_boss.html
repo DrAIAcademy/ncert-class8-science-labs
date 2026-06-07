@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 17 — Microbe Friend or Foe Final Boss | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#07122d;--bg2:#123b7a;--panel:rgba(12,30,62,.94);--cyan:#63f4ff;--gold:#ffe066;
+  --green:#8cffc1;--red:#ff8aa0;--violet:#d3a5ff;--text:#eef8ff;--muted:#b5cbe4
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);overflow-x:hidden;background:
+radial-gradient(circle at 12% 8%,rgba(99,244,255,.20),transparent 26%),
+radial-gradient(circle at 88% 12%,rgba(255,224,102,.18),transparent 27%),
+radial-gradient(circle at 60% 90%,rgba(211,165,255,.13),transparent 24%),
+linear-gradient(135deg,var(--bg),var(--bg2) 60%,#09233d)}
+.watermark{position:fixed;inset:0;z-index:5;pointer-events:none;overflow:hidden}.wm{position:absolute;color:rgba(255,255,255,.075);font-size:clamp(30px,4vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap;letter-spacing:1px}
+.cornerMark{position:fixed;right:14px;bottom:14px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.76);background:rgba(4,13,24,.42);border:1px solid rgba(255,255,255,.20);padding:7px 12px;border-radius:999px;font-weight:1000;backdrop-filter:blur(6px)}
+.wrap{max-width:1500px;margin:auto;padding:16px;position:relative;z-index:10}.panel{background:var(--panel);border:1px solid rgba(99,244,255,.25);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.hero{padding:22px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(23,63,125,.9),rgba(9,25,57,.9))}.hero:after{content:"🦠 🧫 🛡️ 🌱 💉 ✨";position:absolute;right:22px;bottom:18px;font-size:34px;letter-spacing:10px;opacity:.28}
+.logo{position:absolute;right:18px;top:18px;background:rgba(0,0,0,.28);border:1px solid rgba(99,244,255,.3);border-radius:18px;padding:10px 14px;text-align:right}.logo b{display:block}.logo span{color:var(--cyan);font-size:.78rem;font-weight:900}
+.badge{display:inline-block;background:rgba(99,244,255,.12);border:1px solid rgba(99,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:1000;padding:9px 14px;font-size:.8rem}
+h1{font-size:clamp(2rem,4.5vw,4.2rem);line-height:1.02;margin:14px 0 10px;max-width:1120px;text-shadow:0 4px 0 rgba(0,0,0,.18)}.sub{color:var(--muted);max-width:1140px;line-height:1.6}
+.btn{border:0;border-radius:18px;padding:12px 16px;font-weight:900;cursor:pointer;background:linear-gradient(135deg,var(--cyan),#baf7ff);color:#04131e;min-height:46px;touch-action:manipulation}.btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)}.btn.gold{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}.btn.green{background:linear-gradient(135deg,var(--green),#ddffe8);color:#031b0c}.btn:disabled{opacity:.55}
+.actions,.nav,.storyBtns{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}.nav{position:sticky;top:0;z-index:60;background:rgba(7,18,45,.94);padding:8px;border-radius:18px;backdrop-filter:blur(10px)}.nav .active{background:linear-gradient(135deg,var(--gold),#fff1b0);color:#311b00}
+.fun{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.fun div{background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.1);padding:10px;border-radius:16px;text-align:center;font-weight:900}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.labGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,470px);gap:16px;margin-top:16px;align-items:start}.box{padding:18px}
+.rule,.level{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px;margin-top:10px}.n{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(99,244,255,.16);color:var(--cyan);font-weight:1000}.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:.8rem;font-weight:900}
+.done{border-color:rgba(140,255,193,.55)!important;background:rgba(140,255,193,.1)!important}.activeLevel{border-color:rgba(255,224,102,.55)!important;background:rgba(255,224,102,.1)!important}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.stat{padding:12px;text-align:center;background:rgba(255,255,255,.055);border-radius:15px}.stat b{display:block;color:var(--cyan);font-size:1.3rem}
+.section{display:none}.section.active{display:block}.storyBox,.explain{padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(99,244,255,.11),rgba(255,255,255,.04));border:1px solid rgba(99,244,255,.22);line-height:1.65}.storyBox{min-height:300px}.storyBox h2:before,.explain h4:before{content:"💡 "}
+.scene{position:relative;min-height:680px;border-radius:22px;overflow:hidden;background:
+radial-gradient(circle at 20% 18%,rgba(99,244,255,.14),transparent 26%),
+radial-gradient(circle at 78% 22%,rgba(255,224,102,.13),transparent 22%),
+linear-gradient(180deg,#102f62 0%,#0a2f68 45%,#10213a 45%,#091526 100%);border:1px solid rgba(255,255,255,.08);perspective:1300px}
+.sceneTip{position:absolute;left:16px;top:16px;z-index:8;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.14);padding:8px 12px;border-radius:14px;font-size:.85rem;color:#d7ebff}.screen{position:absolute;right:16px;top:16px;width:min(42%,390px);min-height:205px;background:rgba(5,21,46,.78);border:1px solid rgba(99,244,255,.22);border-radius:22px;padding:14px;pointer-events:none;z-index:8}.line{background:rgba(255,255,255,.065);padding:10px;border-radius:12px;margin:8px 0}
+.world3d{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .18s ease}.floor{position:absolute;left:50%;bottom:20px;transform:translateX(-50%) rotateX(82deg);width:78%;height:410px;background:radial-gradient(circle,rgba(99,244,255,.13),rgba(99,244,255,.02) 62%,transparent 76%);border-radius:50%;filter:blur(2px)}
+.portal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) translateZ(20px);width:310px;height:310px;border-radius:50%;border:8px solid rgba(99,244,255,.45);background:radial-gradient(circle,rgba(99,244,255,.22),rgba(211,165,255,.14),transparent 70%);box-shadow:0 0 40px rgba(99,244,255,.28);animation:portalPulse 3.4s infinite}
+.portal:before{content:"MICROBE UNIVERSE";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:1000;color:#ddfbff;background:rgba(8,20,42,.62);padding:8px 14px;border-radius:999px;letter-spacing:.5px}
+.orb{position:absolute;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:32px;cursor:pointer;user-select:none;box-shadow:0 0 20px rgba(255,255,255,.16);transition:transform .2s ease,opacity .2s ease}.orb:hover{transform:scale(1.12)}.orb.friend{background:radial-gradient(circle,#ddffe8,#22c55e)}.orb.foe{background:radial-gradient(circle,#ffe4e9,#ef4444)}.orb.neutral{background:radial-gradient(circle,#e0f2fe,#38bdf8)}
+.o1{left:18%;top:160px;animation:orbitA 7s infinite}.o2{left:62%;top:150px;animation:orbitB 8s infinite}.o3{left:24%;top:440px;animation:orbitB 7.5s infinite}.o4{left:68%;top:430px;animation:orbitA 8.4s infinite}.o5{left:48%;top:112px;animation:floatY 5s infinite}.o6{left:47%;top:500px;animation:floatY 5.6s infinite}.orb.captured{opacity:.15;transform:scale(.25);pointer-events:none}
+.beam{position:absolute;height:2px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(99,244,255,.9),rgba(255,255,255,0));box-shadow:0 0 12px rgba(99,244,255,.4);animation:beamMove 6s linear infinite;opacity:.55}.b1{left:-160px;top:120px;width:220px}.b2{left:-200px;top:210px;width:270px;animation-delay:1.8s}.b3{left:-170px;top:300px;width:230px;animation-delay:3.4s}
+.ai{position:absolute;left:26px;bottom:28px;font-size:86px;z-index:8}.ai:after{content:"Dr AI";display:block;font-size:14px;background:var(--gold);color:#2c1900;border-radius:999px;padding:6px 10px;font-weight:1000;text-align:center}
+.chipGrid,.socketGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.chip,.socket{padding:12px;border-radius:16px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.10);min-height:78px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;cursor:pointer;user-select:none;touch-action:manipulation;transition:transform .18s ease,border-color .18s ease,background .18s ease}.chip:hover,.socket:hover{transform:translateY(-2px)}.chip.ok{border-color:rgba(140,255,193,.55);background:rgba(140,255,193,.12)}.chip.bad{border-color:rgba(255,138,160,.55);background:rgba(255,138,160,.12)}.chip.used{opacity:.55;pointer-events:none}.socket.filled{border-color:rgba(99,244,255,.5);background:rgba(99,244,255,.12);color:var(--cyan)}
+.controlBox{padding:18px;border-radius:22px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09)}.cards{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}.opt,.mission{padding:14px;border-radius:16px;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.1);color:white;cursor:pointer;text-align:left;min-height:52px;touch-action:manipulation}.mission b{color:var(--gold)}.opt.correct,.mission.good{border-color:rgba(140,255,193,.65);background:rgba(140,255,193,.14)}.opt.wrong,.mission.bad{border-color:rgba(255,138,160,.65);background:rgba(255,138,160,.14)}.mission.used{opacity:.82}
+.meter{padding:14px;background:rgba(255,255,255,.06);border-radius:16px;margin-top:10px}.meter label{display:flex;justify-content:space-between;color:var(--gold);font-weight:900}.bar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:8px}.bar span{height:100%;display:block;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.challengeCard{padding:14px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);margin-top:10px}.challengeCard h4{margin:0 0 8px}
+.cert{text-align:center;background:radial-gradient(circle at 20% 20%,rgba(99,244,255,.22),transparent 30%),linear-gradient(135deg,rgba(99,244,255,.18),rgba(255,224,102,.16));border:2px solid rgba(255,224,102,.45);border-radius:22px;padding:24px}.cert .seal{font-size:56px}.cert input{width:min(360px,100%);padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);color:white;text-align:center}
+footer{margin:20px 0 6px;padding:16px 20px;border:1px solid rgba(99,244,255,.25);border-radius:20px;background:rgba(9,18,32,.78);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted)}footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@keyframes portalPulse{0%,100%{box-shadow:0 0 24px rgba(99,244,255,.25);transform:translate(-50%,-50%) translateZ(20px) scale(.96)}50%{box-shadow:0 0 54px rgba(99,244,255,.55);transform:translate(-50%,-50%) translateZ(20px) scale(1.04)}}@keyframes orbitA{0%,100%{transform:translate(0,0)}50%{transform:translate(18px,-18px)}}@keyframes orbitB{0%,100%{transform:translate(0,0)}50%{transform:translate(-18px,18px)}}@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}@keyframes beamMove{0%{transform:translateX(0);opacity:0}15%{opacity:.65}100%{transform:translateX(840px);opacity:0}}
+@media(max-width:1000px){.grid2,.labGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 12px auto}.fun,.stats{grid-template-columns:1fr 1fr}.screen{position:relative;width:auto;right:auto;top:auto;margin:12px}.scene{min-height:820px}.nav{display:grid;grid-template-columns:1fr 1fr}.actions{display:grid;grid-template-columns:1fr 1fr}.actions .btn,.actions select{width:100%}.hero:after{display:none}.ai{left:50%;transform:translateX(-50%);bottom:18px}.portal{top:55%}}
+@media(max-width:430px){.fun,.stats,.nav,.actions,.chipGrid,.socketGrid{grid-template-columns:1fr}.rule,.level{grid-template-columns:34px 1fr}.tag{grid-column:2}.ai{font-size:72px}.portal{width:245px;height:245px}.orb{width:54px;height:54px;font-size:28px}}
+@media print{.hero,.nav,.section:not(#certificate),footer,.watermark,.cornerMark{display:none!important}.cert{color:#111;background:white;border:4px solid #111}.cert input{border:0;color:#111}}
+</style>
+</head>
+<body>
+<div class="watermark"><div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:20%;left:34%">Dr AI Academy</div><div class="wm" style="top:36%;left:-4%">Dr AI Academy</div><div class="wm" style="top:52%;left:45%">Dr AI Academy</div><div class="wm" style="top:68%;left:6%">Dr AI Academy</div><div class="wm" style="top:84%;left:44%">Dr AI Academy</div></div>
+<div class="cornerMark">Dr AI Academy</div>
+<div class="wrap">
+<section class="hero panel">
+  <div class="logo"><b>Dr AI Academy</b><span>Invisible World Lab Series</span></div>
+  <div class="badge">LAB 17 • FINAL BOSS • MICROORGANISMS FRIEND AND FOE</div>
+  <h1>MICROBE FRIEND OR FOE:<br>THE FINAL BOSS UNIVERSE</h1>
+  <p class="sub">A chapter revision boss lab where students classify microbes, solve useful vs harmful microbe missions, balance ecosystem-health factors, and earn a final chapter mastery certificate. This lab connects fermentation, antibiotics, vaccines, nitrogen cycle, food preservation and disease prevention.</p>
+  <div class="actions"><button class="btn gold" id="startBtn">🎮 Start Final Boss Lab</button><button class="btn" id="voiceBtn">🔊 Voice ON</button><button class="btn secondary" id="stopVoiceBtn">⏹ Stop Voice</button><select id="voiceStyle"><option value="standard">Standard English</option><option value="indian">Indian English</option></select></div>
+  <div class="fun"><div>🦠 Microbe Sorting</div><div>🌱 Helpful Microbes</div><div>🛡️ Harmful Microbes</div><div>🏅 Chapter Certificate</div></div>
+  <div class="grid2">
+    <div class="panel box"><h3>Game Rules</h3>
+      <div class="rule"><div class="n">1</div><div><b>Revise the full story</b><br>Useful and harmful microorganisms.</div><div class="tag">Level 1</div></div>
+      <div class="rule"><div class="n">2</div><div><b>Capture and classify</b><br>Tap microbe orbs and fill the correct sockets.</div><div class="tag">Level 2</div></div>
+      <div class="rule"><div class="n">3</div><div><b>Balance the microbe world</b><br>Control hygiene, preservation, and beneficial microbes.</div><div class="tag">Level 3</div></div>
+      <div class="rule"><div class="n">4</div><div><b>Final boss missions</b><br>Solve chapter-level application cases.</div><div class="tag">Level 4</div></div>
+    </div>
+    <div class="panel box"><h3>Level Map</h3>
+      <div class="level activeLevel" id="lvl1"><div class="n">1</div><div><b>Story Briefing</b><br><small>Complete 4 story cards.</small></div><div class="tag" id="tag1">Active</div></div>
+      <div class="level" id="lvl2"><div class="n">2</div><div><b>Microbe Sorter</b><br><small>Capture 6 orbs + fill 6 sockets.</small></div><div class="tag" id="tag2">Locked</div></div>
+      <div class="level" id="lvl3"><div class="n">3</div><div><b>Balance Lab</b><br><small>Reach 80+ and run final simulation.</small></div><div class="tag" id="tag3">Locked</div></div>
+      <div class="level" id="lvl4"><div class="n">4</div><div><b>Mission + Quiz</b><br><small>Clear missions and answer quiz.</small></div><div class="tag" id="tag4">Locked</div></div>
+      <div class="stats"><div class="stat"><b id="theoryCount">0/4</b><span>Story</span></div><div class="stat"><b id="simCount">0/3</b><span>Levels</span></div><div class="stat"><b id="quizCount">0/5</b><span>Quiz</span></div><div class="stat"><b id="score">0</b><span>Score</span></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="nav"><button class="btn gold active" data-go="theory">Story</button><button class="btn secondary" data-go="sorter" id="navSorter" disabled>Sorter</button><button class="btn secondary" data-go="balance" id="navBalance" disabled>Balance</button><button class="btn secondary" data-go="mission" id="navMission" disabled>Mission</button><button class="btn secondary" data-go="quiz" id="navQuiz" disabled>Quiz</button><button class="btn secondary" data-go="certificate" id="navCert" disabled>Certificate</button></div>
+
+<section class="section active" id="theory">
+  <div class="grid2">
+    <div class="panel box"><h3>Dr AI Final Story Briefing</h3><div class="storyBox" id="storyBox"></div><div class="storyBtns"><button class="btn secondary" id="prevStory">← Previous</button><button class="btn" id="nextStory">Next Story →</button><button class="btn gold" id="markTheory">Mark Story Complete</button></div></div>
+    <div class="panel box"><h3>Chapter Mastery Target</h3><div class="explain"><b>NCERT Link:</b> Microorganisms can be useful or harmful. They help in food, medicine, soil fertility and environment, but some cause disease and spoil food.<br><br><b>Olympiad Link:</b> Classification, cause-effect reasoning, cycles, disease prevention, food safety and microbial roles.<br><br><b>NEET Foundation:</b> Microbiology, immunity, vaccines, antibiotics, fermentation, nitrogen cycle and public health.</div></div>
+  </div>
+</section>
+
+<section class="section" id="sorter">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 2: 3D Microbe Universe Sorter</h3>
+      <div class="scene" id="sceneSorter">
+        <div class="sceneTip">Move mouse / finger for 3D feel • Tap all 6 microbe orbs</div>
+        <div class="screen"><h3>Dr AI Microbe Scanner</h3><div class="line">Captured Orbs: <b id="captureCount">0 / 6</b></div><div class="line">Correct Sockets: <b id="socketCount">0 / 6</b></div><div class="line">Sorter Status: <b id="sorterStatus">Waiting</b></div></div>
+        <div class="world3d" id="worldSorter">
+          <div class="floor"></div><div class="beam b1"></div><div class="beam b2"></div><div class="beam b3"></div>
+          <div class="portal"></div>
+          <div class="orb friend o1" data-label="Yeast: Useful" data-type="friend">🍞</div>
+          <div class="orb friend o2" data-label="Rhizobium: Useful" data-type="friend">🌱</div>
+          <div class="orb friend o3" data-label="Lactobacillus: Useful" data-type="friend">🥛</div>
+          <div class="orb foe o4" data-label="Pathogen: Harmful" data-type="foe">🦠</div>
+          <div class="orb foe o5" data-label="Food Spoilage Microbe: Harmful" data-type="foe">🍲</div>
+          <div class="orb neutral o6" data-label="Decomposer: Useful in ecosystem" data-type="friend">🍂</div>
+        </div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+    <div class="panel box">
+      <h3>Classification Console</h3>
+      <div class="controlBox">
+        <p><b>Step A:</b> Tap 6 microbe orbs in the arena. <b>Step B:</b> Tap correct classification chips.</p>
+        <div class="chipGrid">
+          <div class="chip" data-item="Yeast helps fermentation" data-good="1">🍞 Yeast helps fermentation</div>
+          <div class="chip" data-item="Lactobacillus makes curd" data-good="1">🥛 Lactobacillus makes curd</div>
+          <div class="chip" data-item="Rhizobium fixes nitrogen" data-good="1">🌱 Rhizobium fixes nitrogen</div>
+          <div class="chip" data-item="Pathogens cause disease" data-good="1">🦠 Pathogens cause disease</div>
+          <div class="chip" data-item="Spoilage microbes ruin food" data-good="1">🍲 Spoilage microbes ruin food</div>
+          <div class="chip" data-item="Decomposers recycle nutrients" data-good="1">🍂 Decomposers recycle nutrients</div>
+          <div class="chip" data-item="All microbes are harmful" data-good="0">❌ All microbes are harmful</div>
+          <div class="chip" data-item="Antibiotics kill viruses directly" data-good="0">❌ Antibiotics kill viruses directly</div>
+        </div>
+        <p style="margin-top:14px"><b>Microbe Mastery Sockets</b></p>
+        <div class="socketGrid"><div class="socket" id="socket1">Socket 1</div><div class="socket" id="socket2">Socket 2</div><div class="socket" id="socket3">Socket 3</div><div class="socket" id="socket4">Socket 4</div><div class="socket" id="socket5">Socket 5</div><div class="socket" id="socket6">Socket 6</div></div>
+      </div>
+      <div class="explain" id="sorterExplain"><h4>Sorter Feedback</h4>Capture orbs and complete the six correct classifications.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="balance">
+  <div class="labGrid">
+    <div class="panel box">
+      <h3>Level 3: Microbe World Balance Lab</h3>
+      <div class="scene" id="sceneBalance">
+        <div class="sceneTip">Balance useful microbes + hygiene + preservation, then run final simulation</div>
+        <div class="screen"><h3>Balance Meter</h3><div class="line">Balance Score: <b id="balanceScore">0</b></div><div class="line">World Status: <b id="worldStatus">Unstable</b></div><div class="line">Final Simulation: <b id="finalSim">Not Run</b></div></div>
+        <div class="world3d" id="worldBalance">
+          <div class="floor"></div><div class="beam b1"></div><div class="beam b2"></div><div class="beam b3"></div>
+          <div class="portal"></div>
+          <div class="orb friend o1">🍞</div><div class="orb friend o2">🌱</div><div class="orb friend o3">🥛</div>
+          <div class="orb foe o4" id="foe1">🦠</div><div class="orb foe o5" id="foe2">🍲</div><div class="orb neutral o6">🍂</div>
+        </div>
+        <div class="ai">🤖</div>
+      </div>
+    </div>
+    <div class="panel box">
+      <h3>Controls: Balance the Microbe World</h3>
+      <div class="controlBox">
+        <div class="meter"><label>Useful Microbe Use <span id="usefulOut">50</span></label><input type="range" min="0" max="100" value="50" id="useful"></div>
+        <div class="meter"><label>Hygiene and Disease Prevention <span id="hygieneOut">50</span></label><input type="range" min="0" max="100" value="50" id="hygiene"></div>
+        <div class="meter"><label>Food Preservation <span id="preserveOut">50</span></label><input type="range" min="0" max="100" value="50" id="preserve"></div>
+        <button class="btn green" id="checkBalance">🧪 Check Balance Score</button>
+        <button class="btn gold" id="runFinal">⚡ Run Final Boss Simulation</button>
+      </div>
+      <div class="explain" id="balanceExplain"><h4>Balance Feedback</h4>Set the sliders, then run the final simulation. You need a score of 80+ to pass.</div>
+      <div class="meter"><label>Chapter Mastery Power <span id="activityText">0%</span></label><div class="bar"><span id="activityBar"></span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mission">
+  <div class="grid2">
+    <div class="panel box">
+      <h3>Level 4: Final Boss Mission Challenges</h3>
+      <div class="challengeCard"><h4>Mission 1: Dough needs to rise</h4><div class="cards"><button class="mission" data-mission="1" data-good="1"><b>Use yeast fermentation</b><br>Yeast produces carbon dioxide that helps dough rise.</button><button class="mission" data-mission="1" data-good="0"><b>Use pathogen contamination</b><br>Pathogens are harmful, not useful for dough rising.</button></div></div>
+      <div class="challengeCard"><h4>Mission 2: Improve soil nitrogen</h4><div class="cards"><button class="mission" data-mission="2" data-good="1"><b>Use Rhizobium / nitrogen fixation concept</b><br>Rhizobium helps convert nitrogen into usable compounds.</button><button class="mission" data-mission="2" data-good="0"><b>Keep soil completely lifeless</b><br>Useful microbes support soil fertility.</button></div></div>
+      <div class="challengeCard"><h4>Mission 3: Prevent food poisoning</h4><div class="cards"><button class="mission" data-mission="3" data-good="1"><b>Use hygiene, safe cooking and storage</b><br>These reduce microbial contamination risk.</button><button class="mission" data-mission="3" data-good="0"><b>Leave food warm and uncovered</b><br>This can increase microbial growth.</button></div></div>
+      <div class="challengeCard"><h4>Mission 4: Medicine safety</h4><div class="cards"><button class="mission" data-mission="4" data-good="1"><b>Use antibiotics only with medical guidance</b><br>Misuse can contribute to antibiotic resistance.</button><button class="mission" data-mission="4" data-good="0"><b>Use antibiotics for every cold</b><br>Antibiotics mainly act against bacteria, not every viral cold.</button></div></div>
+      <div class="explain" id="missionExplain"><h4>Mission Feedback</h4>Clear all 4 missions to unlock the final quiz.</div>
+    </div>
+    <div class="panel box"><h3>Grand Concept Panel</h3><div class="explain"><b>Chapter Summary:</b><br>Microorganisms are everywhere. Some are useful in food, medicine, agriculture and environment. Some cause disease and spoil food.<br><br><b>Final Boss Logic:</b><br>• Use helpful microbes wisely<br>• Control harmful microbes with hygiene and preservation<br>• Understand antibiotics and vaccines responsibly<br>• Connect microbes to soil, food, health and ecosystem cycles</div></div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="panel box"><h3>Level 5: Chapter 2 Final Boss Quiz</h3><div class="cards">
+    <div><b>Q1. Which microorganism helps in curd formation?</b><div class="opt" data-q="q1" data-correct="1">Lactobacillus</div><div class="opt" data-q="q1">Pathogen only</div><div class="opt" data-q="q1">Plastic particles</div></div>
+    <div><b>Q2. Which microbe is linked with nitrogen fixation in root nodules?</b><div class="opt" data-q="q2" data-correct="1">Rhizobium</div><div class="opt" data-q="q2">Yeast only</div><div class="opt" data-q="q2">Mould in bread only</div></div>
+    <div><b>Q3. Why are vaccines useful?</b><div class="opt" data-q="q3" data-correct="1">They train the immune system</div><div class="opt" data-q="q3">They replace food preservation</div><div class="opt" data-q="q3">They make all microbes harmful</div></div>
+    <div><b>Q4. What do antibiotics mainly act against?</b><div class="opt" data-q="q4" data-correct="1">Bacteria</div><div class="opt" data-q="q4">All viral colds automatically</div><div class="opt" data-q="q4">Only soil minerals</div></div>
+    <div><b>Q5. Which action helps prevent food poisoning?</b><div class="opt" data-q="q5" data-correct="1">Hygiene, safe cooking and proper storage</div><div class="opt" data-q="q5">Leaving food warm and uncovered</div><div class="opt" data-q="q5">Using dirty water</div></div>
+  </div></div>
+</section>
+
+<section class="section" id="certificate"><div class="panel box"><div class="cert"><div class="seal">🦠🏆🏅</div><h2>Certificate of Chapter 2 Microbiology Mastery</h2><p>This certifies that</p><input id="studentName" placeholder="Enter Student Name"><p>has successfully completed <b>Lab 17: Microbe Friend or Foe Final Boss Universe</b></p><p>Skills: Useful Microbes • Harmful Microbes • Fermentation • Antibiotics • Vaccines • Nitrogen Cycle • Food Safety</p><p><b>Developed by Dr AI Academy</b></p><button class="btn gold" onclick="window.print()">Print / Save Certificate</button></div></div></section>
+
+<footer><div>Developed by <b>Dr AI Academy</b> • Story-based Science Lab Game</div><div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div></footer>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const state={voice:true,style:"standard",storyIndex:0,theoryDone:0,score:0,sorterDone:false,balanceDone:false,missionDone:false,captured:{},chips:{},missions:{},quizCorrect:{},unlocked:{sorter:false,balance:false,mission:false,quiz:false,certificate:false},finalPassed:false};
+const stories=[
+{title:"Story 1: The Invisible Kingdom",body:"Microorganisms are tiny living things. Some are bacteria, fungi, protozoa and algae. They are invisible to our eyes but powerful in nature.",points:["Microbes are tiny organisms.","They include bacteria, fungi, algae and protozoa.","They affect food, soil, health and environment."]},
+{title:"Story 2: Microbes as Friends",body:"Some microbes help us. Yeast helps dough rise, Lactobacillus helps make curd, Rhizobium helps plants get nitrogen, and decomposers recycle nutrients.",points:["Yeast helps fermentation.","Lactobacillus helps curd formation.","Rhizobium and decomposers support ecosystems."]},
+{title:"Story 3: Microbes as Foes",body:"Some microbes are harmful. Pathogens can cause disease, and spoilage microbes can ruin food. Hygiene and preservation help control them.",points:["Pathogens can cause disease.","Spoilage microbes can damage food.","Prevention reduces risk."]},
+{title:"Story 4: Science-Based Control",body:"We use vaccines, antibiotics, food preservation and hygiene to manage microorganisms. The real skill is knowing when microbes are useful and when they are harmful.",points:["Vaccines train immunity.","Antibiotics act mainly against bacteria.","Food safety prevents contamination."]}
+];
+function speak(t){if(!state.voice||!("speechSynthesis" in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="en-IN"; u.rate=state.style==="indian"?0.88:0.98; speechSynthesis.speak(u)}
+function show(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.go===id)); $(id).scrollIntoView({behavior:'smooth',block:'start'})}
+function simDone(){return (state.sorterDone?1:0)+(state.balanceDone?1:0)+(state.missionDone?1:0)}
+function status(){ $('theoryCount').textContent=Math.min(state.theoryDone,4)+"/4"; $('simCount').textContent=simDone()+"/3"; $('quizCount').textContent=Object.keys(state.quizCorrect).length+"/5"; $('score').textContent=state.score; [["lvl1","tag1",state.theoryDone>=4,true],["lvl2","tag2",state.sorterDone,state.unlocked.sorter],["lvl3","tag3",state.balanceDone,state.unlocked.balance],["lvl4","tag4",state.missionDone,state.unlocked.mission]].forEach(([id,tag,done,active])=>{$(id).classList.toggle('done',done); $(id).classList.toggle('activeLevel',active&&!done); $(tag).textContent=done?'Done':active?'Active':'Locked'}); $('navSorter').disabled=!state.unlocked.sorter; $('navBalance').disabled=!state.unlocked.balance; $('navMission').disabled=!state.unlocked.mission; $('navQuiz').disabled=!state.unlocked.quiz; $('navCert').disabled=!state.unlocked.certificate; }
+function unlock(){ if(state.theoryDone>=4&&!state.unlocked.sorter){state.unlocked.sorter=true; speak('Microbe sorter unlocked.'); show('sorter')} if(state.sorterDone&&!state.unlocked.balance){state.unlocked.balance=true; speak('Balance lab unlocked.'); show('balance')} if(state.balanceDone&&!state.unlocked.mission){state.unlocked.mission=true; speak('Final boss missions unlocked.'); show('mission')} if(state.missionDone&&!state.unlocked.quiz){state.unlocked.quiz=true; speak('Final quiz unlocked.'); show('quiz')} if(Object.keys(state.quizCorrect).length>=5&&!state.unlocked.certificate){state.unlocked.certificate=true; speak('Chapter mastery certificate unlocked.'); show('certificate')} status(); }
+function renderStory(){const s=stories[state.storyIndex]; $('storyBox').innerHTML=`<h2>${s.title}</h2><p>${s.body}</p><ul>${s.points.map(x=>`<li>${x}</li>`).join('')}</ul>`; speak(s.title+'. '+s.body)}
+function markTheory(){if(state.theoryDone<state.storyIndex+1){state.theoryDone=state.storyIndex+1; state.score+=15} if(state.storyIndex<3){state.storyIndex++; renderStory()} unlock();}
+const socketIds=['socket1','socket2','socket3','socket4','socket5','socket6'];
+function fillNextSocket(label){const next=socketIds.find(id=>!$(id).classList.contains('filled')); if(!next) return; $(next).classList.add('filled'); $(next).textContent=label;}
+function checkSorter(){ const cap=Object.keys(state.captured).length, ch=Object.keys(state.chips).length; $('captureCount').textContent=cap+' / 6'; $('socketCount').textContent=ch+' / 6'; $('sorterStatus').textContent=(cap>=6&&ch>=6)?'Complete':(cap+ch>0?'Sorting':'Waiting'); if(cap>=6&&ch>=6&&!state.sorterDone){state.sorterDone=true; state.score+=40; $('sorterExplain').innerHTML='<h4>Microbe Sorter Complete!</h4>You captured all microbe orbs and classified their roles correctly.'; speak('Microbe sorter complete.');} unlock();}
+function captureOrb(el){ if(!state.unlocked.sorter||el.classList.contains('captured')) return; const label=el.dataset.label; state.captured[label]=true; state.score+=7; el.classList.add('captured'); $('sorterExplain').innerHTML=`<h4>Orb Captured</h4><b>${label}</b> captured. Now complete the classification sockets.`; checkSorter();}
+function useChip(chip){ if(!state.unlocked.sorter||chip.classList.contains('used')) return; const item=chip.dataset.item, good=chip.dataset.good==='1'; if(good){ if(!state.chips[item]){state.chips[item]=true; state.score+=10; fillNextSocket(item); chip.classList.add('ok','used');} $('sorterExplain').innerHTML=`<h4>Correct Classification</h4><b>${item}</b> is part of Chapter 2 microbe mastery.`; } else { chip.classList.add('bad'); $('sorterExplain').innerHTML=`<h4>Wrong Generalization</h4><b>${item}</b> is not scientifically correct.`; } checkSorter();}
+function updateBalance(){ const u=+$('useful').value, h=+$('hygiene').value, p=+$('preserve').value; $('usefulOut').textContent=u; $('hygieneOut').textContent=h; $('preserveOut').textContent=p; const score=Math.round((100-Math.abs(u-76))*0.34 + (100-Math.abs(h-84))*0.34 + (100-Math.abs(p-78))*0.32); const finalScore=Math.max(0,Math.min(100,score)); $('balanceScore').textContent=finalScore; $('activityText').textContent=finalScore+'%'; $('activityBar').style.width=finalScore+'%'; $('worldStatus').textContent=finalScore>=80?'Stable':finalScore>=55?'Improving':'Unstable'; const op=finalScore>=80?.18:finalScore>=55?.48:.82; ['foe1','foe2'].forEach(id=>$(id).style.opacity=op); return finalScore;}
+function checkBalance(){ const sc=updateBalance(); if(sc>=80){ $('balanceExplain').innerHTML='<h4>Strong Balance</h4>Now run the final boss simulation to prove chapter mastery.'; } else { $('balanceExplain').innerHTML='<h4>Need Better Balance</h4>Try useful microbe use around 76, hygiene around 84 and preservation around 78.'; }}
+function runFinal(){ const sc=updateBalance(); if(sc>=80){ state.finalPassed=true; state.score+=30; $('finalSim').textContent='Passed'; $('balanceExplain').innerHTML='<h4>Final Boss Simulation Passed!</h4>You balanced useful microbes and controlled harmful microbes. Chapter mastery unlocked.'; if(!state.balanceDone){state.balanceDone=true; state.score+=25;} speak('Final boss simulation passed.'); } else { state.finalPassed=false; $('finalSim').textContent='Failed'; $('balanceExplain').innerHTML='<h4>Final Boss Simulation Failed</h4>Your microbe world is not balanced yet. Improve the sliders and test again.'; } unlock();}
+function doMission(btn){ if(!state.unlocked.mission) return; const mission=btn.dataset.mission, good=btn.dataset.good==='1'; if(state.missions[mission]) return; const group=[...document.querySelectorAll(`.mission[data-mission="${mission}"]`)]; if(good){ state.missions[mission]=true; state.score+=18; btn.classList.add('good','used'); $('missionExplain').innerHTML=`<h4>Mission ${mission} Cleared</h4>Correct! You applied Chapter 2 concepts properly.`; } else { btn.classList.add('bad'); group.forEach(x=>{if(x.dataset.good==='1') x.classList.add('good')}); $('missionExplain').innerHTML='<h4>Try Again Conceptually</h4>Think about useful vs harmful microbes and prevention.'; } if(Object.keys(state.missions).length>=4&&!state.missionDone){state.missionDone=true; state.score+=30} unlock();}
+function answerQuiz(opt){ if(!state.unlocked.quiz) return; const q=opt.dataset.q; if(state.quizCorrect[q]) return; const group=[...document.querySelectorAll(`.opt[data-q="${q}"]`)]; if(opt.dataset.correct){ state.quizCorrect[q]=true; opt.classList.add('correct'); state.score+=20; } else { opt.classList.add('wrong'); group.forEach(x=>{if(x.dataset.correct) x.classList.add('correct')}); } unlock();}
+function attachParallax(sceneId, worldId){ const scene=$(sceneId), world=$(worldId); if(!scene||!world) return; function move(clientX,clientY){ const r=scene.getBoundingClientRect(); const x=(clientX-r.left)/r.width-.5; const y=(clientY-r.top)/r.height-.5; world.style.transform=`rotateX(${(-y*9).toFixed(2)}deg) rotateY(${(x*15).toFixed(2)}deg)`; } function reset(){ world.style.transform='rotateX(0deg) rotateY(0deg)'; } scene.addEventListener('mousemove',e=>move(e.clientX,e.clientY)); scene.addEventListener('mouseleave',reset); scene.addEventListener('touchmove',e=>{const t=e.touches[0]; if(t) move(t.clientX,t.clientY)}, {passive:true}); scene.addEventListener('touchend',reset); }
+$('startBtn').onclick=()=>show('theory'); $('voiceBtn').onclick=()=>{state.voice=!state.voice; $('voiceBtn').textContent=state.voice?'🔊 Voice ON':'🔇 Voice OFF'}; $('stopVoiceBtn').onclick=()=>speechSynthesis.cancel(); $('voiceStyle').onchange=e=>state.style=e.target.value; $('nextStory').onclick=()=>{state.storyIndex=Math.min(3,state.storyIndex+1); renderStory()}; $('prevStory').onclick=()=>{state.storyIndex=Math.max(0,state.storyIndex-1); renderStory()}; $('markTheory').onclick=markTheory; document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(!b.disabled) show(b.dataset.go)}); document.querySelectorAll('.orb').forEach(o=>o.onclick=()=>captureOrb(o)); document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>useChip(c)); ['useful','hygiene','preserve'].forEach(id=>$(id).oninput=updateBalance); $('checkBalance').onclick=checkBalance; $('runFinal').onclick=runFinal; document.querySelectorAll('.mission').forEach(m=>m.onclick=()=>doMission(m)); document.querySelectorAll('.opt').forEach(o=>o.onclick=()=>answerQuiz(o)); attachParallax('sceneSorter','worldSorter'); attachParallax('sceneBalance','worldBalance'); renderStory(); updateBalance(); status();
+})();
+</script>
+</body>
+</html>
