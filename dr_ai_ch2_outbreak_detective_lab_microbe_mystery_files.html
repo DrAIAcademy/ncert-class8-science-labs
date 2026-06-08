@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Outbreak Detective Lab | Dr AI Academy</title>
+<style>
+:root{--panel:rgba(12,28,58,.96);--cyan:#64f4ff;--gold:#ffe066;--green:#8cffc1;--red:#ff8aa0;--text:#eef8ff;--muted:#b7cce5}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;font-family:Arial,Segoe UI,sans-serif;color:var(--text);background:radial-gradient(circle at 15% 10%,rgba(100,244,255,.16),transparent 26%),radial-gradient(circle at 85% 10%,rgba(255,224,102,.14),transparent 26%),linear-gradient(135deg,#061123,#123d82 60%,#071c34);overflow-x:hidden;-webkit-text-size-adjust:100%;user-select:none}
+button{font-family:inherit;touch-action:manipulation;cursor:pointer}
+.watermark{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.055);font-size:clamp(28px,4vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap}
+.cornerMark{position:fixed;right:12px;bottom:12px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.75);background:rgba(4,13,24,.45);border:1px solid rgba(255,255,255,.20);padding:7px 10px;border-radius:999px;font-weight:900}
+.wrap{max-width:1450px;margin:auto;padding:12px;position:relative;z-index:1}
+.panel{background:var(--panel);border:1px solid rgba(100,244,255,.25);border-radius:20px;padding:14px;margin:12px 0;box-shadow:0 12px 34px rgba(0,0,0,.35)}
+.hero{background:linear-gradient(180deg,rgba(18,61,130,.92),rgba(7,22,48,.96));position:relative;overflow:hidden}
+.hero:after{content:"🕵️‍♀️ 🧫 🔬 🍱 💧 🦠";position:absolute;right:18px;bottom:14px;font-size:32px;letter-spacing:8px;opacity:.22}
+.logo{position:absolute;right:14px;top:14px;background:rgba(0,0,0,.28);border:1px solid rgba(100,244,255,.3);border-radius:16px;padding:8px 11px;text-align:right}
+.logo b{display:block}.logo span{color:var(--cyan);font-size:.74rem;font-weight:900}
+.badge{display:inline-block;background:rgba(100,244,255,.12);border:1px solid rgba(100,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:900;padding:8px 12px;font-size:.78rem}
+h1{font-size:clamp(1.8rem,5vw,3.8rem);line-height:1.04;margin:10px 0 8px;max-width:1050px}.sub{line-height:1.55;color:var(--muted);max-width:1080px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:0;border-radius:15px;padding:12px 14px;font-weight:900;font-size:15px;background:linear-gradient(135deg,var(--cyan),#d9fbff);color:#061123;min-height:46px}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff3b0);color:#241400}.btn.dark{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:white}
+.gameGrid{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:12px;align-items:start}
+.scene{position:relative;min-height:560px;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#91d7ff 0,#cadff5 34%,#a77946 35%,#4b2d1a 100%);border:1px solid rgba(255,255,255,.15)}
+.place{position:absolute;left:14px;top:14px;background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:9px 12px;font-weight:900;z-index:5}
+.shop{position:absolute;left:8%;top:95px;font-size:50px;text-align:center}.shop:after{content:"Food Stall";display:block;font-size:13px;font-weight:900}
+.lab{position:absolute;right:9%;top:96px;font-size:50px;text-align:center}.lab:after{content:"Mini Lab";display:block;font-size:13px;font-weight:900}
+.road{position:absolute;left:0;right:0;bottom:100px;height:120px;background:rgba(80,70,70,.68);border-top:8px solid rgba(255,224,102,.35);border-bottom:8px solid rgba(255,224,102,.28)}
+.detective{position:absolute;left:48%;bottom:78px;transform:translateX(-50%);font-size:68px;z-index:3;animation:bob 2.4s infinite ease-in-out}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-10px)}}
+.evidence{position:absolute;width:68px;height:68px;border:2px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(255,224,102,.18);display:grid;place-items:center;font-size:34px;z-index:4;box-shadow:0 0 18px rgba(255,224,102,.22)}
+.evidence.found{background:rgba(140,255,193,.22);border-color:rgba(140,255,193,.8);opacity:.55}
+.move0{animation:floatA 4s infinite ease-in-out}.move1{animation:floatB 5s infinite ease-in-out}.move2{animation:floatC 4.5s infinite ease-in-out}
+@keyframes floatA{0%,100%{transform:translate(0,0)}50%{transform:translate(26px,-16px)}}@keyframes floatB{0%,100%{transform:translate(0,0)}50%{transform:translate(-22px,18px)}}@keyframes floatC{0%,100%{transform:translate(0,0)}50%{transform:translate(18px,20px)}}
+.sampleBox{position:absolute;left:50%;bottom:205px;transform:translateX(-50%);width:230px;height:135px;border-radius:20px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.15);display:grid;place-items:center;text-align:center;font-weight:900}
+.sampleBox .big{font-size:54px;animation:pulseIcon 2.2s infinite ease-in-out}@keyframes pulseIcon{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.bubble{position:absolute;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 12px;font-weight:900;z-index:3}
+#eBubble{left:7%;bottom:245px}#lBubble{right:7%;bottom:245px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:rgba(255,255,255,.08);border-radius:14px;padding:10px;text-align:center}.stat b{display:block;color:var(--cyan);font-size:22px}
+.bar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:8px}.bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.infoBox{background:linear-gradient(180deg,rgba(100,244,255,.10),rgba(255,255,255,.04));border:1px solid rgba(100,244,255,.20);border-radius:16px;padding:12px;line-height:1.55;margin-top:10px}
+#coach{background:rgba(255,224,102,.10);border:1px solid rgba(255,224,102,.25);border-radius:14px;padding:10px;font-weight:800;animation:pulse 2.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 rgba(255,224,102,0)}50%{box-shadow:0 0 18px rgba(255,224,102,.18)}}
+.tests,.suspects{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}
+.test,.suspect{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:11px;color:white;text-align:left;min-height:58px}
+.test.done,.suspect.done{border-color:rgba(140,255,193,.7);background:rgba(140,255,193,.14)}
+.suspect.wrong{border-color:rgba(255,138,160,.7);background:rgba(255,138,160,.14)}
+.log{max-height:150px;overflow:auto;background:rgba(0,0,0,.18);border-radius:14px;padding:10px;font-size:.92rem}.log p{margin:0 0 8px}
+.cert{display:none;text-align:center;border:2px solid var(--gold)}.cert input{width:100%;max-width:360px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.2);color:white;text-align:center}
+.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted)}.footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:980px){.gameGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 10px auto}.hero:after{display:none}.controls{display:grid;grid-template-columns:1fr 1fr}.btn{width:100%}.scene{min-height:520px}}
+@media(max-width:520px){.wrap{padding:6px}.panel{padding:10px;margin:8px 0;border-radius:16px}h1{font-size:1.46rem}h2{font-size:1.08rem;margin:8px 0}h3{font-size:1rem;margin:8px 0}.controls,.stats{grid-template-columns:1fr}.stat{padding:8px}.stat b{font-size:18px}.scene{min-height:470px}.evidence{width:56px;height:56px;font-size:29px}.detective{font-size:54px}.shop,.lab{font-size:40px}.sampleBox{width:180px;height:115px}.sampleBox .big{font-size:42px}.bubble{font-size:.78rem;padding:6px 9px}.infoBox{font-size:.9rem;padding:10px}}
+@media print{.hero,.gameGrid,.footer,.watermark,.cornerMark{display:none!important}.cert{display:block!important;color:#111;background:white}.cert input{color:#111;border:0}}
+</style>
+</head>
+<body oncontextmenu="return false">
+<div class="watermark"><div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:30%;left:35%">Dr AI Academy</div><div class="wm" style="top:55%;left:-5%">Dr AI Academy</div><div class="wm" style="top:78%;left:35%">Dr AI Academy</div></div>
+<div class="cornerMark">Dr AI Academy</div>
+<div class="wrap">
+<section class="panel hero">
+  <div class="logo"><b>Dr AI Academy</b><span>Microbe Mystery Game Lab</span></div>
+  <div class="badge">CHAPTER 2 • OUTBREAK DETECTIVE • REAL-LIFE CASES</div>
+  <h1>Outbreak Detective Lab:<br>The Microbe Mystery Files</h1>
+  <p class="sub">A real-life investigation game where students solve food poisoning, dirty water, curd spoilage, cough spread, and monsoon fever cases by collecting evidence, running lab tests, and identifying the correct source.</p>
+  <div class="controls">
+    <button class="btn gold" onclick="Detective.start()">🎮 Start Investigation</button>
+    <button class="btn dark" onclick="Detective.hint()">💡 Dr AI Hint</button>
+    <button class="btn dark" onclick="Detective.nextCase()">➡️ Next Case</button>
+    <button class="btn dark" onclick="Detective.toggleVoice()" id="voiceBtn">🔊 Voice ON</button>
+  </div>
+</section>
+<section class="gameGrid">
+  <main class="panel">
+    <h2 id="caseTitle">Case</h2>
+    <div class="scene" id="scene">
+      <div class="place" id="place">Investigation Site</div>
+      <div class="shop">🍲</div><div class="lab">🔬</div><div class="road"></div>
+      <div class="sampleBox"><div><div class="big" id="sampleIcon">🧫</div><div id="sampleText">Sample Zone</div></div></div>
+      <div class="bubble" id="eBubble">Evidence 0/3</div><div class="bubble" id="lBubble">Lab 0/2</div>
+      <div class="detective">🕵️‍♀️</div>
+    </div>
+    <div class="infoBox"><b>Case Story:</b> <span id="story"></span></div>
+  </main>
+  <aside class="panel">
+    <div class="stats"><div class="stat"><b id="score">0</b>Score</div><div class="stat"><b id="caseNo">1/5</b>Case</div><div class="stat"><b id="accuracy">0%</b>Proof</div></div>
+    <div class="bar"><span id="proofBar"></span></div>
+    <div class="infoBox"><h3>🤖 Dr AI Live Guide</h3><p id="coach">Collect evidence, run tests, then identify the source.</p></div>
+    <div class="infoBox"><b>Step 1: Tap moving evidence in the scene</b><p id="progress">0 evidence • 0 tests</p></div>
+    <div class="infoBox"><b>Step 2: Run lab tests</b><div class="tests" id="tests"></div></div>
+    <div class="infoBox"><b>Step 3: Identify the source</b><div class="suspects" id="suspects"></div></div>
+    <div class="infoBox"><b>Science Result</b><p id="concept">Solve the case to reveal the science concept.</p></div>
+    <div class="infoBox"><b>Mission Log</b><div class="log" id="log"></div></div>
+  </aside>
+</section>
+<section class="panel cert" id="certificate">
+  <div style="font-size:54px">🕵️‍♀️🔬🏅</div><h2>Certificate of Outbreak Detective Mastery</h2><p>This certifies that</p><input placeholder="Enter Student Name">
+  <p>has completed <b>Outbreak Detective Lab: The Microbe Mystery Files</b></p>
+  <p>Skills: Evidence Collection • Food Safety • Water Safety • Disease Spread • Lab Reasoning • Prevention</p>
+  <p><b>Developed by Dr AI Academy</b></p><button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+</section>
+<footer class="panel footer"><div>Developed by <b>Dr AI Academy</b> • Microbe mystery investigation game</div><div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div></footer>
+</div>
+
+<script>
+(function(){
+var D={voice:true,score:0,caseIndex:0,found:{},tests:{},solved:false};
+
+var cases=[
+{title:'Case 1: Chaat Stall Stomach Pain',place:'Evening Chaat Stall',sample:'🍲',story:'After eating pani puri and chaat, some students complain of stomach pain. Find the contamination source.',evidence:['fly','openFood','dirtyWater'],tests:['microscope','waterTest'],answer:'dirtyWater',concept:'Food and water can get contaminated by microbes. Clean water and covered food are important to prevent disease.'},
+{title:'Case 2: Lunchbox Smell Mystery',place:'Classroom Lunch Area',sample:'🍱',story:'A lunchbox was left open in warm weather. The food smells odd and flies are nearby.',evidence:['openFood','warmFood','fly'],tests:['smellTest','spoilageTest'],answer:'warmFood',concept:'Warm conditions allow many microbes to grow faster. Spoiled food should not be eaten.'},
+{title:'Case 3: Curd Turned Sour',place:'Home Dairy Corner',sample:'🥛',story:'Curd was kept outside too long. Students must decide whether this is useful fermentation or spoilage risk.',evidence:['time','warmFood','container'],tests:['phTest','smellTest'],answer:'time',concept:'Useful microbes like Lactobacillus make curd, but too much time or poor storage can cause spoilage.'},
+{title:'Case 4: Cough Spread in Class',place:'Classroom Health Zone',sample:'🤧',story:'Several students start coughing after sitting close and sharing bottles.',evidence:['cough','crowd','bottle'],tests:['contactTrace','dropletTest'],answer:'cough',concept:'Respiratory infections can spread through droplets, close contact, and shared bottles.'},
+{title:'Case 5: Monsoon Fever Clue',place:'Rainy Street Near School',sample:'🦟',story:'After rain, stagnant water collects near school and fever cases increase.',evidence:['mosquito','stagnantWater','fever'],tests:['siteScan','vectorTest'],answer:'stagnantWater',concept:'Stagnant water may support mosquito breeding. Removing stagnant water helps reduce disease risk.'}
+];
+
+var evidenceInfo={
+fly:['🪰','Flies Nearby','Flies can carry microbes from dirty places to food.'],
+openFood:['🍱','Open Food','Uncovered food can collect dust, flies and microbes.'],
+dirtyWater:['💧','Dirty Water','Unsafe water can carry disease-causing microbes.'],
+warmFood:['🌡️','Warm Food','Warm conditions help many microbes grow faster.'],
+time:['⏰','Long Time Outside','Too much time outside can allow microbial growth.'],
+container:['🥣','Unclean Container','Unclean containers can contaminate food.'],
+cough:['🤧','Cough Droplets','Droplets can spread infection.'],
+crowd:['👥','Close Sitting','Crowding increases spread risk.'],
+bottle:['🍼','Shared Bottle','Sharing bottles can transfer germs.'],
+mosquito:['🦟','Mosquitoes','Mosquitoes can act as vectors for some diseases.'],
+stagnantWater:['💧','Stagnant Water','Standing water may allow mosquito breeding.'],
+fever:['🌡️','Fever Cases','Fever can indicate infection and needs care.']
+};
+var testInfo={
+microscope:['🔬','Microscope Check','Looks for signs of microbial contamination.'],
+waterTest:['💧','Water Safety Test','Checks if water may be unsafe.'],
+smellTest:['👃','Smell Check','Odd smell can indicate spoilage.'],
+spoilageTest:['🧫','Spoilage Test','Checks food spoilage risk.'],
+phTest:['⚗️','pH Test','Helps understand curd/fermentation changes.'],
+contactTrace:['📋','Contact Tracing','Finds who shared contact or bottles.'],
+dropletTest:['💨','Droplet Spread Test','Shows how coughing spreads droplets.'],
+siteScan:['🛰️','Site Scan','Finds stagnant water spots.'],
+vectorTest:['🦟','Vector Risk Test','Checks mosquito breeding risk.']
+};
+
+function $(id){return document.getElementById(id)}
+function say(t){if(!D.voice)return;try{if('speechSynthesis' in window){speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-IN';u.rate=.94;u.pitch=1.04;speechSynthesis.speak(u)}}catch(e){}}
+function coach(t){$('coach').textContent=t;say(t)}
+function log(t){$('log').innerHTML='<p>'+t+'</p>'+$('log').innerHTML}
+function start(){D.score=0;D.caseIndex=0;loadCase(0);coach('Welcome detective. Collect evidence, run lab tests, and identify the microbe source.')}
+function loadCase(i){
+D.caseIndex=i;D.found={};D.tests={};D.solved=false;
+var c=cases[i];
+$('caseTitle').textContent=c.title;$('place').textContent=c.place;$('story').textContent=c.story;$('sampleIcon').textContent=c.sample;$('sampleText').textContent='Case Sample';$('caseNo').textContent=(i+1)+'/'+cases.length;$('concept').textContent='Solve the case to reveal the science concept.';
+drawEvidence(c);drawTests(c);drawSuspects(c);update();
+log('<b>'+c.title+'</b> started.');coach(c.story+' First tap the moving evidence in the scene.');
+}
+function drawEvidence(c){
+var scene=$('scene');scene.querySelectorAll('.evidence').forEach(function(x){x.remove()});
+var pos=[[12,32],[72,28],[23,68],[76,62],[46,45]];
+c.evidence.forEach(function(e,i){
+var inf=evidenceInfo[e],b=document.createElement('button');
+b.className='evidence move'+(i%3);b.style.left=pos[i][0]+'%';b.style.top=pos[i][1]+'%';b.innerHTML='<span>'+inf[0]+'</span>';b.onclick=function(){findEvidence(e,b)};scene.appendChild(b);
+});
+}
+function drawTests(c){
+var html='';
+c.tests.forEach(function(t){
+var inf=testInfo[t];html+='<button class="test" id="test-'+t+'" onclick="Detective.runTest(&quot;'+t+'&quot;)"><b>'+inf[0]+' '+inf[1]+'</b><br><small>'+inf[2]+'</small></button>';
+});
+$('tests').innerHTML=html;
+}
+function drawSuspects(c){
+var list=[c.answer];
+c.evidence.forEach(function(e){if(list.indexOf(e)<0)list.push(e)});
+list=list.slice(0,3);
+var html='';
+list.forEach(function(s){
+var inf=evidenceInfo[s];html+='<button class="suspect" id="sus-'+s+'" onclick="Detective.accuse(&quot;'+s+'&quot;)"><b>'+inf[0]+' '+inf[1]+'</b><br><small>Is this the main source?</small></button>';
+});
+$('suspects').innerHTML=html;
+}
+function findEvidence(e,el){
+if(D.found[e])return;D.found[e]=true;el.classList.add('found');
+var inf=evidenceInfo[e];D.score+=25;
+log('<b>Evidence found:</b> '+inf[0]+' '+inf[1]+' — '+inf[2]);coach(inf[1]+' found. '+inf[2]);update();
+}
+function runTest(t){
+if(D.tests[t])return;D.tests[t]=true;
+var inf=testInfo[t];D.score+=35;var el=$('test-'+t);if(el)el.classList.add('done');
+log('<b>Lab test done:</b> '+inf[0]+' '+inf[1]+' — '+inf[2]);coach(inf[1]+' complete. Evidence is getting stronger.');update();
+}
+function accuse(s){
+var c=cases[D.caseIndex],btn=$('sus-'+s);
+if(Object.keys(D.found).length<c.evidence.length){coach('Collect all evidence before final answer.');return}
+if(Object.keys(D.tests).length<c.tests.length){coach('Run all lab tests before final answer.');return}
+if(s===c.answer){
+D.solved=true;D.score+=120;if(btn)btn.classList.add('done');
+$('concept').textContent=c.concept;log('<b>Case solved:</b> '+c.concept);coach('Correct source identified. '+c.concept);update();
+if(D.caseIndex===cases.length-1){$('certificate').style.display='block';coach('Excellent. You completed all Outbreak Detective cases. Certificate unlocked.');$('certificate').scrollIntoView({behavior:'smooth'});}
+else{setTimeout(function(){if(confirm('Case solved! Move to next mystery file?'))nextCase()},800)}
+}else{D.score=Math.max(0,D.score-20);if(btn)btn.classList.add('wrong');coach('Not the main source. Review the evidence and tests again.');update();}
+}
+function proof(){
+var c=cases[D.caseIndex];var a=Object.keys(D.found).length/c.evidence.length;var b=Object.keys(D.tests).length/c.tests.length;return Math.round((a*0.55+b*0.45)*100);
+}
+function update(){
+$('score').textContent=D.score;$('accuracy').textContent=proof()+'%';$('proofBar').style.width=proof()+'%';
+var c=cases[D.caseIndex];$('progress').textContent=Object.keys(D.found).length+'/'+c.evidence.length+' evidence • '+Object.keys(D.tests).length+'/'+c.tests.length+' tests';
+$('eBubble').textContent='Evidence '+Object.keys(D.found).length+'/'+c.evidence.length;$('lBubble').textContent='Lab '+Object.keys(D.tests).length+'/'+c.tests.length;
+}
+function hint(){
+var c=cases[D.caseIndex];var e=c.evidence.find(function(x){return !D.found[x]});
+if(e){var ei=evidenceInfo[e];coach('Hint: find '+ei[1]+' in the scene.');alert('Hint: tap '+ei[0]+' '+ei[1]+' in the scene.');return}
+var t=c.tests.find(function(x){return !D.tests[x]});
+if(t){var ti=testInfo[t];coach('Hint: run '+ti[1]+'.');alert('Hint: run '+ti[0]+' '+ti[1]+'.');return}
+coach('All evidence and tests are ready. Choose the most likely source.');
+alert('All evidence and tests are ready. Choose the most likely source.');
+}
+function nextCase(){if(D.caseIndex<cases.length-1)loadCase(D.caseIndex+1)}
+function toggleVoice(){D.voice=!D.voice;$('voiceBtn').textContent=D.voice?'🔊 Voice ON':'🔇 Voice OFF';if(D.voice)coach('Voice guide is on. Dr AI will guide the investigation.')}
+document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&['s','u'].includes(e.key.toLowerCase()))e.preventDefault();if(e.key==='F12')e.preventDefault()});
+window.Detective={start:start,runTest:runTest,accuse:accuse,hint:hint,nextCase:nextCase,toggleVoice:toggleVoice};
+start();
+})();
+</script>
+</body>
+</html>

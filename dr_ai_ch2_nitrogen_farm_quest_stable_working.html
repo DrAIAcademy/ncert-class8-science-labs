@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nitrogen Farm Quest Stable | Dr AI Academy</title>
+<style>
+:root{--panel:rgba(12,28,58,.96);--cyan:#64f4ff;--gold:#ffe066;--green:#8cffc1;--red:#ff8aa0;--text:#eef8ff;--muted:#b7cce5}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;font-family:Arial,Segoe UI,sans-serif;color:var(--text);background:radial-gradient(circle at 15% 10%,rgba(100,244,255,.16),transparent 26%),radial-gradient(circle at 85% 10%,rgba(255,224,102,.14),transparent 26%),linear-gradient(135deg,#061123,#123d82 60%,#071c34);overflow-x:hidden;-webkit-text-size-adjust:100%;user-select:none}
+button{font-family:inherit;touch-action:manipulation;cursor:pointer}
+.watermark{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.055);font-size:clamp(28px,4vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap}
+.cornerMark{position:fixed;right:12px;bottom:12px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.75);background:rgba(4,13,24,.45);border:1px solid rgba(255,255,255,.20);padding:7px 10px;border-radius:999px;font-weight:900}
+.wrap{max-width:1450px;margin:auto;padding:12px;position:relative;z-index:1}
+.panel{background:var(--panel);border:1px solid rgba(100,244,255,.25);border-radius:20px;padding:14px;margin:12px 0;box-shadow:0 12px 34px rgba(0,0,0,.35)}
+.hero{background:linear-gradient(180deg,rgba(18,61,130,.92),rgba(7,22,48,.96));position:relative;overflow:hidden}
+.hero:after{content:"🌱 🦠 💧 🍂 🫘 🌾";position:absolute;right:18px;bottom:14px;font-size:32px;letter-spacing:8px;opacity:.22}
+.logo{position:absolute;right:14px;top:14px;background:rgba(0,0,0,.28);border:1px solid rgba(100,244,255,.3);border-radius:16px;padding:8px 11px;text-align:right}
+.logo b{display:block}.logo span{color:var(--cyan);font-size:.74rem;font-weight:900}
+.badge{display:inline-block;background:rgba(100,244,255,.12);border:1px solid rgba(100,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:900;padding:8px 12px;font-size:.78rem}
+h1{font-size:clamp(1.8rem,5vw,3.8rem);line-height:1.04;margin:10px 0 8px;max-width:1050px}
+.sub{line-height:1.55;color:var(--muted);max-width:1080px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:0;border-radius:15px;padding:12px 14px;font-weight:900;font-size:15px;background:linear-gradient(135deg,var(--cyan),#d9fbff);color:#061123;min-height:46px}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff3b0);color:#241400}
+.btn.dark{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:white}
+.gameGrid{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:12px;align-items:start}
+.scene{position:relative;min-height:560px;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#9bdfff 0,#bde889 34%,#9b6b38 35%,#4f2c17 100%);border:1px solid rgba(255,255,255,.15)}
+.place{position:absolute;left:14px;top:14px;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:9px 12px;font-weight:900;z-index:5}
+.sun{position:absolute;right:8%;top:65px;font-size:54px;animation:sun 5s infinite ease-in-out}
+@keyframes sun{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.cloud{position:absolute;left:15%;top:85px;font-size:54px;transition:.3s;animation:cloud 7s infinite ease-in-out}
+@keyframes cloud{0%,100%{margin-left:0}50%{margin-left:30px}}
+.field{position:absolute;left:0;right:0;bottom:0;height:260px;background:repeating-linear-gradient(90deg,#5d351c 0,#5d351c 38px,#704522 39px,#704522 70px)}
+.crop{position:absolute;left:50%;bottom:95px;transform:translateX(-50%);width:220px;height:300px;border-radius:24px;background:rgba(0,0,0,.08);overflow:hidden;border:1px solid rgba(255,255,255,.12)}
+.crop span{position:absolute;left:0;right:0;bottom:0;height:35%;background:linear-gradient(180deg,rgba(140,255,193,.85),rgba(89,173,75,.85));transition:.3s}
+.plant{position:absolute;left:50%;bottom:120px;transform:translateX(-50%);font-size:88px;z-index:2;animation:plant 2.8s infinite ease-in-out}
+@keyframes plant{0%,100%{transform:translateX(-50%) rotate(-2deg)}50%{transform:translateX(-50%) rotate(2deg)}}
+.roots{position:absolute;left:50%;bottom:65px;transform:translateX(-50%);font-size:56px;opacity:.5;transition:.3s}
+.bubble{position:absolute;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 12px;font-weight:900;z-index:3}
+#nBubble{left:7%;top:165px}#mBubble{right:7%;top:165px}#wBubble{left:8%;bottom:215px}#cBubble{right:8%;bottom:215px}
+.problem{position:absolute;width:66px;height:66px;border:2px solid rgba(255,255,255,.2);border-radius:50%;background:rgba(255,138,160,.2);display:grid;place-items:center;font-size:32px;z-index:4;box-shadow:0 0 18px rgba(255,138,160,.22)}
+.problem.found{background:rgba(140,255,193,.22);border-color:rgba(140,255,193,.8);opacity:.55}
+.move0{animation:floatA 4s infinite ease-in-out}.move1{animation:floatB 5s infinite ease-in-out}.move2{animation:floatC 4.5s infinite ease-in-out}
+@keyframes floatA{0%,100%{transform:translate(0,0)}50%{transform:translate(26px,-16px)}}@keyframes floatB{0%,100%{transform:translate(0,0)}50%{transform:translate(-22px,18px)}}@keyframes floatC{0%,100%{transform:translate(0,0)}50%{transform:translate(18px,20px)}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:rgba(255,255,255,.08);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;color:var(--cyan);font-size:22px}
+.bar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:8px}
+.bar span{display:block;height:100%;width:45%;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.infoBox{background:linear-gradient(180deg,rgba(100,244,255,.10),rgba(255,255,255,.04));border:1px solid rgba(100,244,255,.20);border-radius:16px;padding:12px;line-height:1.55;margin-top:10px}
+#coach{background:rgba(255,224,102,.10);border:1px solid rgba(255,224,102,.25);border-radius:14px;padding:10px;font-weight:800;animation:pulse 2.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 rgba(255,224,102,0)}50%{box-shadow:0 0 18px rgba(255,224,102,.18)}}
+.tools,.slots{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}
+.tool,.slot{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:11px;color:white;text-align:left;min-height:58px}
+.tool.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,224,102,.18)}
+.slot.done{border-color:rgba(140,255,193,.7);background:rgba(140,255,193,.14)}
+.log{max-height:150px;overflow:auto;background:rgba(0,0,0,.18);border-radius:14px;padding:10px;font-size:.92rem}
+.log p{margin:0 0 8px}
+.cert{display:none;text-align:center;border:2px solid var(--gold)}
+.cert input{width:100%;max-width:360px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.2);color:white;text-align:center}
+.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted)}
+.footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:980px){.gameGrid{grid-template-columns:1fr}.logo{position:static;width:max-content;margin:0 0 10px auto}.hero:after{display:none}.controls{display:grid;grid-template-columns:1fr 1fr}.btn{width:100%}.scene{min-height:520px}}
+@media(max-width:520px){.wrap{padding:6px}.panel{padding:10px;margin:8px 0;border-radius:16px}h1{font-size:1.46rem}h2{font-size:1.08rem;margin:8px 0}h3{font-size:1rem;margin:8px 0}.controls,.stats{grid-template-columns:1fr}.stat{padding:8px}.stat b{font-size:18px}.scene{min-height:470px}.problem{width:56px;height:56px;font-size:27px}.plant{font-size:68px}.roots{font-size:42px}.crop{width:170px;height:245px}.sun,.cloud{font-size:42px}.bubble{font-size:.78rem;padding:6px 9px}.infoBox{font-size:.9rem;padding:10px}}
+@media print{.hero,.gameGrid,.footer,.watermark,.cornerMark{display:none!important}.cert{display:block!important;color:#111;background:white}.cert input{color:#111;border:0}}
+</style>
+</head>
+<body oncontextmenu="return false">
+<div class="watermark"><div class="wm" style="top:5%;left:-8%">Dr AI Academy</div><div class="wm" style="top:30%;left:35%">Dr AI Academy</div><div class="wm" style="top:55%;left:-5%">Dr AI Academy</div><div class="wm" style="top:78%;left:35%">Dr AI Academy</div></div>
+<div class="cornerMark">Dr AI Academy</div>
+<div class="wrap">
+<section class="panel hero">
+  <div class="logo"><b>Dr AI Academy</b><span>Stable Farm Science Game</span></div>
+  <div class="badge">CHAPTER 2 • NITROGEN CYCLE + SOIL MICROBES</div>
+  <h1>Nitrogen Farm Quest:<br>The Soil Microbe Mission</h1>
+  <p class="sub">A real-life Indian farming game where students save crops by using Rhizobium, decomposers, compost, smart irrigation and balanced nutrients. This stable build uses direct JavaScript without encoded payload issues.</p>
+  <div class="controls">
+    <button class="btn gold" onclick="Nitro.start()">🎮 Start Farm Quest</button>
+    <button class="btn dark" onclick="Nitro.hint()">💡 Dr AI Hint</button>
+    <button class="btn dark" onclick="Nitro.nextSeason()">➡️ Next Mission</button>
+    <button class="btn dark" onclick="Nitro.toggleVoice()" id="voiceBtn">🔊 Voice ON</button>
+  </div>
+</section>
+<section class="gameGrid">
+  <main class="panel">
+    <h2 id="missionTitle">Mission</h2>
+    <div class="scene" id="scene">
+      <div class="place" id="place">Farm Field</div>
+      <div class="sun">☀️</div><div class="cloud" id="cloud">☁️</div>
+      <div class="bubble" id="nBubble">Nitrogen</div><div class="bubble" id="mBubble">Microbes</div><div class="bubble" id="wBubble">Water</div><div class="bubble" id="cBubble">Crop</div>
+      <div class="crop"><span id="cropFill"></span></div><div class="plant">🌾</div><div class="roots" id="rootGlow">🫘🦠</div><div class="field"></div>
+    </div>
+    <div class="infoBox"><b>Farm Story:</b> <span id="story"></span></div>
+  </main>
+  <aside class="panel">
+    <div class="stats"><div class="stat"><b id="score">0</b>Score</div><div class="stat"><b id="nitrogen">28</b>Nitrogen</div><div class="stat"><b id="crop">35</b>Crop</div></div>
+    <div class="stats" style="margin-top:8px"><div class="stat"><b id="microbes">25</b>Microbes</div><div class="stat"><b id="farmHealth">45%</b>Farm Health</div><div class="stat"><b>🌱</b>Soil</div></div>
+    <div class="bar"><span id="healthBar"></span></div>
+    <div class="infoBox"><h3>🤖 Dr AI Live Guide</h3><p id="coach">Find soil problems, then apply farming solutions.</p></div>
+    <div class="infoBox"><b>Step 1: Tap moving soil problems</b><p id="progress">0 problems • 0 actions</p></div>
+    <div class="infoBox"><b>Step 2: Select farm solutions</b><div class="tools" id="tools"></div></div>
+    <div class="infoBox"><b>Step 3: Apply actions</b><div class="slots" id="slots"></div></div>
+    <div class="infoBox"><b>Science Result</b><p id="concept">Solve the farm mission to unlock the science concept.</p></div>
+    <div class="infoBox"><b>Mission Log</b><div class="log" id="log"></div></div>
+  </aside>
+</section>
+<section class="panel cert" id="certificate">
+  <div style="font-size:54px">🌱🦠🏅</div><h2>Certificate of Nitrogen Farm Mastery</h2><p>This certifies that</p><input placeholder="Enter Student Name">
+  <p>has completed <b>Nitrogen Farm Quest: The Soil Microbe Mission</b></p>
+  <p>Skills: Rhizobium • Nitrogen Fixation • Decomposers • Compost • Soil Health • Crop Protection</p>
+  <p><b>Developed by Dr AI Academy</b></p><button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+</section>
+<footer class="panel footer"><div>Developed by <b>Dr AI Academy</b> • Farm science game lab</div><div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div></footer>
+</div>
+
+<script>
+(function(){
+var G={voice:true,score:0,season:0,day:1,selected:null,nitrogen:28,crop:35,microbes:25,pests:20,water:45,soil:45,solved:{},found:{}};
+
+var seasons=[
+{title:'Mission 1: Weak Soil Before Sowing',place:'Indian Farm Field',story:'A farmer wants to grow pulses and wheat. The soil is weak because nutrients are low. You must activate useful soil microbes.',problems:['lowN','drySoil','noMicrobes'],tools:['rhizobium','compost','irrigation'],concept:'Rhizobium and decomposers improve soil fertility. Plants need nutrients, water and healthy soil microbes.'},
+{title:'Mission 2: Pulse Crop Nitrogen Boost',place:'Pulse Crop Root Zone',story:'Pulse plants are growing slowly. Their root nodules need useful bacteria to fix nitrogen.',problems:['lowN','weakRoots','noMicrobes'],tools:['rhizobium','rootNodule','irrigation'],concept:'Rhizobium lives in root nodules of leguminous plants and helps fix atmospheric nitrogen into usable forms.'},
+{title:'Mission 3: Crop Waste Recycling',place:'Compost Corner',story:'Leaves and crop waste are lying in the field. Instead of burning waste, convert it into compost.',problems:['cropWaste','lowSoil','drySoil'],tools:['compost','decomposer','irrigation'],concept:'Decomposers break down dead matter and return nutrients to the soil. Compost improves soil health.'},
+{title:'Mission 4: Overuse Fertilizer Alert',place:'Fertilizer Decision Zone',story:'A farmer is tempted to add too much chemical fertilizer. Balance nutrients without damaging soil health.',problems:['overFertilizer','lowMicrobe','lowSoil'],tools:['balancedFertilizer','compost','rhizobium'],concept:'Balanced nutrient management protects soil. Too much chemical fertilizer can disturb soil health and microbes.'},
+{title:'Mission 5: Final Harvest Challenge',place:'Village Harvest Field',story:'The final crop is ready only if nitrogen, water, soil microbes and crop health are balanced.',problems:['lowN','pestRisk','drySoil'],tools:['rhizobium','irrigation','bioControl'],concept:'Healthy farming depends on nutrient cycle, water, useful microbes and protection from harmful organisms.'}
+];
+
+var problemInfo={
+lowN:['⚠️','Low Nitrogen','Plants need nitrogen to make proteins and grow well.'],
+drySoil:['🏜️','Dry Soil','Water helps roots absorb nutrients and supports soil life.'],
+noMicrobes:['🚫🦠','Low Useful Microbes','Useful microbes support nutrient cycling and soil fertility.'],
+weakRoots:['🌿','Weak Roots','Roots need nutrients and microbial support for healthy growth.'],
+cropWaste:['🍂','Crop Waste','Dead plant matter can be recycled by decomposers.'],
+lowSoil:['🟤','Poor Soil Health','Soil needs organic matter and nutrients.'],
+overFertilizer:['🧪','Too Much Fertilizer','Overuse can harm soil balance and useful microbes.'],
+lowMicrobe:['🦠','Microbe Disturbance','Soil microbes are important for natural fertility.'],
+pestRisk:['🐛','Pest Risk','Some organisms harm crops and reduce yield.']
+};
+
+var toolInfo={
+rhizobium:['🌱','Rhizobium Boost','Adds useful bacteria for nitrogen fixation.',{nitrogen:22,microbes:18,crop:10,soil:6}],
+compost:['🍂','Compost Mix','Adds organic matter and supports decomposers.',{soil:22,microbes:16,nitrogen:8,crop:7}],
+irrigation:['💧','Smart Irrigation','Improves water balance and nutrient absorption.',{water:25,crop:8,soil:5}],
+rootNodule:['🫘','Root Nodule Scan','Activates legume root-zone learning.',{nitrogen:18,microbes:12,crop:12}],
+decomposer:['🧫','Decomposer Culture','Breaks dead matter into nutrients.',{soil:18,microbes:20,nitrogen:10}],
+balancedFertilizer:['⚖️','Balanced Fertilizer','Adds controlled nutrients without overuse.',{nitrogen:16,crop:12,soil:4}],
+bioControl:['🛡️','Bio-Control Guard','Reduces harmful organisms in an eco-friendly way.',{pests:-18,crop:16,microbes:6}]
+};
+
+function $(id){return document.getElementById(id)}
+function clamp(v){return Math.max(0,Math.min(100,v))}
+function say(t){if(!G.voice)return;try{if('speechSynthesis' in window){speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-IN';u.rate=.94;u.pitch=1.04;speechSynthesis.speak(u)}}catch(e){}}
+function coach(t){$('coach').textContent=t;say(t)}
+function log(t){$('log').innerHTML='<p>'+t+'</p>'+$('log').innerHTML}
+
+function start(){G.score=0;G.season=0;G.day=1;loadSeason(0);coach('Welcome to Nitrogen Farm Quest. Find soil problems, then apply the correct farming solutions.')}
+function loadSeason(i){
+G.season=i;G.selected=null;G.solved={};G.found={};
+G.nitrogen=28+i*3;G.crop=35;G.microbes=25;G.pests=20+i*5;G.water=45;G.soil=45;
+var s=seasons[i];
+$('missionTitle').textContent=s.title;$('place').textContent=s.place;$('story').textContent=s.story;$('concept').textContent='Solve the farm mission to unlock the science concept.';
+drawProblems(s);drawTools(s);drawPlots();update();
+log('<b>'+s.title+'</b> started.');coach(s.story+' First tap the moving soil problems in the farm scene.');
+}
+
+function drawProblems(s){
+var scene=$('scene');scene.querySelectorAll('.problem').forEach(function(x){x.remove()});
+var pos=[[12,30],[72,28],[22,68],[74,64],[46,45]];
+s.problems.forEach(function(p,i){
+var inf=problemInfo[p],b=document.createElement('button');
+b.className='problem move'+(i%3);b.style.left=pos[i][0]+'%';b.style.top=pos[i][1]+'%';b.innerHTML='<span>'+inf[0]+'</span>';
+b.onclick=function(){findProblem(p,b)};scene.appendChild(b);
+});
+}
+
+function drawTools(s){
+var html='';
+s.tools.forEach(function(t){
+var inf=toolInfo[t];
+html+='<button class="tool" id="tool-'+t+'" onclick="Nitro.select(&quot;'+t+'&quot;)"><b>'+inf[0]+' '+inf[1]+'</b><br><small>'+inf[2]+'</small></button>';
+});
+$('tools').innerHTML=html;drawSlots();
+}
+
+function drawSlots(){
+var s=seasons[G.season],html='';
+s.tools.forEach(function(t,i){
+var inf=toolInfo[t],done=!!G.solved[t];
+html+='<button class="slot '+(done?'done':'')+'" onclick="Nitro.apply(&quot;'+t+'&quot;)">'+(done?inf[0]+' '+inf[1]:'Farm Action '+(i+1))+'</button>';
+});
+$('slots').innerHTML=html;
+}
+
+function drawPlots(){
+$('nBubble').textContent='Nitrogen '+G.nitrogen+'%';$('mBubble').textContent='Microbes '+G.microbes+'%';$('wBubble').textContent='Water '+G.water+'%';$('cBubble').textContent='Crop '+G.crop+'%';
+$('cropFill').style.height=clamp(G.crop)+'%';$('rootGlow').style.opacity=G.microbes/100;$('cloud').style.transform='translateX('+((G.water-50)/2)+'px)';
+}
+
+function findProblem(p,el){
+if(G.found[p])return;G.found[p]=true;el.classList.add('found');
+var inf=problemInfo[p];G.score+=25;G.soil=clamp(G.soil+4);G.crop=clamp(G.crop+3);
+log('<b>Problem found:</b> '+inf[0]+' '+inf[1]+' — '+inf[2]);coach(inf[1]+' detected. '+inf[2]);update();
+}
+
+function select(t){
+G.selected=t;document.querySelectorAll('.tool').forEach(function(x){x.classList.remove('active')});
+var el=$('tool-'+t);if(el)el.classList.add('active');
+var inf=toolInfo[t];coach('Selected '+inf[1]+'. Now apply it to the farm action slot.');
+}
+
+function apply(t){
+if(!G.selected){coach('Select a farm solution first, then tap the matching action slot.');return}
+if(G.selected!==t){coach('Wrong farm action slot. Select the correct solution for this action.');return}
+if(G.solved[t])return;
+G.solved[t]=true;var inf=toolInfo[t],effect=inf[3];
+Object.keys(effect).forEach(function(k){G[k]=clamp(G[k]+effect[k])});
+G.score+=45;log('<b>Action applied:</b> '+inf[0]+' '+inf[1]+' — '+inf[2]);coach(inf[1]+' applied. '+inf[2]);
+drawSlots();update();checkComplete();
+}
+
+function healthScore(){return Math.round((G.nitrogen+G.crop+G.microbes+G.water+G.soil+(100-G.pests))/6)}
+function update(){
+drawPlots();$('score').textContent=G.score;$('nitrogen').textContent=G.nitrogen;$('crop').textContent=G.crop;$('microbes').textContent=G.microbes;$('farmHealth').textContent=healthScore()+'%';$('healthBar').style.width=healthScore()+'%';
+var s=seasons[G.season];$('progress').textContent=Object.keys(G.found).length+'/'+s.problems.length+' problems • '+Object.keys(G.solved).length+'/'+s.tools.length+' actions';
+}
+
+function checkComplete(){
+var s=seasons[G.season],pDone=s.problems.every(function(p){return G.found[p]}),aDone=s.tools.every(function(t){return G.solved[t]});
+if(pDone&&aDone){
+G.score+=100;update();$('concept').textContent=s.concept;coach('Mission solved. '+s.concept);log('<b>Mission solved:</b> '+s.concept);
+if(G.season===seasons.length-1){$('certificate').style.display='block';coach('Excellent. You completed Nitrogen Farm Quest. Certificate unlocked.');$('certificate').scrollIntoView({behavior:'smooth'});}
+else{setTimeout(function(){if(confirm('Farm mission solved! Move to next farming challenge?'))nextSeason()},800)}
+}
+}
+
+function nextSeason(){if(G.season<seasons.length-1){G.day++;loadSeason(G.season+1)}}
+function hint(){
+var s=seasons[G.season];var p=s.problems.find(function(x){return !G.found[x]});
+if(p){var pi=problemInfo[p];coach('Hint: find '+pi[1]+' in the farm.');alert('Hint: tap '+pi[0]+' '+pi[1]+' in the farm scene.');return}
+var t=s.tools.find(function(x){return !G.solved[x]});
+if(t){var ti=toolInfo[t];coach('Hint: apply '+ti[1]+'.');alert('Hint: select '+ti[0]+' '+ti[1]+' and apply it.')}
+}
+
+function toggleVoice(){G.voice=!G.voice;$('voiceBtn').textContent=G.voice?'🔊 Voice ON':'🔇 Voice OFF';if(G.voice)coach('Voice guidance is on. Dr AI will guide the farm mission.')}
+window.Nitro={start:start,select:select,apply:apply,hint:hint,nextSeason:nextSeason,toggleVoice:toggleVoice};
+start();
+})();
+</script>
+</body>
+</html>

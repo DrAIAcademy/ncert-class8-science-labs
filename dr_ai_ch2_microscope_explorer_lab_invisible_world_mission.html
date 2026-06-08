@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MicroScope Explorer Lab | Dr AI Academy</title>
+<style>
+:root{
+  --panel: rgba(12,28,58,.96);
+  --cyan:#64f4ff; --gold:#ffe066; --green:#8cffc1; --red:#ff8aa0;
+  --text:#eef8ff; --muted:#b7cce5;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0;padding:0;font-family:Arial,Segoe UI,sans-serif;color:var(--text);
+  background:
+    radial-gradient(circle at 15% 10%,rgba(100,244,255,.16),transparent 26%),
+    radial-gradient(circle at 85% 10%,rgba(255,224,102,.14),transparent 26%),
+    linear-gradient(135deg,#061123,#123d82 60%,#071c34);
+  overflow-x:hidden;-webkit-text-size-adjust:100%;user-select:none;
+}
+button,input{font-family:inherit;touch-action:manipulation}
+.watermark{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wm{position:absolute;color:rgba(255,255,255,.055);font-size:clamp(28px,4vw,54px);font-weight:1000;transform:rotate(-24deg);white-space:nowrap}
+.cornerMark{position:fixed;right:12px;bottom:12px;z-index:1000;pointer-events:none;color:rgba(255,255,255,.78);background:rgba(4,13,24,.45);border:1px solid rgba(255,255,255,.2);padding:7px 10px;border-radius:999px;font-weight:900}
+.wrap{max-width:1460px;margin:auto;padding:12px;position:relative;z-index:1}
+.panel{background:var(--panel);border:1px solid rgba(100,244,255,.25);border-radius:20px;padding:14px;margin:12px 0;box-shadow:0 12px 34px rgba(0,0,0,.35)}
+.hero{background:linear-gradient(180deg,rgba(18,61,130,.92),rgba(7,22,48,.96));position:relative;overflow:hidden}
+.hero:after{content:"🔬 🧫 🦠 🧪 🍞 🥛";position:absolute;right:18px;bottom:14px;font-size:32px;letter-spacing:8px;opacity:.22}
+.logo{position:absolute;right:14px;top:14px;background:rgba(0,0,0,.28);border:1px solid rgba(100,244,255,.3);border-radius:16px;padding:8px 11px;text-align:right}
+.logo b{display:block}.logo span{color:var(--cyan);font-size:.74rem;font-weight:900}
+.badge{display:inline-block;background:rgba(100,244,255,.12);border:1px solid rgba(100,244,255,.25);border-radius:999px;color:var(--cyan);font-weight:900;padding:8px 12px;font-size:.78rem}
+h1{font-size:clamp(1.8rem,5vw,3.8rem);line-height:1.04;margin:10px 0 8px;max-width:1050px}
+.sub{line-height:1.55;color:var(--muted);max-width:1080px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:0;border-radius:15px;padding:12px 14px;font-weight:900;font-size:15px;background:linear-gradient(135deg,var(--cyan),#d9fbff);color:#061123;min-height:46px;cursor:pointer}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#fff3b0);color:#241400}
+.btn.dark{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff}
+.gameGrid{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:12px;align-items:start}
+.scene{
+  position:relative;min-height:620px;border-radius:18px;overflow:hidden;
+  background:linear-gradient(180deg,#b8e9ff 0,#dff5ff 24%,#a9c6e8 25%,#2d2e52 100%);
+  border:1px solid rgba(255,255,255,.15);
+}
+.labHeader{position:absolute;left:14px;top:14px;background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:9px 12px;font-weight:900;z-index:5}
+.shelf{position:absolute;left:6%;right:6%;top:85px;height:88px;border-radius:20px;background:rgba(116,81,54,.55);border:1px solid rgba(255,255,255,.16)}
+.sampleTray{position:absolute;left:6%;bottom:32px;width:28%;min-width:170px;border-radius:18px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.14);padding:10px}
+.sampleTray h3,.notes h3{margin:4px 0 8px;font-size:1rem}
+.sampleButtons{display:grid;gap:8px}
+.sampleButtons button{
+  width:100%;text-align:left;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.08);color:#fff;font-weight:800
+}
+.sampleButtons button.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,224,102,.18)}
+.notes{position:absolute;right:6%;bottom:32px;width:26%;min-width:170px;border-radius:18px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.14);padding:10px}
+.notes p{margin:6px 0;color:var(--muted);font-size:.93rem;line-height:1.45}
+.scopeBase{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);width:min(58vw,520px);height:min(58vw,520px);max-width:520px;max-height:520px;z-index:2}
+.scopeRing{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 40% 30%,rgba(255,255,255,.12),rgba(0,0,0,.15));border:12px solid rgba(215,234,255,.88);box-shadow:0 0 0 10px rgba(61,99,150,.45),0 18px 28px rgba(0,0,0,.35);overflow:hidden}
+.scopeView{
+  position:absolute;inset:18px;border-radius:50%;overflow:hidden;
+  background:radial-gradient(circle,#113256 0,#081a30 72%,#020913 100%);
+}
+.lightOverlay{position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.28),transparent 55%);mix-blend-mode:screen;pointer-events:none}
+.crosshairX,.crosshairY{position:absolute;background:rgba(255,255,255,.22);z-index:3}
+.crosshairX{left:0;right:0;top:50%;height:1px}
+.crosshairY{top:0;bottom:0;left:50%;width:1px}
+.focusBlur{position:absolute;inset:0;backdrop-filter:blur(6px);pointer-events:none;transition:.15s linear}
+.sampleLabel{position:absolute;left:50%;top:18px;transform:translateX(-50%);padding:7px 12px;border-radius:999px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.16);font-weight:900;z-index:4}
+.slideStage{
+  position:absolute;left:50%;bottom:62px;transform:translateX(-50%);
+  width:50%;height:18px;border-radius:999px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.12)
+}
+.disc{
+  position:absolute;display:grid;place-items:center;border-radius:50%;font-weight:900;
+  box-shadow:0 0 18px rgba(255,255,255,.12), inset 0 0 18px rgba(255,255,255,.08);
+}
+.disc.small{width:18px;height:18px;font-size:12px}.disc.med{width:30px;height:30px;font-size:18px}.disc.big{width:44px;height:44px;font-size:24px}
+.microbeFloat{animation:floatMicro 4.5s infinite ease-in-out}
+@keyframes floatMicro{0%,100%{transform:translate(0,0)}25%{transform:translate(6px,-8px)}50%{transform:translate(-5px,8px)}75%{transform:translate(7px,4px)}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:rgba(255,255,255,.08);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;color:var(--cyan);font-size:22px}
+.bar{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:8px}
+.bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.infoBox{background:linear-gradient(180deg,rgba(100,244,255,.10),rgba(255,255,255,.04));border:1px solid rgba(100,244,255,.20);border-radius:16px;padding:12px;line-height:1.55;margin-top:10px}
+#coach{background:rgba(255,224,102,.10);border:1px solid rgba(255,224,102,.25);border-radius:14px;padding:10px;font-weight:800;animation:pulse 2.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 rgba(255,224,102,0)}50%{box-shadow:0 0 18px rgba(255,224,102,.18)}}
+.controlCard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px;margin:8px 0}
+.controlCard label{display:flex;justify-content:space-between;gap:8px;font-weight:900;color:var(--gold);margin-bottom:6px}
+input[type=range]{width:100%}
+.optionGrid{display:grid;grid-template-columns:1fr;gap:8px}
+.optionBtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:11px;color:#fff;text-align:left;min-height:56px;cursor:pointer}
+.optionBtn.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,224,102,.18)}
+.optionBtn.correct{border-color:rgba(140,255,193,.75);background:rgba(140,255,193,.16)}
+.optionBtn.wrong{border-color:rgba(255,138,160,.75);background:rgba(255,138,160,.16)}
+.log{max-height:150px;overflow:auto;background:rgba(0,0,0,.18);border-radius:14px;padding:10px;font-size:.92rem}
+.log p{margin:0 0 8px}
+.cert{display:none;text-align:center;border:2px solid var(--gold)}
+.cert input{width:100%;max-width:360px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.2);color:#fff;text-align:center}
+.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted)}
+.footer a{color:var(--cyan);font-weight:900;text-decoration:none}
+@media(max-width:980px){
+  .gameGrid{grid-template-columns:1fr}
+  .logo{position:static;width:max-content;margin:0 0 10px auto}
+  .hero:after{display:none}
+  .controls{display:grid;grid-template-columns:1fr 1fr}
+  .btn{width:100%}
+  .scene{min-height:760px}
+  .sampleTray,.notes{position:relative;left:auto;right:auto;bottom:auto;width:100%;margin:10px}
+  .scopeBase{top:42%}
+}
+@media(max-width:520px){
+  .wrap{padding:6px}.panel{padding:10px;margin:8px 0;border-radius:16px}
+  h1{font-size:1.46rem}h2{font-size:1.08rem;margin:8px 0}h3{font-size:1rem;margin:8px 0}
+  .controls,.stats{grid-template-columns:1fr}.stat{padding:8px}.stat b{font-size:18px}
+  .scene{min-height:760px}
+  .scopeBase{width:86vw;height:86vw}
+  .scopeRing{border-width:10px}
+  .sampleTray,.notes{margin:8px}
+  .sampleButtons button,.optionBtn{font-size:.92rem}
+  .notes p,.infoBox{font-size:.9rem}
+}
+@media print{
+  .hero,.gameGrid,.footer,.watermark,.cornerMark{display:none!important}
+  .cert{display:block!important;color:#111;background:#fff}
+  .cert input{color:#111;border:0}
+}
+</style>
+</head>
+<body oncontextmenu="return false">
+<div class="watermark">
+  <div class="wm" style="top:5%;left:-8%">Dr AI Academy</div>
+  <div class="wm" style="top:30%;left:35%">Dr AI Academy</div>
+  <div class="wm" style="top:55%;left:-5%">Dr AI Academy</div>
+  <div class="wm" style="top:78%;left:35%">Dr AI Academy</div>
+</div>
+<div class="cornerMark">Dr AI Academy</div>
+
+<div class="wrap">
+  <section class="panel hero">
+    <div class="logo"><b>Dr AI Academy</b><span>Microscope Adventure Game Lab</span></div>
+    <div class="badge">CHAPTER 2 • MICROSCOPIC WORLD • REAL LAB FEEL</div>
+    <h1>MicroScope Explorer Lab:<br>The Invisible World Mission</h1>
+    <p class="sub">A real-life microscope adventure where students choose a sample, adjust zoom, focus and light, observe the invisible world, and identify the microorganism correctly. It gives a true lab feeling while building NEET, JEE and Olympiad-level observation habits.</p>
+    <div class="controls">
+      <button class="btn gold" onclick="ScopeLab.start()">🎮 Start Lab Mission</button>
+      <button class="btn dark" onclick="ScopeLab.hint()">💡 Dr AI Hint</button>
+      <button class="btn dark" onclick="ScopeLab.nextSlide()">➡️ Next Slide</button>
+      <button class="btn dark" onclick="ScopeLab.toggleVoice()" id="voiceBtn">🔊 Voice ON</button>
+    </div>
+  </section>
+
+  <section class="gameGrid">
+    <main class="panel">
+      <h2 id="missionTitle">Slide 1</h2>
+      <div class="scene">
+        <div class="labHeader" id="labHeader">Micro Lab Station</div>
+        <div class="shelf"></div>
+
+        <div class="scopeBase">
+          <div class="scopeRing"></div>
+          <div class="scopeView" id="scopeView">
+            <div class="sampleLabel" id="sampleName">Sample: Pond Water</div>
+            <div class="crosshairX"></div>
+            <div class="crosshairY"></div>
+            <div class="lightOverlay" id="lightOverlay"></div>
+            <div class="focusBlur" id="focusBlur"></div>
+          </div>
+          <div class="slideStage"></div>
+        </div>
+
+        <div class="sampleTray">
+          <h3>🧪 Slide Rack</h3>
+          <div class="sampleButtons" id="sampleButtons"></div>
+        </div>
+
+        <div class="notes">
+          <h3>📓 Dr AI Notes</h3>
+          <p id="storyText">Select a sample and adjust the microscope controls.</p>
+          <p><b>Observation Goal:</b> <span id="goalText">Bring the sample into clear view.</span></p>
+          <p><b>What this builds:</b> microscope handling, observation, identification, and science reasoning.</p>
+        </div>
+      </div>
+    </main>
+
+    <aside class="panel">
+      <div class="stats">
+        <div class="stat"><b id="score">0</b>Score</div>
+        <div class="stat"><b id="slideNo">1/5</b>Slide</div>
+        <div class="stat"><b id="clarity">0%</b>Clarity</div>
+      </div>
+      <div class="bar"><span id="clarityBar"></span></div>
+
+      <div class="infoBox">
+        <h3>🤖 Dr AI Live Guide</h3>
+        <p id="coach">Choose a sample, adjust zoom, focus and light, then identify the organism.</p>
+      </div>
+
+      <div class="infoBox">
+        <b>Microscope Controls</b>
+
+        <div class="controlCard">
+          <label>Zoom <span id="zoomOut">1x</span></label>
+          <input type="range" id="zoom" min="1" max="10" value="3">
+        </div>
+
+        <div class="controlCard">
+          <label>Focus <span id="focusOut">50</span></label>
+          <input type="range" id="focus" min="0" max="100" value="50">
+        </div>
+
+        <div class="controlCard">
+          <label>Light <span id="lightOut">50</span></label>
+          <input type="range" id="light" min="0" max="100" value="50">
+        </div>
+
+        <button class="btn gold" style="width:100%;margin-top:6px" onclick="ScopeLab.checkObservation()">🔬 Check Observation</button>
+      </div>
+
+      <div class="infoBox">
+        <b>Step 1: Identify the microorganism type</b>
+        <div class="optionGrid" id="typeOptions"></div>
+      </div>
+
+      <div class="infoBox">
+        <b>Step 2: Identify its role</b>
+        <div class="optionGrid" id="roleOptions"></div>
+      </div>
+
+      <div class="infoBox">
+        <b>Science Result</b>
+        <p id="conceptText">Make the image clear and identify the sample to unlock the science explanation.</p>
+      </div>
+
+      <div class="infoBox">
+        <b>Mission Log</b>
+        <div class="log" id="log"></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="panel cert" id="certificate">
+    <div style="font-size:54px">🔬🦠🏅</div>
+    <h2>Certificate of MicroScope Explorer Mastery</h2>
+    <p>This certifies that</p>
+    <input placeholder="Enter Student Name">
+    <p>has completed <b>MicroScope Explorer Lab: The Invisible World Mission</b></p>
+    <p>Skills: microscope observation • focusing • microbial identification • useful vs harmful role • scientific reasoning</p>
+    <p><b>Developed by Dr AI Academy</b></p>
+    <button class="btn gold" onclick="window.print()">Print / Save Certificate</button>
+  </section>
+
+  <footer class="panel footer">
+    <div>Developed by <b>Dr AI Academy</b> • Microscope-based science game lab</div>
+    <div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div>
+  </footer>
+</div>
+
+<script>
+(function(){
+const LAB = {
+  voice:true,
+  score:0,
+  index:0,
+  zoom:3,
+  focus:50,
+  light:50,
+  selectedType:null,
+  selectedRole:null,
+  solvedSlides:{}
+};
+
+const slides = [
+  {
+    title:'Slide 1: Pond Water Mystery',
+    header:'School Science Lab • Pond Water',
+    sample:'Pond Water Drop',
+    icon:'🦠',
+    story:'A pond water drop may contain tiny living organisms. Bring them into clear view and identify them correctly.',
+    goal:'Observe a moving protozoan-like organism in pond water.',
+    target:{zoom:6, focus:62, light:58},
+    type:'Protozoa',
+    role:'Can be useful in ecosystem, but some protozoa cause disease.',
+    concept:'Protozoa are single-celled organisms. Some live freely in water, while some can cause disease. This slide shows why microbes cannot be seen with naked eyes.',
+    render:'protozoa'
+  },
+  {
+    title:'Slide 2: Bread Mould Alert',
+    header:'Kitchen Sample Station • Bread Mould',
+    sample:'Bread Mould',
+    icon:'🍞',
+    story:'Old bread develops mould. Observe the fungal growth pattern.',
+    goal:'Observe fungal hyphae and spore-like structures on bread.',
+    target:{zoom:7, focus:68, light:52},
+    type:'Fungi',
+    role:'Mostly harmful here because bread mould causes food spoilage.',
+    concept:'Fungi like bread mould grow on moist food and spoil it. This helps students connect microbes with food spoilage and preservation.',
+    render:'fungi'
+  },
+  {
+    title:'Slide 3: Curd Culture Discovery',
+    header:'Dairy Counter Lab • Curd Sample',
+    sample:'Curd Smear',
+    icon:'🥛',
+    story:'Curd contains useful bacteria. Observe the sample and connect it to Lactobacillus action.',
+    goal:'Observe useful bacteria from curd.',
+    target:{zoom:8, focus:72, light:60},
+    type:'Bacteria',
+    role:'Useful because Lactobacillus helps convert milk into curd.',
+    concept:'Lactobacillus is a useful bacterium that converts milk into curd. Not all microorganisms are harmful.',
+    render:'bacteria'
+  },
+  {
+    title:'Slide 4: Green Water Layer',
+    header:'Water Tank Observation • Algae',
+    sample:'Green Water Layer',
+    icon:'🌿',
+    story:'Green colour in water often indicates algal growth. Bring the sample into focus and identify it.',
+    goal:'Observe algae-like chain or colony structure.',
+    target:{zoom:5, focus:56, light:70},
+    type:'Algae',
+    role:'Often useful because algae can make oxygen and food, though too much growth may cause problems.',
+    concept:'Algae are plant-like microorganisms. Many algae make oxygen and are important in aquatic ecosystems.',
+    render:'algae'
+  },
+  {
+    title:'Slide 5: Root Nodule Secret',
+    header:'Farm Biology Lab • Root Nodule Smear',
+    sample:'Legume Root Nodule',
+    icon:'🌱',
+    story:'Root nodules of leguminous plants contain useful bacteria. Observe the sample to connect microbes with soil fertility.',
+    goal:'Observe bacteria associated with root nodules.',
+    target:{zoom:7, focus:66, light:55},
+    type:'Bacteria',
+    role:'Useful because Rhizobium helps nitrogen fixation.',
+    concept:'Rhizobium lives in root nodules of leguminous plants and helps fix atmospheric nitrogen, improving soil fertility.',
+    render:'rhizobium'
+  }
+];
+
+const typeChoices = ['Bacteria','Fungi','Protozoa','Algae','Virus'];
+const roleChoices = [
+  'Useful because Lactobacillus helps convert milk into curd.',
+  'Mostly harmful here because bread mould causes food spoilage.',
+  'Can be useful in ecosystem, but some protozoa cause disease.',
+  'Often useful because algae can make oxygen and food, though too much growth may cause problems.',
+  'Useful because Rhizobium helps nitrogen fixation.',
+  'Harmful because antibiotics are microbes.'
+];
+
+function $(id){return document.getElementById(id);}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+function say(t){
+  if(!LAB.voice) return;
+  try{
+    if('speechSynthesis' in window){
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(t);
+      u.lang='en-IN'; u.rate=.94; u.pitch=1.04;
+      speechSynthesis.speak(u);
+    }
+  }catch(e){}
+}
+function coach(t){$('coach').textContent=t; say(t);}
+function log(t){$('log').innerHTML='<p>'+t+'</p>'+$('log').innerHTML;}
+
+function start(){
+  LAB.score=0;
+  LAB.index=0;
+  LAB.solvedSlides={};
+  loadSlide(0);
+  coach('Welcome explorer. Choose the sample, adjust zoom, focus and light, then identify the microorganism and its role.');
+}
+
+function loadSlide(i){
+  LAB.index=i;
+  LAB.zoom=3;
+  LAB.focus=50;
+  LAB.light=50;
+  LAB.selectedType=null;
+  LAB.selectedRole=null;
+  const s = slides[i];
+  $('missionTitle').textContent=s.title;
+  $('labHeader').textContent=s.header;
+  $('sampleName').textContent='Sample: '+s.sample;
+  $('storyText').textContent=s.story;
+  $('goalText').textContent=s.goal;
+  $('slideNo').textContent=(i+1)+'/'+slides.length;
+  $('conceptText').textContent='Make the image clear and identify the sample to unlock the science explanation.';
+  updateSliders();
+  drawSampleButtons();
+  drawTypeOptions();
+  drawRoleOptions();
+  renderMicrobes();
+  update();
+  log('<b>'+s.title+'</b> loaded.');
+  coach(s.story+' Use the microscope controls to make the image clearer.');
+}
+
+function drawSampleButtons(){
+  let html='';
+  slides.forEach((s,idx)=>{
+    html += '<button class="'+(idx===LAB.index?'active':'')+'" onclick="ScopeLab.goToSlide('+idx+')">'+s.icon+' '+s.sample+'</button>';
+  });
+  $('sampleButtons').innerHTML=html;
+}
+
+function drawTypeOptions(){
+  let html='';
+  typeChoices.forEach(t=>{
+    const cls = LAB.selectedType===t?'optionBtn active':'optionBtn';
+    html += '<button class="'+cls+'" onclick="ScopeLab.pickType(\''+t.replace(/'/g,"&#39;")+'\')"><b>'+t+'</b></button>';
+  });
+  $('typeOptions').innerHTML=html;
+}
+
+function drawRoleOptions(){
+  let html='';
+  roleChoices.forEach(r=>{
+    const safe = r.replace(/'/g,"&#39;");
+    const cls = LAB.selectedRole===r?'optionBtn active':'optionBtn';
+    html += '<button class="'+cls+'" onclick="ScopeLab.pickRole(\''+safe+'\')"><small>'+r+'</small></button>';
+  });
+  $('roleOptions').innerHTML=html;
+}
+
+function updateSliders(){
+  $('zoom').value=LAB.zoom; $('focus').value=LAB.focus; $('light').value=LAB.light;
+  $('zoomOut').textContent=LAB.zoom+'x';
+  $('focusOut').textContent=LAB.focus;
+  $('lightOut').textContent=LAB.light;
+}
+
+function currentClarity(){
+  const s = slides[LAB.index];
+  const dz = Math.abs(LAB.zoom - s.target.zoom);
+  const df = Math.abs(LAB.focus - s.target.focus);
+  const dl = Math.abs(LAB.light - s.target.light);
+  const score = 100 - (dz*12 + df*1.1 + dl*0.9);
+  return clamp(Math.round(score),0,100);
+}
+
+function updateVisuals(){
+  const clarity = currentClarity();
+  const blurPx = clamp((100-clarity)/12,0,7);
+  $('focusBlur').style.backdropFilter = 'blur('+blurPx+'px)';
+  $('lightOverlay').style.opacity = clamp(LAB.light/100,0.15,1);
+  const scale = 1 + (LAB.zoom-1)*0.09;
+  const view = $('scopeView');
+  view.querySelectorAll('.microbeSprite').forEach(el=>{
+    el.style.transform='scale('+scale+')';
+    el.dataset.scale = scale;
+  });
+}
+
+function update(){
+  const clarity = currentClarity();
+  $('score').textContent=LAB.score;
+  $('clarity').textContent=clarity+'%';
+  $('clarityBar').style.width=clarity+'%';
+  updateVisuals();
+}
+
+function readControls(){
+  LAB.zoom = +$('zoom').value;
+  LAB.focus = +$('focus').value;
+  LAB.light = +$('light').value;
+  updateSliders();
+  update();
+}
+
+function renderMicrobes(){
+  const view = $('scopeView');
+  view.querySelectorAll('.microbeSprite').forEach(el=>el.remove());
+  const s = slides[LAB.index];
+  const add = (html,left,top,size='med',bg='rgba(140,255,193,.22)',border='rgba(140,255,193,.55)')=>{
+    const d = document.createElement('div');
+    d.className='disc microbeSprite microbeFloat '+size;
+    d.style.left=left; d.style.top=top; d.style.background=bg; d.style.border='2px solid '+border;
+    d.innerHTML=html; view.appendChild(d);
+  };
+  if(s.render==='protozoa'){
+    add('🦠','30%','30%','big','rgba(110,220,255,.24)','rgba(110,220,255,.65)');
+    add('•','52%','22%','small','rgba(255,224,102,.22)','rgba(255,224,102,.55)');
+    add('•','58%','56%','small','rgba(255,224,102,.22)','rgba(255,224,102,.55)');
+    add('◌','38%','60%','med','rgba(110,220,255,.15)','rgba(110,220,255,.4)');
+    add('◌','62%','42%','med','rgba(110,220,255,.15)','rgba(110,220,255,.4)');
+  }else if(s.render==='fungi'){
+    add('✺','34%','34%','big','rgba(255,170,220,.22)','rgba(255,170,220,.65)');
+    add('✺','50%','48%','med','rgba(255,170,220,.22)','rgba(255,170,220,.65)');
+    add('⟋','42%','40%','small','rgba(255,255,255,.18)','rgba(255,255,255,.35)');
+    add('⟍','57%','34%','small','rgba(255,255,255,.18)','rgba(255,255,255,.35)');
+    add('•','63%','57%','small','rgba(255,224,102,.25)','rgba(255,224,102,.55)');
+  }else if(s.render==='bacteria'){
+    add('—','34%','34%','med','rgba(140,255,193,.22)','rgba(140,255,193,.6)');
+    add('—','54%','52%','med','rgba(140,255,193,.22)','rgba(140,255,193,.6)');
+    add('—','47%','28%','med','rgba(140,255,193,.22)','rgba(140,255,193,.6)');
+    add('•','60%','34%','small','rgba(255,224,102,.24)','rgba(255,224,102,.55)');
+    add('•','28%','55%','small','rgba(255,224,102,.24)','rgba(255,224,102,.55)');
+  }else if(s.render==='algae'){
+    add('≋','32%','35%','big','rgba(140,255,193,.22)','rgba(140,255,193,.6)');
+    add('≋','52%','52%','med','rgba(140,255,193,.22)','rgba(140,255,193,.6)');
+    add('≋','48%','24%','med','rgba(140,255,193,.22)','rgba(140,255,193,.6)');
+    add('•','62%','60%','small','rgba(255,255,255,.22)','rgba(255,255,255,.55)');
+  }else if(s.render==='rhizobium'){
+    add('—','35%','35%','med','rgba(255,230,140,.22)','rgba(255,230,140,.6)');
+    add('—','48%','46%','med','rgba(255,230,140,.22)','rgba(255,230,140,.6)');
+    add('◉','60%','34%','med','rgba(255,170,120,.16)','rgba(255,170,120,.45)');
+    add('•','30%','58%','small','rgba(255,255,255,.22)','rgba(255,255,255,.5)');
+    add('•','56%','60%','small','rgba(255,255,255,.22)','rgba(255,255,255,.5)');
+  }
+  updateVisuals();
+}
+
+function pickType(t){
+  LAB.selectedType = t;
+  drawTypeOptions();
+}
+function pickRole(r){
+  LAB.selectedRole = r;
+  drawRoleOptions();
+}
+
+function checkObservation(){
+  const clarity = currentClarity();
+  if(clarity < 75){
+    coach('Image is still not clear enough. Adjust focus, light and zoom more carefully.');
+    log('<b>Observation check:</b> Clarity is only '+clarity+'%. Keep adjusting the microscope.');
+    return;
+  }
+  if(!LAB.selectedType || !LAB.selectedRole){
+    coach('Good observation. Now choose the microorganism type and its role.');
+    log('<b>Observation ready:</b> Clarity reached '+clarity+'%. Identification step unlocked.');
+    return;
+  }
+  const s = slides[LAB.index];
+  let gain = 0;
+  const typeOk = LAB.selectedType === s.type;
+  const roleOk = LAB.selectedRole === s.role;
+  document.querySelectorAll('#typeOptions .optionBtn').forEach(btn=>{
+    if(btn.textContent.trim()===s.type) btn.classList.add('correct');
+    else if(btn.textContent.trim()===LAB.selectedType && !typeOk) btn.classList.add('wrong');
+  });
+  document.querySelectorAll('#roleOptions .optionBtn').forEach(btn=>{
+    if(btn.textContent.trim()===s.role) btn.classList.add('correct');
+    else if(btn.textContent.trim()===LAB.selectedRole && !roleOk) btn.classList.add('wrong');
+  });
+  if(typeOk) gain += 60;
+  if(roleOk) gain += 60;
+  gain += clarity;
+  LAB.score += gain;
+  $('conceptText').textContent = s.concept;
+  LAB.solvedSlides[LAB.index] = true;
+  log('<b>Slide solved:</b> '+s.sample+' — '+s.concept);
+  if(typeOk && roleOk){
+    coach('Excellent. You identified the sample correctly. '+s.concept);
+  }else{
+    coach('Observation done, but one choice was not fully correct. Read the science result and try the next slide.');
+  }
+  update();
+  if(Object.keys(LAB.solvedSlides).length === slides.length){
+    $('certificate').style.display='block';
+    coach('Outstanding. You completed the entire MicroScope Explorer mission. Certificate unlocked.');
+    $('certificate').scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function goToSlide(i){ loadSlide(i); }
+function nextSlide(){ if(LAB.index < slides.length-1) loadSlide(LAB.index+1); }
+function hint(){
+  const s = slides[LAB.index];
+  const clarity = currentClarity();
+  if(clarity < 75){
+    const hz = s.target.zoom, hf = s.target.focus, hl = s.target.light;
+    const msg = 'Hint: try Zoom near '+hz+'x, Focus near '+hf+', and Light near '+hl+'.';
+    coach(msg); alert(msg); return;
+  }
+  if(!LAB.selectedType){
+    const msg = 'Hint: think about the sample source. Bread mould = fungi, curd = bacteria, pond water often shows protozoa, green water can show algae.';
+    coach(msg); alert(msg); return;
+  }
+  if(!LAB.selectedRole){
+    const msg = 'Hint: now choose whether the microbe is useful or harmful in this sample.';
+    coach(msg); alert(msg); return;
+  }
+  coach('You are ready. Press Check Observation.');
+  alert('You are ready. Press Check Observation.');
+}
+function toggleVoice(){
+  LAB.voice=!LAB.voice;
+  $('voiceBtn').textContent = LAB.voice ? '🔊 Voice ON' : '🔇 Voice OFF';
+  if(LAB.voice) coach('Voice guide is on. Dr AI will guide your microscope mission.');
+}
+
+document.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey)&&['s','u'].includes(e.key.toLowerCase())) e.preventDefault();
+  if(e.key==='F12') e.preventDefault();
+});
+['zoom','focus','light'].forEach(id => $(id).addEventListener('input',readControls));
+
+window.ScopeLab = {
+  start, hint, nextSlide, toggleVoice, checkObservation, pickType, pickRole, goToSlide
+};
+start();
+})();
+</script>
+</body>
+</html>
