@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Onion Ninja Pro: Microscope Slice | Dr AI Academy</title>
+<style>
+:root{
+  --bg:#050713;--panel:#0f1737;--line:rgba(255,255,255,.17);
+  --cyan:#55f7ff;--pink:#ff5fcb;--yellow:#ffe65b;--green:#74ffae;--red:#ff5c78;
+  --text:#f8fbff;--muted:#c4d0ff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0;min-height:100%;font-family:Arial,Segoe UI,sans-serif;color:var(--text);
+  background:
+    radial-gradient(circle at 10% 8%,rgba(85,247,255,.22),transparent 27%),
+    radial-gradient(circle at 88% 12%,rgba(255,95,203,.20),transparent 28%),
+    radial-gradient(circle at 50% 100%,rgba(255,230,91,.13),transparent 34%),
+    linear-gradient(135deg,#050713,#12194a 54%,#241054);
+  overflow-x:hidden;user-select:none;
+}
+button,input{font-family:inherit}
+button{cursor:pointer;touch-action:manipulation}
+.app{max-width:1440px;margin:auto;padding:12px}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.055));
+  border:1px solid var(--line);border-radius:28px;box-shadow:0 22px 58px rgba(0,0,0,.38);backdrop-filter:blur(18px)
+}
+.hero{position:relative;padding:18px;margin-bottom:12px;overflow:hidden}
+.hero:after{content:"🧅 ⚔️ 🔬 🧫 🟣 🧱 💧 🏆";position:absolute;right:16px;bottom:12px;font-size:34px;letter-spacing:8px;opacity:.16}
+.chip{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(85,247,255,.28);background:rgba(85,247,255,.12);color:var(--cyan);border-radius:999px;padding:8px 12px;font-size:.78rem;font-weight:1000}
+h1{font-size:clamp(1.8rem,5vw,4.1rem);line-height:.95;margin:12px 0 8px;letter-spacing:-.045em}
+.sub{color:var(--muted);line-height:1.55;max-width:1050px;margin:0}
+.controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.btn{border:0;border-radius:18px;padding:13px 16px;min-height:50px;font-size:15px;font-weight:1000;color:#061123;background:linear-gradient(135deg,var(--cyan),#e3fcff)}
+.btn.pink{background:linear-gradient(135deg,var(--pink),#ffd8f6);color:#28001f}
+.btn.yellow{background:linear-gradient(135deg,var(--yellow),#fff7bf);color:#251900}
+.btn.dark{background:rgba(255,255,255,.09);color:#fff;border:1px solid var(--line)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:12px;align-items:start}
+.gameCard{padding:10px}
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.hudItem{min-height:70px;display:grid;place-items:center;text-align:center;background:rgba(0,0,0,.24);border:1px solid var(--line);border-radius:20px}
+.hudItem b{display:block;color:var(--cyan);font-size:1.5rem;line-height:1}.hudItem span{display:block;color:var(--muted);font-size:.76rem;font-weight:900}
+#arena{
+  position:relative;width:100%;height:700px;overflow:hidden;border-radius:28px;
+  background:
+    radial-gradient(circle at 50% 86%,rgba(255,230,91,.09),transparent 22%),
+    linear-gradient(180deg,#182164,#0b1130 62%,#070a1e);
+  border:1px solid rgba(255,255,255,.18);
+  touch-action:none;
+}
+#arena:before{
+  content:"";position:absolute;inset:0;opacity:.18;
+  background-image:linear-gradient(rgba(255,255,255,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.13) 1px,transparent 1px);
+  background-size:58px 58px;
+}
+.track{
+  position:absolute;left:4%;right:4%;top:86px;bottom:118px;z-index:1;
+  border-radius:34px;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));
+  border:1px solid rgba(255,255,255,.10);
+}
+.lane{
+  position:absolute;top:0;bottom:0;width:30%;border-radius:30px;background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.08)
+}
+.lane:nth-child(1){left:2%}.lane:nth-child(2){left:35%}.lane:nth-child(3){right:2%}
+.lane.active{background:rgba(255,230,91,.10);box-shadow:inset 0 0 30px rgba(255,230,91,.10)}
+.topStrip{position:absolute;z-index:20;left:12px;right:12px;top:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.pill{background:rgba(5,10,30,.80);border:1px solid var(--line);border-radius:999px;padding:8px 11px;font-weight:1000;font-size:.85rem;box-shadow:0 8px 18px rgba(0,0,0,.25)}
+.player{
+  position:absolute;z-index:12;width:110px;height:110px;border-radius:32px;left:50%;bottom:28px;transform:translateX(-50%);
+  display:grid;place-items:center;background:linear-gradient(135deg,#ffffff,#e8feff);border:5px solid var(--yellow);
+  box-shadow:0 16px 30px rgba(0,0,0,.38),0 0 0 8px rgba(255,230,91,.13);font-size:56px;transition:left .16s ease
+}
+.player:after{content:"SLICE";position:absolute;bottom:-13px;background:#10173b;color:#ffe65b;border:1px solid rgba(255,255,255,.22);border-radius:999px;font-size:11px;font-weight:1000;padding:3px 8px}
+.obj{
+  position:absolute;z-index:10;width:122px;height:122px;border-radius:34px;display:grid;place-items:center;text-align:center;
+  border:4px solid rgba(255,255,255,.78);background:linear-gradient(135deg,#fff9c5,#fff);color:#1a0920;font-weight:1000;
+  box-shadow:0 22px 36px rgba(0,0,0,.38),0 0 0 7px rgba(255,230,91,.10);
+  transition:filter .12s ease;
+}
+.obj.bad{background:linear-gradient(135deg,#676d8a,#252b43);color:#fff;border-color:rgba(255,255,255,.40);box-shadow:0 22px 36px rgba(0,0,0,.38),0 0 0 7px rgba(255,92,120,.08)}
+.obj.good{outline:2px solid rgba(255,230,91,.45)}
+.obj.microObj{z-index:30;width:132px;height:132px;border-radius:38px;box-shadow:0 24px 42px rgba(0,0,0,.48),0 0 0 10px rgba(85,247,255,.10)}
+.obj.microObj .emoji{font-size:62px}
+.obj.microObj .label{font-size:14px;background:rgba(0,0,0,.20);border-radius:999px;padding:2px 8px}
+.obj .emoji{font-size:56px;line-height:1;filter:drop-shadow(0 3px 0 rgba(0,0,0,.25))}.obj .label{font-size:13px;margin-top:4px}
+.obj.warning{animation:warn .45s infinite alternate}
+@keyframes warn{from{filter:brightness(1)}to{filter:brightness(1.25)}}
+.slice{
+  position:absolute;z-index:35;height:9px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),var(--yellow),transparent);
+  box-shadow:0 0 24px rgba(85,247,255,.9);transform-origin:left center;pointer-events:none;animation:sliceFade .34s forwards
+}
+@keyframes sliceFade{from{opacity:1}to{opacity:0}}
+.comboPop{
+  position:absolute;z-index:40;left:50%;top:45%;transform:translate(-50%,-50%);
+  font-size:clamp(1.7rem,6vw,4.1rem);font-weight:1000;text-align:center;color:#fff;text-shadow:0 4px 0 #000,0 0 24px var(--pink);animation:pop .72s forwards;pointer-events:none
+}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}100%{opacity:0;transform:translate(-50%,-75%) scale(1)}}
+.focusPanel{
+  position:absolute;z-index:25;left:50%;top:50%;transform:translate(-50%,-50%);width:min(90%,650px);
+  border-radius:34px;padding:22px;text-align:center;display:none;background:rgba(255,255,255,.95);color:#081024;border:5px solid rgba(255,255,255,.75);box-shadow:0 24px 56px rgba(0,0,0,.38)
+}
+.microPanel{
+  position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);width:min(90%,650px);
+  border-radius:34px;padding:22px;text-align:center;display:none;background:rgba(255,255,255,.18);color:#ffffff;border:2px solid rgba(255,255,255,.22);box-shadow:0 24px 56px rgba(0,0,0,.20);
+  pointer-events:none;opacity:.42
+}
+.focusTrack{height:52px;border-radius:999px;background:linear-gradient(90deg,var(--red) 0 38%,var(--green) 38% 62%,var(--red) 62% 100%);position:relative;overflow:hidden;margin:16px 0}
+.needle{position:absolute;top:-8px;left:0;width:16px;height:68px;border-radius:999px;background:#071225}
+.microCircle{
+  width:min(90vw,520px);aspect-ratio:1/1;margin:auto;border-radius:50%;border:15px solid #081024;overflow:hidden;
+  background:radial-gradient(circle,rgba(255,255,255,.78),rgba(217,251,255,.55) 50%,rgba(120,217,239,.35) 70%,rgba(30,66,100,.35) 72%);display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:55px
+}
+.cell{border-radius:15px;background:rgba(196,129,207,.28);border:3px solid rgba(117,48,135,.55);position:relative}
+.cell:nth-child(3n):after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#7f2db2}
+.cell:nth-child(4n):before{content:"";position:absolute;right:10%;bottom:12%;width:24px;height:24px;border-radius:50%;background:rgba(85,247,255,.42)}
+.startOverlay{
+  position:absolute;z-index:50;inset:16px;border-radius:24px;background:rgba(7,9,22,.72);backdrop-filter:blur(7px);display:grid;place-items:center;text-align:center
+}
+.startBox{width:min(92%,650px);background:linear-gradient(180deg,#151d5e,#221050);border:2px solid rgba(255,230,91,.62);border-radius:34px;padding:22px;box-shadow:0 24px 56px rgba(0,0,0,.42)}
+.startBox h2{font-size:clamp(1.5rem,4vw,2.6rem);margin:0 0 8px}.startBox p{color:var(--muted);line-height:1.55}
+.side{padding:14px}.sideBox{background:rgba(255,255,255,.065);border:1px solid var(--line);border-radius:20px;padding:12px;margin-bottom:10px}
+#coach{background:rgba(255,230,91,.10);border:1px solid rgba(255,230,91,.26);border-radius:16px;padding:11px;font-weight:900;line-height:1.45}
+.choice{width:100%;margin-top:8px;min-height:54px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:#fff;text-align:left;padding:12px;font-size:15px;font-weight:900}
+.choice.correct{background:rgba(116,255,174,.16);border-color:var(--green)}.choice.wrong{background:rgba(255,92,120,.16);border-color:var(--red)}
+.stageList,.badgeList{display:grid;gap:8px}.stageItem,.badgeItem{background:rgba(255,255,255,.075);border:1px solid var(--line);border-radius:16px;padding:10px;font-weight:900}
+.stageItem.active{border-color:var(--yellow);background:rgba(255,230,91,.13)}.stageItem.done,.badgeItem.done{border-color:var(--green);background:rgba(116,255,174,.12)}
+.log{max-height:140px;overflow:auto;background:rgba(0,0,0,.20);border-radius:14px;padding:9px;font-size:.92rem}.log p{margin:0 0 7px}
+.bottomControls{display:none;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px -6px -6px;padding:8px;background:rgba(7,9,22,.84);backdrop-filter:blur(14px);border-top:1px solid var(--line);border-radius:20px 20px 0 0;position:sticky;bottom:0;z-index:25}
+.cert{display:none;text-align:center;border:2px solid var(--yellow);padding:16px;margin-top:12px}.cert input{width:100%;max-width:360px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.2);color:#fff;text-align:center}
+.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);padding:14px;margin-top:12px}.footer a{color:var(--cyan);text-decoration:none;font-weight:1000}
+
+.tabBar{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:10px;
+}
+.tabBtn{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:11px 10px;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  font-weight:1000;
+}
+.tabBtn.active{
+  background:linear-gradient(135deg,var(--yellow),#fff7bf);
+  color:#241700;
+  border-color:rgba(255,230,91,.75);
+}
+.tabPanel{display:none}
+.tabPanel.active{display:block}
+.aboutHero{
+  background:linear-gradient(135deg,rgba(85,247,255,.12),rgba(255,95,203,.10));
+  border:1px solid rgba(85,247,255,.22);
+  border-radius:18px;
+  padding:13px;
+  line-height:1.55;
+}
+.aboutHero b{color:var(--yellow)}
+.learnGrid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-top:10px;
+}
+.learnCard{
+  background:rgba(255,255,255,.075);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:10px;
+  line-height:1.45;
+}
+.learnCard b{color:var(--cyan)}
+.rulesList{
+  margin:8px 0 0;
+  padding-left:20px;
+  color:var(--muted);
+  line-height:1.55;
+}
+.rulesList li{margin-bottom:6px}
+@media(max-width:760px){
+  .tabBtn{padding:10px 8px;font-size:14px}
+}
+
+@media(max-width:1120px){.layout{grid-template-columns:1fr}.hero:after{display:none}}
+@media(max-width:760px){
+ .app{padding:6px}.card{border-radius:22px}.hero,.side,.gameCard{padding:8px}h1{font-size:1.52rem}.sub{font-size:.92rem}.btn{padding:11px 12px;min-height:46px;font-size:14px}
+ .hud{grid-template-columns:repeat(4,1fr);gap:6px}.hudItem{min-height:58px;border-radius:16px}.hudItem b{font-size:1.05rem}.hudItem span{font-size:.62rem}
+ #arena{height:620px;border-radius:22px}.player{width:88px;height:88px;font-size:46px}.obj{width:96px;height:96px;border-radius:26px}.obj .emoji{font-size:42px}.obj .label{font-size:11px}.obj.microObj{width:108px;height:108px;border-radius:30px}.obj.microObj .emoji{font-size:48px}
+ .topStrip{flex-direction:column;align-items:flex-start}.pill{font-size:.74rem;padding:7px 9px}.bottomControls{display:grid}
+}
+@media(max-width:430px){#arena{height:580px}.obj{width:86px;height:86px}.obj .emoji{font-size:37px}.obj .label{font-size:10px}.player{width:78px;height:78px;font-size:40px}.microCircle{padding:38px}}
+</style>
+</head>
+<body>
+<div class="app">
+<section class="hero card">
+  <div class="chip">⚔️ PRO V2 • BIG OBJECTS • CLEAR LANES</div>
+  <h1>Onion Ninja Pro: Microscope Slice</h1>
+  <p class="sub">Action-based science game with clear lanes, bigger objects, microscope missions, learning checkpoints, rules, and a dedicated About Game tab.</p>
+  <div class="controls">
+    <button class="btn yellow" onclick="Ninja.start()">🎮 Start Game</button>
+    <button class="btn pink" onclick="Ninja.action()">⚡ Slice / Action</button>
+    <button class="btn dark" onclick="Ninja.pause()">⏸ Pause</button>
+    <button class="btn dark" onclick="Ninja.toggleVoice()" id="voiceBtn">🔊 Voice ON</button>
+  </div>
+</section>
+
+<section class="layout">
+<main class="gameCard card">
+  <div class="hud">
+    <div class="hudItem"><div><b id="score">0</b><span>Score</span></div></div>
+    <div class="hudItem"><div><b id="goal">0/7</b><span>Goal</span></div></div>
+    <div class="hudItem"><div><b id="combo">x1</b><span>Combo</span></div></div>
+    <div class="hudItem"><div><b id="timer">60</b><span>Time</span></div></div>
+  </div>
+  <div id="arena">
+    <div class="track"><div class="lane" id="lane0"></div><div class="lane" id="lane1"></div><div class="lane" id="lane2"></div></div>
+    <div class="topStrip"><div class="pill" id="stagePill">Stage 1: Peel Slice</div><div class="pill" id="tipPill">Slice yellow onion peels. Avoid grey dust.</div></div>
+    <div class="player" id="player">⚔️</div>
+    <div class="focusPanel" id="focusPanel">
+      <h2>🔬 Focus Ninja</h2>
+      <p>Hit Action when the needle is in the green zone.</p>
+      <div class="focusTrack"><div class="needle" id="needle"></div></div>
+    </div>
+    <div class="microPanel" id="microPanel">
+      <h2>Microscope World</h2>
+      <div class="microCircle" id="microCircle"></div>
+    </div>
+    <div class="startOverlay" id="startOverlay">
+      <div class="startBox">
+        <h2>⚔️ Onion Ninja Pro</h2>
+        <p>Objects are now larger and slower. Move left/right lane and slice clean onion peels. Avoid dust, bubbles and germs.</p>
+        <button class="btn yellow" onclick="Ninja.start()">Start Game</button>
+      </div>
+    </div>
+  </div>
+  <div class="bottomControls">
+    <button class="btn dark" onclick="Ninja.move(-1)">⬅️ Lane</button>
+    <button class="btn pink" onclick="Ninja.action()">⚡ Slice</button>
+    <button class="btn dark" onclick="Ninja.move(1)">Lane ➡️</button>
+  </div>
+</main>
+
+<aside class="side card">
+  <div class="tabBar">
+    <button class="tabBtn active" id="tabGameBtn" onclick="Ninja.showTab('game')">🎮 Game Panel</button>
+    <button class="tabBtn" id="tabAboutBtn" onclick="Ninja.showTab('about')">📘 About Game</button>
+  </div>
+
+  <div id="gameTab" class="tabPanel active">
+  <h2 id="sideTitle">Onion Ninja Pro</h2>
+  <div class="sideBox"><h3>🤖 Dr AI Guide</h3><p id="coach">Start the game. Objects are bigger and slower now.</p></div>
+  <div class="sideBox"><b>Live Mission</b><p id="story">Slice clean onion peels.</p><p><b>Status:</b> <span id="status">Ready.</span></p></div>
+  <div class="sideBox"><b id="questionHead">Science Checkpoint</b><p id="question">Checkpoint appears after each stage.</p><div id="options"></div></div>
+  <div class="sideBox"><b>Science Result</b><p id="concept">Slice action teaches onion peel and microscope observation.</p></div>
+  <div class="sideBox"><h3>✅ Stages</h3><div class="stageList" id="stageList"></div></div>
+  <div class="sideBox"><h3>🏅 Badges</h3><div class="badgeList" id="badgeList"></div></div>
+  <div class="sideBox"><b>Game Log</b><div class="log" id="log"></div></div>
+  </div>
+
+  <div id="aboutTab" class="tabPanel">
+    <h2>📘 About This Game</h2>
+    <div class="aboutHero">
+      <b>Onion Ninja Pro: Microscope Slice</b> is an action-based science game where students play like a science ninja. 
+      They slice clean onion peels, avoid dust and bubbles, focus the microscope, identify onion cell parts, and complete a final germ challenge.
+      The game connects arcade action with real classroom science.
+    </div>
+
+    <div class="sideBox">
+      <h3>🎯 What is this game about?</h3>
+      <p>
+        This game is based on the onion peel microscope activity. Students learn how onion peel is prepared, why the peel should be thin, how a microscope helps us see cells, and what important parts of an onion cell look like.
+      </p>
+    </div>
+
+    <div class="sideBox">
+      <h3>🧠 What students will learn</h3>
+      <div class="learnGrid">
+        <div class="learnCard"><b>Thin onion peel:</b> A thin peel allows light to pass through, so cells can be seen clearly.</div>
+        <div class="learnCard"><b>Slide preparation:</b> Dust, folds and air bubbles make the microscope view unclear.</div>
+        <div class="learnCard"><b>Microscope focus:</b> A microscope helps us observe tiny cells that cannot be seen clearly with naked eyes.</div>
+        <div class="learnCard"><b>Onion cell parts:</b> Students identify the cell wall, nucleus and vacuole.</div>
+        <div class="learnCard"><b>Plant cell shape:</b> The cell wall gives onion cells a fixed box-like shape.</div>
+      </div>
+    </div>
+
+    <div class="sideBox">
+      <h3>🎮 How to play</h3>
+      <ul class="rulesList">
+        <li>Move left or right lane and slice only the correct objects.</li>
+        <li>Slice onion peels, cell parts and energy cards.</li>
+        <li>Avoid dust, air bubbles and germs.</li>
+        <li>Complete the target score of each stage.</li>
+        <li>Answer the science checkpoint question after every stage.</li>
+        <li>Complete all stages to unlock the certificate.</li>
+      </ul>
+    </div>
+
+    <div class="sideBox">
+      <h3>🕹️ Controls</h3>
+      <p><b>Desktop:</b> Left/Right Arrow or A/D to move. Space/Up Arrow to slice or action.</p>
+      <p><b>Mobile:</b> Tap/swipe on the game area or use the bottom lane/action buttons.</p>
+    </div>
+
+    <div class="sideBox">
+      <h3>🏆 Game stages</h3>
+      <ul class="rulesList">
+        <li><b>Stage 1:</b> Peel Slice — slice clean onion peels and avoid dust.</li>
+        <li><b>Stage 2:</b> Slide Dash — collect peels and avoid air bubbles.</li>
+        <li><b>Stage 3:</b> Focus Ninja — hit the green focus zone.</li>
+        <li><b>Stage 4:</b> Cell Slice — identify nucleus, cell wall and vacuole.</li>
+        <li><b>Stage 5:</b> Germ Boss — finish the final microscope challenge.</li>
+      </ul>
+    </div>
+  </div>
+</aside>
+</section>
+
+<section class="cert card" id="certificate">
+  <div style="font-size:54px">⚔️🧅🔬🏆</div>
+  <h2>Certificate of Onion Ninja Pro Mastery</h2>
+  <p>This certifies that</p>
+  <input placeholder="Enter Student Name">
+  <p>has completed <b>Onion Ninja Pro: Microscope Slice</b>.</p>
+  <p>Skills: onion peel • slide preparation • microscope focus • cell wall • nucleus • vacuole</p>
+  <p><b>Developed by Dr AI Academy</b></p>
+  <button class="btn yellow" onclick="window.print()">Print / Save Certificate</button>
+</section>
+
+<footer class="footer card"><div>Developed by <b>Dr AI Academy</b> • Onion Ninja Pro Game</div><div><a href="https://courses.draiacademy.com" target="_blank">AI Courses @ Dr AI Academy</a></div></footer>
+</div>
+
+<script>
+(function(){
+const arena=document.getElementById('arena');
+const stages=[
+ {name:'Peel Slice',badge:'🧅 Peel Ninja Badge',goal:6,time:50,tip:'Slice yellow onion peels. Avoid grey dust.',story:'Clean onion peels are falling slowly in lanes. Slice only peels.',q:'Why should onion peel be thin?',a:'So light can pass and cells can be seen',o:['So light can pass and cells can be seen','To make it heavy','To hide the cells'],c:'A thin peel lets light pass through, so cells are visible.'},
+ {name:'Slide Dash',badge:'🧫 Slide Dash Badge',goal:6,time:50,tip:'Collect peels. Avoid blue bubbles.',story:'Collect peels for slide preparation and avoid bubbles.',q:'What should be avoided while preparing a slide?',a:'Air bubbles and folds',o:['Air bubbles and folds','Clean cover slip','Thin specimen'],c:'Air bubbles and folds make microscope view unclear.'},
+ {name:'Focus Ninja',badge:'🔬 Focus Ninja Badge',goal:4,time:45,tip:'Action in green zone.',story:'Hit the focus point like a ninja.',q:'Which instrument helps us see onion cells?',a:'Microscope',o:['Microscope','Thermometer','Magnet'],c:'A microscope magnifies tiny onion cells.'},
+ {name:'Cell Slice',badge:'🧬 Cell Slice Badge',goal:8,time:55,tip:'Slice BIG cell parts in front. Avoid germs.',story:'Inside microscope, slice useful cell parts and avoid germs.',q:'Which part gives onion cell fixed shape?',a:'Cell wall',o:['Cell wall','Wing','Leg'],c:'The cell wall gives plant cells a regular shape.'},
+ {name:'Germ Boss',badge:'🏆 Onion Ninja Champion',goal:9,time:55,tip:'Slice BIG energy cards. Avoid germs.',story:'Final boss is attacking the microscope view.',q:'Onion peel cells usually look like:',a:'Brick-like boxes',o:['Brick-like boxes','Flying birds','Round footballs only'],c:'Onion peel cells are usually brick-like plant cells.'}
+];
+const G={stage:0,score:0,goal:0,combo:1,time:60,badges:{},running:false,paused:false,checkpoint:false,voice:true,lane:1,timer:null,spawn:null,focus:0,focusDir:1,focusLoop:null,swiping:false};
+const lanes=[16.66,50,83.33];
+function $(id){return document.getElementById(id)}
+function say(t){if(!G.voice)return;try{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='en-IN';u.rate=.94;speechSynthesis.speak(u)}catch(e){}}
+function coach(t){$('coach').textContent=t;say(t)}
+function log(t){$('log').innerHTML='<p>'+t+'</p>'+$('log').innerHTML}
+function tone(f=900,d=90){try{const C=window.AudioContext||window.webkitAudioContext,ctx=new C(),o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=f;g.gain.value=.055;o.connect(g);g.connect(ctx.destination);o.start();setTimeout(()=>{o.stop();ctx.close()},d)}catch(e){}}
+function pop(t){let d=document.createElement('div');d.className='comboPop';d.textContent=t;arena.appendChild(d);setTimeout(()=>d.remove(),700)}
+function drawHUD(){
+ let s=stages[G.stage];
+ $('score').textContent=G.score;$('goal').textContent=G.goal+'/'+s.goal;$('combo').textContent='x'+G.combo;$('timer').textContent=G.time;
+ $('stagePill').textContent='Stage '+(G.stage+1)+': '+s.name;$('tipPill').textContent=s.tip;$('sideTitle').textContent=s.name;$('story').textContent=s.story;
+ $('player').style.left=lanes[G.lane]+'%';
+ for(let i=0;i<3;i++)$('lane'+i).classList.toggle('active',i===G.lane);
+ drawStages();drawBadges();
+}
+function drawStages(){let h='';stages.forEach((s,i)=>h+=`<div class="stageItem ${G.stage===i?'active':''} ${G.badges[i]?'done':''}">${G.badges[i]?'✅':'⚔️'} ${s.name}</div>`);$('stageList').innerHTML=h}
+function drawBadges(){let h='';stages.forEach((s,i)=>h+=`<div class="badgeItem ${G.badges[i]?'done':''}">${G.badges[i]?s.badge:'🔒 '+s.badge}</div>`);$('badgeList').innerHTML=h}
+function clearObjs(){document.querySelectorAll('.obj').forEach(o=>o.remove())}
+function start(){
+ stop();G.stage=0;G.score=0;G.goal=0;G.combo=1;G.badges={};G.running=true;G.paused=false;G.checkpoint=false;G.lane=1;
+ $('certificate').style.display='none';$('startOverlay').style.display='none';$('options').innerHTML='';
+ log('<b>Game started:</b> Onion Ninja Pro is live.');coach('Objects are bigger and slower now. Slice clean peels.');beginStage();
+}
+function beginStage(){
+ stop();clearObjs();G.goal=0;G.combo=1;G.time=stages[G.stage].time;G.running=true;G.paused=false;G.checkpoint=false;
+ $('focusPanel').style.display=G.stage===2?'block':'none';$('microPanel').style.display=G.stage>=3?'block':'none';buildCells();
+ $('question').textContent='Play the stage first.';$('status').textContent='Playing '+stages[G.stage].name;$('concept').textContent=stages[G.stage].story;
+ if(G.stage===2)focusStart();else G.spawn=setInterval(spawnObj,980);
+ G.timer=setInterval(()=>{if(!G.paused&&!G.checkpoint){G.time--;if(G.time<=0){if(G.goal>0)stageClear();else G.time=stages[G.stage].time}drawHUD()}},1000);drawHUD();
+}
+function stop(){clearInterval(G.timer);clearInterval(G.spawn);clearInterval(G.focusLoop)}
+function pause(){G.paused=!G.paused;coach(G.paused?'Paused.':'Resumed.')}
+function move(dir){G.lane=Math.max(0,Math.min(2,G.lane+dir));drawHUD()}
+function spawnObj(){
+ if(G.paused||G.checkpoint)return;
+ let s=G.stage,good=true,emoji='🧅',label='PEEL';
+ if(s===0){good=Math.random()>.22;emoji=good?'🧅':'💨';label=good?'PEEL':'DUST'}
+ if(s===1){good=Math.random()>.25;emoji=good?'🧅':'🫧';label=good?'PEEL':'BUBBLE'}
+ if(s===3){good=Math.random()>.25;let parts=[['🟣','NUCLEUS'],['🧱','WALL'],['💧','VACUOLE']];let p=parts[Math.floor(Math.random()*parts.length)];emoji=good?p[0]:'🦠';label=good?p[1]:'GERM'}
+ if(s===4){good=Math.random()>.18;emoji=good?'⚡':'🦠';label=good?'ENERGY':'GERM'}
+ let lane=Math.floor(Math.random()*3);
+ let el=document.createElement('button');
+ el.className='obj '+(good?'good':'bad')+(s>=3?' microObj':'');
+ el.innerHTML=`<div><div class="emoji">${emoji}</div><div class="label">${label}</div></div>`;
+ el.dataset.good=good?'1':'0';el.dataset.label=label;el.style.left=lanes[lane]+'%';el.style.top='-130px';
+ arena.appendChild(el);
+ let dur=5200-Math.min(1400,G.stage*260);
+ el.animate([{top:'-130px'},{top:(arena.clientHeight+80)+'px'}],{duration:dur,easing:'linear'});
+ setTimeout(()=>el.classList.add('warning'),dur-1400);
+ let check=setInterval(()=>{if(!el.parentNode){clearInterval(check);return}let r=el.getBoundingClientRect(),pr=$('player').getBoundingClientRect();if(!(r.right<pr.left||r.left>pr.right||r.bottom<pr.top||r.top>pr.bottom)){hitObj(el);clearInterval(check)}},70);
+ setTimeout(()=>{if(el.parentNode){el.remove();clearInterval(check);if(good){G.combo=1;drawHUD()}}},dur+100);
+}
+function hitObj(el){
+ let good=el.dataset.good==='1',label=el.dataset.label;el.remove();
+ if(good){G.goal++;G.score+=65*G.combo;G.combo=Math.min(9,G.combo+1);tone(950);pop('SLICE '+label+'!')}
+ else{G.score=Math.max(0,G.score-45);G.combo=1;tone(180);pop('AVOID '+label)}
+ if(G.goal>=stages[G.stage].goal)stageClear();drawHUD();
+}
+function action(){if(G.stage===2&&!G.checkpoint&&!G.paused){if(G.focus>38&&G.focus<62){G.goal++;G.score+=100;G.combo=Math.min(9,G.combo+1);tone(950);pop('PERFECT FOCUS')}else{G.score=Math.max(0,G.score-30);G.combo=1;tone(160);pop('BLUR!')}if(G.goal>=stages[G.stage].goal)stageClear();drawHUD()}else{sliceLane()}}
+function sliceLane(){let pr=$('player').getBoundingClientRect();document.querySelectorAll('.obj').forEach(el=>{let r=el.getBoundingClientRect();if(Math.abs((r.left+r.right)/2-(pr.left+pr.right)/2)<95 && r.bottom>80 && r.top<arena.clientHeight-70)hitObj(el)});drawSlice()}
+function drawSlice(){let s=document.createElement('div');s.className='slice';s.style.left=(lanes[G.lane]*arena.clientWidth/100-105)+'px';s.style.top=(arena.clientHeight-170)+'px';s.style.width='210px';s.style.transform='rotate(-18deg)';arena.appendChild(s);setTimeout(()=>s.remove(),350)}
+function focusStart(){G.focus=0;G.focusDir=1;G.focusLoop=setInterval(()=>{if(G.paused||G.checkpoint)return;G.focus+=G.focusDir*2.4;if(G.focus>=100){G.focus=100;G.focusDir=-1}if(G.focus<=0){G.focus=0;G.focusDir=1}$('needle').style.left='calc('+G.focus+'% - 8px)'},35)}
+function stageClear(){if(G.checkpoint)return;G.checkpoint=true;stop();clearObjs();G.badges[G.stage]=true;G.score+=260;pop(stages[G.stage].badge);log('<b>Badge:</b> '+stages[G.stage].badge);showQuestion()}
+function showQuestion(){let s=stages[G.stage];$('questionHead').textContent='Science Checkpoint: '+s.name;$('question').textContent=s.q;$('status').textContent=s.badge+' unlocked. Answer checkpoint.';$('concept').textContent=s.c;let h='';s.o.forEach((o,i)=>h+=`<button class="choice" onclick="Ninja.answer(${i})">${o}</button>`);$('options').innerHTML=h;coach('Stage clear. Answer checkpoint to continue.');drawHUD()}
+function answer(i){let s=stages[G.stage],ans=s.o[i],correct=ans===s.a;document.querySelectorAll('.choice').forEach((b,idx)=>{if(s.o[idx]===s.a)b.classList.add('correct');else if(idx===i&&!correct)b.classList.add('wrong');b.disabled=true});if(correct){G.score+=120;$('concept').textContent=s.c}else{G.score=Math.max(0,G.score-25);$('concept').textContent='Correct answer: '+s.a+'. '+s.c}drawHUD();setTimeout(nextStage,800)}
+function nextStage(){G.stage++;if(G.stage>=stages.length){finish();return}beginStage()}
+function finish(){stop();clearObjs();G.running=false;$('certificate').style.display='block';$('certificate').scrollIntoView({behavior:'smooth'});coach('Onion Ninja Pro completed. Certificate unlocked.')}
+function buildCells(){let h='';for(let i=0;i<25;i++)h+='<div class="cell"></div>';$('microCircle').innerHTML=h}
+function showTab(tab){
+ const game=tab==='game';
+ $('gameTab').classList.toggle('active',game);
+ $('aboutTab').classList.toggle('active',!game);
+ $('tabGameBtn').classList.toggle('active',game);
+ $('tabAboutBtn').classList.toggle('active',!game);
+}
+function toggleVoice(){G.voice=!G.voice;$('voiceBtn').textContent=G.voice?'🔊 Voice ON':'🔇 Voice OFF'}
+arena.addEventListener('pointerdown',e=>{G.swiping=true;let r=arena.getBoundingClientRect();let x=e.clientX-r.left;G.lane=x<r.width/3?0:x<2*r.width/3?1:2;drawHUD();sliceLane()});
+arena.addEventListener('pointermove',e=>{if(!G.swiping)return;let r=arena.getBoundingClientRect();let x=e.clientX-r.left;G.lane=x<r.width/3?0:x<2*r.width/3?1:2;drawHUD();sliceLane()});
+arena.addEventListener('pointerup',()=>G.swiping=false);
+document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')move(-1);if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')move(1);if(e.key===' '||e.key==='ArrowUp')action()});
+window.Ninja={start,pause,move,action,answer,toggleVoice,showTab};
+buildCells();drawHUD();
+})();
+</script>
+</body>
+</html>
